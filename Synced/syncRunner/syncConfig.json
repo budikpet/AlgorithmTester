@@ -1,0 +1,11 @@
+{
+	"sharedDirs": {
+		"local": "/home/petr/Documents/LocalShared",
+		"global": "/mnt/hgfs/Shared/PythonProjects/Synced"
+	},
+	"exclude": [
+		"venv",
+		"__pycache__"
+	],
+	"freezePythonDeps": true
+}
