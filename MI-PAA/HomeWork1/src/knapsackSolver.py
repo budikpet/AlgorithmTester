@@ -1,6 +1,6 @@
 import click
 import os
-from myDataClasses import Task, Solution
+from myDataClasses import Task, Solution, Thing
 import solverStrategy
 from solverStrategy import Strategies
 
@@ -9,12 +9,16 @@ from solverStrategy import Strategies
 @click.option("-s", "--strategy", type=click.Choice([Strategies.BruteForce.name, Strategies.BranchBorder.name]), default=Strategies.BruteForce.name)
 def knapsackSolver(datafile, strategy):
     data = datafile.readline()
-    context = solverStrategy.Context(Strategies[strategy])
+    context = solverStrategy.Context(Strategies[strategy].value)
     solutions = list()
 
     while data:
         values = data.split(" ")
-        task = Task(id=values.pop(0), count=values.pop(0), capacity=values.pop(0), minValue=values.pop(0), thingValues=values)
+        id, count, capacity, minValue = values.pop(0), values.pop(0), values.pop(0), values.pop(0)
+        it = iter(values)
+        things = [Thing(cost, weight) for (cost, weight) in list(zip(it, it))]
+
+        task = Task(id=id, count=count, capacity=capacity, minValue=minValue, things=things)
 
         solution = context.solve(task)
         print(solution)

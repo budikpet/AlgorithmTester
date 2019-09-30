@@ -12,8 +12,8 @@
                 "--dataFile", "${workspaceFolder}/HomeWork1/data/NR/NR4_inst.dat",
                 // "-s", "BranchBorder"
             ],
-            // "program": "${workspaceFolder}/HomeWork1/src/knapsackSolver.py",
-            "program": "${file}",
+            "program": "${workspaceFolder}/HomeWork1/src/knapsackSolver.py",
+            // "program": "${file}",
             "console": "integratedTerminal"
         }
     ]

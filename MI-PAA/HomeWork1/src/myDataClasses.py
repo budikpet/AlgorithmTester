@@ -1,16 +1,21 @@
 from dataclasses import dataclass
 
 @dataclass
+class Thing:
+    cost: int
+    weight: int
+
+@dataclass
 class Task:
     id: int
     count: int
     capacity: int
     minValue: int
-    thingValues: [int]
+    things: [int]
 
 @dataclass
 class Solution:
     id: int
     count: int
-    bestValue: int
+    maxValue: int
     things: [int]
