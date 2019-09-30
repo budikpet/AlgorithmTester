@@ -2,12 +2,14 @@ import click
 import os
 from myDataClasses import Task, Solution
 import solverStrategy
+from solverStrategy import Strategies
 
 @click.command()
 @click.option("--dataFile", type=click.File("r"), required=True)
-def knapsackSolver(datafile):
+@click.option("-s", "--strategy", type=click.Choice([Strategies.BruteForce.name, Strategies.BranchBorder.name]), default=Strategies.BruteForce.name)
+def knapsackSolver(datafile, strategy):
     data = datafile.readline()
-    context = solverStrategy.Context(solverStrategy.BranchBorder())
+    context = solverStrategy.Context(Strategies[strategy])
     solutions = list()
 
     while data:

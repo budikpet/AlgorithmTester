@@ -1,4 +1,5 @@
 from myDataClasses import Task, Solution
+from enum import Enum
 
 class Context():
 
@@ -27,3 +28,7 @@ class BranchBorder(SolverStrategy):
         print(f"BranchBorder#{task.id} solving.")
 
         return Solution(-1, -1, -1, [])
+
+class Strategies(Enum):
+    BruteForce = BruteForce()
+    BranchBorder = BranchBorder()
