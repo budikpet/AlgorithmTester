@@ -14,9 +14,9 @@ def knapsackSolver(datafile, strategy):
 
     while data:
         values = data.split(" ")
-        id, count, capacity, minValue = values.pop(0), values.pop(0), values.pop(0), values.pop(0)
+        id, count, capacity, minValue = int(values.pop(0)), int(values.pop(0)), int(values.pop(0)), int(values.pop(0))
         it = iter(values)
-        things = [Thing(cost, weight) for (cost, weight) in list(zip(it, it))]
+        things = [Thing(int(weight), int(cost)) for (weight, cost) in list(zip(it, it))]
 
         task = Task(id=id, count=count, capacity=capacity, minValue=minValue, things=things)
 

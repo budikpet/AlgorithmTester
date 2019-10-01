@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 @dataclass
 class Thing:
-    cost: int
     weight: int
+    cost: int
 
 @dataclass
 class Task:
@@ -11,11 +12,17 @@ class Task:
     count: int
     capacity: int
     minValue: int
-    things: [int]
+    things: List[Thing] = field(default_factory=list)
 
 @dataclass
 class Solution:
     id: int
     count: int
     maxValue: int
-    things: [int]
+    things: [int] = field(default_factory=list)
+
+    def __str__(self):
+        return f'{abs(self.id)} {self.count} {self.maxValue} {" ".join(map(str, self.things))}'
+
+    def __repr__(self):
+        return self.__str__()
