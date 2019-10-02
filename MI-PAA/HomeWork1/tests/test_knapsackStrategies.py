@@ -1,7 +1,9 @@
 import os
 import re
-import knapsackSolver
+from knapsackSolver import knapsackSolver
+from solverStrategy import Strategies
 from myDataClasses import Solution
+from click.testing import CliRunner
 
 class FilePair:
     def __init__(self, file1, file2):
@@ -34,11 +36,32 @@ def getFiles(path: str):
 
     return result
 
+def checkFile(cliRunner, filePair: FilePair, strategy):
+    print(f"Testing file: {filePair.dataFile}")
+    solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "-s", strategy]).output.split("\n")
+
+    # Check values
+    with open(filePair.solutionFile, "r") as solutionFile:
+        for solution in solutions:
+            if solution == "":
+                break
+            line = solutionFile.readline().split(" ")
+            assert line[2] == solution.split(" ")[2]
+
 def test_bruteForce():
     path = './HomeWork1/data'
+    cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')
+    dataFiles = getFiles(f'{path}/NR')[0:2]
     
     for filePair in dataFiles:
-        # Run knapsackSolver and check against solution
-        print
+        checkFile(cliRunner, filePair, Strategies.BruteForce.name)
+
+def test_branchBorder():
+    path = './HomeWork1/data'
+    cliRunner = CliRunner()
+
+    dataFiles = getFiles(f'{path}/NR')[0:2]
+    
+    for filePair in dataFiles:
+        checkFile(cliRunner, filePair, Strategies.BranchBorder.name)
