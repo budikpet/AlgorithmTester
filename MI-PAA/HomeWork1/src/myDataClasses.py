@@ -19,10 +19,11 @@ class Solution:
     id: int
     count: int
     maxValue: int
+    numberOfConfigurations: int
     things: [int] = field(default_factory=list)
 
     def __str__(self):
-        return f'{abs(self.id)} {self.count} {self.maxValue} {" ".join(map(str, self.things))}'
+        return f'{abs(self.id)} {self.count} {self.maxValue} {self.numberOfConfigurations} {" ".join(map(str, self.things))}'
 
     def __repr__(self):
         return self.__str__()

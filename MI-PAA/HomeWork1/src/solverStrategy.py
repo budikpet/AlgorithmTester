@@ -7,12 +7,13 @@ class RecursiveResult:
     remainingCapacity: int
     maxValue: int
     things: [int]
+    numberOfConfigurations: int     # Number of final solutions that were visited
 
-    def newSolution(self, thing: Thing = None):
+    def newSolution(self, thing: Thing = None, configurationsToAdd: int = 0):
         if thing is not None:
-            return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, self.things + [1])
+            return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, self.things + [1], self.numberOfConfigurations + configurationsToAdd)
         else:
-            return RecursiveResult(self.remainingCapacity, self.maxValue, self.things + [0])
+            return RecursiveResult(self.remainingCapacity, self.maxValue, self.things + [0], self.numberOfConfigurations + configurationsToAdd)
 
 class Context():
 
@@ -35,32 +36,36 @@ class BruteForce(SolverStrategy):
         if thingAtIndex >= task.count - 1:
             # Last thing
             if currThing.weight <= currState.remainingCapacity:
-                return currState.newSolution(currThing)
+                return currState.newSolution(currThing, configurationsToAdd=1)
             else:
-                return currState.newSolution()
+                return currState.newSolution(configurationsToAdd=1)
         
         # Check all possibilities
         if currThing.weight <= currState.remainingCapacity:
             # Can add current thing
             resultAdded = self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution(currThing))
             resultNotAdded = self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution())
-            return (resultAdded if resultAdded.maxValue >= resultNotAdded.maxValue else resultNotAdded)
+            
+            if resultAdded.maxValue >= resultNotAdded.maxValue:
+                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations)
+            else:
+                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations)
         
         return self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution())
     
     def solve(self, task: Task) -> Solution:
         # print(f"BruteForce#{task.id} solving.")
 
-        result = self.recursiveSolve(task, 0, RecursiveResult(task.capacity, 0, list()))
+        result = self.recursiveSolve(task, 0, RecursiveResult(task.capacity, 0, list(), 0))
 
-        return Solution(task.id, task.count, result.maxValue, result.things)
+        return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
 
 class BranchBorder(SolverStrategy):
     
     def solve(self, task: Task) -> Solution:
         print(f"BranchBorder#{task.id} solving.")
 
-        return Solution(-1, -1, -1, [])
+        return Solution(-1, -1, -1, [], 0)
 
 class Strategies(Enum):
     BruteForce = BruteForce()
