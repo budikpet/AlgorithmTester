@@ -9,11 +9,17 @@ class RecursiveResult:
     things: [int]
     numberOfConfigurations: int     # Number of final solutions that were visited
 
-    def newSolution(self, thing: Thing = None, configurationsToAdd: int = 0):
+    def newSolution(self, thing: Thing = None, configurationsToAdd: int = 0, thingAdded = True):
+        things = self.things
+        
         if thing is not None:
-            return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, self.things + [1], self.numberOfConfigurations + configurationsToAdd)
+            if thingAdded:
+                things = things + [1]
+            return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, things, self.numberOfConfigurations + configurationsToAdd)
         else:
-            return RecursiveResult(self.remainingCapacity, self.maxValue, self.things + [0], self.numberOfConfigurations + configurationsToAdd)
+            if thingAdded:
+                things = things + [0]
+            return RecursiveResult(self.remainingCapacity, self.maxValue, things, self.numberOfConfigurations + configurationsToAdd)
 
 class Context():
 
@@ -38,7 +44,7 @@ class BruteForce(SolverStrategy):
             if currThing.weight <= currState.remainingCapacity:
                 return currState.newSolution(currThing, configurationsToAdd=1)
             else:
-                return currState.newSolution(configurationsToAdd=1)
+                return  currState.newSolution(configurationsToAdd=1)
         
         # Check all possibilities
         if currThing.weight <= currState.remainingCapacity:
@@ -47,9 +53,9 @@ class BruteForce(SolverStrategy):
             resultNotAdded = self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution())
             
             if resultAdded.maxValue >= resultNotAdded.maxValue:
-                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations)
+                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations, thingAdded=False)
             else:
-                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations)
+                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations, thingAdded=False)
         
         return self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution())
     
