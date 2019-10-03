@@ -21,6 +21,8 @@ def knapsackSolver(datafile, strategy):
         task = Task(id=id, count=count, capacity=capacity, minValue=minValue, things=things)
 
         solution = context.solve(task)
+        
+        # Print necessery for unit tests
         print(solution)
         solutions.append(solution)
 

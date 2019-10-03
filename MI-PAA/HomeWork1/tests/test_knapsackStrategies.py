@@ -47,6 +47,7 @@ def checkFile(cliRunner, filePair: FilePair, strategy):
                 break
             line = solutionFile.readline().split(" ")
             assert line[2] == solution.split(" ")[3]
+            print
 
 def test_bruteForce_NR():
     path = './HomeWork1/data'
@@ -61,7 +62,7 @@ def test_branchBorder_NR():
     path = './HomeWork1/data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NR')[0:5]
     
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.BranchBorder.name)

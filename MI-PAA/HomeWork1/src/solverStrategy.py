@@ -82,7 +82,7 @@ class BranchBorder(SolverStrategy):
             # Can add current thing
             resultAdded = self.recursiveSolve(task, maximumSums, thingAtIndex + 1, currState.newSolution(currThing))
             
-            if resultAdded.maxValue >= maximumSums[thingAtIndex + 1]:
+            if resultAdded.maxValue >= currState.maxValue + maximumSums[thingAtIndex + 1]:
                 # The maxValue of the entire branch where this item was not added is not high enough
                 # so we do not need to check it
                 return resultAdded
@@ -90,9 +90,9 @@ class BranchBorder(SolverStrategy):
             resultNotAdded = self.recursiveSolve(task, maximumSums, thingAtIndex + 1, currState.newSolution())
             
             if resultAdded.maxValue >= resultNotAdded.maxValue:
-                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations)
+                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations, thingAdded=False)
             else:
-                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations)
+                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations, thingAdded=False)
         
         # Current thing too heavy
         return self.recursiveSolve(task, maximumSums, thingAtIndex + 1, currState.newSolution())
@@ -101,7 +101,7 @@ class BranchBorder(SolverStrategy):
         # print(f"BranchBorder#{task.id} solving.")
 
         # Sort things by cost/weight comparison
-        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
+        # task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBorder alg.
         maximumSums = list()
@@ -110,6 +110,7 @@ class BranchBorder(SolverStrategy):
             currSum += thing.cost
             maximumSums.append(currSum)
 
+        maximumSums = list(reversed(maximumSums))
         result = self.recursiveSolve(task, maximumSums, 0, RecursiveResult(task.capacity, 0, list(), 0))
 
         return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
