@@ -2,16 +2,18 @@ import click
 import os
 from myDataClasses import Task, Solution, Thing
 import solverStrategy
-from solverStrategy import Strategies
+from solverStrategy import Strategies, Modes
 
 inputStrategies = [strategy.name for strategy in Strategies]
+inputModes = [mode.name for mode in Modes]
 
 @click.command()
 @click.option("--dataFile", type=click.File("r"), required=True)
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0])
-def knapsackSolver(datafile, strategy):
+@click.option("--mode", type=click.Choice(inputModes), default=inputModes[0])
+def knapsackSolver(datafile, strategy, mode):
     data = datafile.readline()
-    context = solverStrategy.Context(Strategies[strategy].value)
+    context = solverStrategy.Context(Modes[mode], Strategies[strategy].value)
     solutions = list()
 
     while data:
