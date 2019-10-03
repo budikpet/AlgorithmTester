@@ -32,6 +32,7 @@ class SolverStrategy(object):
 
 
 class BruteForce(SolverStrategy):
+    """ Uses Brute force  """
 
     def recursiveSolve(self, task: Task, thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
         currThing = task.things[thingAtIndex]
@@ -63,6 +64,16 @@ class BruteForce(SolverStrategy):
         return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
 
 class BranchBound(SolverStrategy):
+    """ Uses BranchBound algorithm. """
+
+    def getMaxSumsTuple(self, task: Task):
+        maximumSums = list()
+        currSum = 0
+        for thing in reversed(task.things):
+            currSum += thing.cost
+            maximumSums.append(currSum)
+
+        return tuple(reversed(maximumSums))
     
     def recursiveSolve(self, task: Task, maximumSums: (int), thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
         currThing = task.things[thingAtIndex]
@@ -100,17 +111,24 @@ class BranchBound(SolverStrategy):
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
-        maximumSums = list()
-        currSum = 0
-        for thing in reversed(task.things):
-            currSum += thing.cost
-            maximumSums.append(currSum)
-
-        maximumSums = tuple(reversed(maximumSums))
+        maximumSums = self.getMaxSumsTuple(task)
         result = self.recursiveSolve(task, maximumSums, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things], 0))
+
+        return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
+
+class UnsortedBranchBound(SolverStrategy):
+    """ Uses BranchBound algorithm without sorting the input first. """
+    def solve(self, task: Task) -> Solution:
+        # print(f"UnsortedBranchBound#{task.id} solving.")
+        solver = Strategies.BranchBound.value
+
+        # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
+        maximumSums = solver.getMaxSumsTuple(task)
+        result = solver.recursiveSolve(task, maximumSums, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things], 0))
 
         return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
 
 class Strategies(Enum):
     BruteForce = BruteForce()
     BranchBound = BranchBound()
+    UnsortedBranchBound = UnsortedBranchBound()

@@ -67,6 +67,15 @@ def test_branchBound_NR():
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.BranchBound.name)
 
+def test_unsortedBranchBound_NR():
+    path = './HomeWork1/data'
+    cliRunner = CliRunner()
+
+    dataFiles = getFiles(f'{path}/NR')[0:3]
+    
+    for filePair in dataFiles:
+        checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound.name)
+
 def test_bruteForce_ZR():
     path = './HomeWork1/data'
     cliRunner = CliRunner()
