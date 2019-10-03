@@ -53,7 +53,7 @@ def test_bruteForce_NR():
     path = './HomeWork1/data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NR')[0:3]
     
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.BruteForce.name)
@@ -62,7 +62,7 @@ def test_branchBound_NR():
     path = './HomeWork1/data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:5]
+    dataFiles = getFiles(f'{path}/NR')[0:3]
     
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.BranchBound.name)
@@ -80,7 +80,7 @@ def test_branchBound_ZR():
     path = './HomeWork1/data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/ZR')[0:2]
+    dataFiles = getFiles(f'{path}/ZR')[0:3]
     
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.BranchBound.name)

@@ -9,17 +9,13 @@ class RecursiveResult:
     things: [int]
     numberOfConfigurations: int     # Number of final solutions that were visited
 
-    def newSolution(self, thing: Thing = None, configurationsToAdd: int = 0, thingAdded = True):
-        things = self.things
-        
+    def newSolution(self, thing: Thing = None, configurationsToAdd: int = 0):        
         if thing is not None:
-            if thingAdded:
-                things = things + [1]
+            things = self.things
+            things[thing.position] = 1
             return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, things, self.numberOfConfigurations + configurationsToAdd)
         else:
-            if thingAdded:
-                things = things + [0]
-            return RecursiveResult(self.remainingCapacity, self.maxValue, things, self.numberOfConfigurations + configurationsToAdd)
+            return RecursiveResult(self.remainingCapacity, self.maxValue, self.things, self.numberOfConfigurations + configurationsToAdd)
 
 class Context():
 
@@ -44,7 +40,7 @@ class BruteForce(SolverStrategy):
             if currThing.weight <= currState.remainingCapacity:
                 return currState.newSolution(currThing, configurationsToAdd=1)
             else:
-                return  currState.newSolution(configurationsToAdd=1)
+                return currState.newSolution(configurationsToAdd=1)
         
         # Check all possibilities
         if currThing.weight <= currState.remainingCapacity:
@@ -53,22 +49,22 @@ class BruteForce(SolverStrategy):
             resultNotAdded = self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution())
             
             if resultAdded.maxValue >= resultNotAdded.maxValue:
-                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations, thingAdded=False)
+                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations)
             else:
-                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations, thingAdded=False)
+                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations)
         
         return self.recursiveSolve(task, thingAtIndex + 1, currState.newSolution())
     
     def solve(self, task: Task) -> Solution:
         # print(f"BruteForce#{task.id} solving.")
 
-        result = self.recursiveSolve(task, 0, RecursiveResult(task.capacity, 0, list(), 0))
+        result = self.recursiveSolve(task, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things], 0))
 
         return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
 
 class BranchBound(SolverStrategy):
     
-    def recursiveSolve(self, task: Task, maximumSums: [int], thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
+    def recursiveSolve(self, task: Task, maximumSums: (int), thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
         currThing = task.things[thingAtIndex]
         if thingAtIndex >= task.count - 1:
             # Last thing
@@ -90,9 +86,9 @@ class BranchBound(SolverStrategy):
             resultNotAdded = self.recursiveSolve(task, maximumSums, thingAtIndex + 1, currState.newSolution())
             
             if resultAdded.maxValue >= resultNotAdded.maxValue:
-                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations, thingAdded=False)
+                return resultAdded.newSolution(configurationsToAdd=resultNotAdded.numberOfConfigurations)
             else:
-                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations, thingAdded=False)
+                return resultNotAdded.newSolution(configurationsToAdd=resultAdded.numberOfConfigurations)
         
         # Current thing too heavy
         return self.recursiveSolve(task, maximumSums, thingAtIndex + 1, currState.newSolution())
@@ -101,7 +97,7 @@ class BranchBound(SolverStrategy):
         # print(f"BranchBound#{task.id} solving.")
 
         # Sort things by cost/weight comparison
-        # task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
+        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximumSums = list()
@@ -110,8 +106,8 @@ class BranchBound(SolverStrategy):
             currSum += thing.cost
             maximumSums.append(currSum)
 
-        maximumSums = list(reversed(maximumSums))
-        result = self.recursiveSolve(task, maximumSums, 0, RecursiveResult(task.capacity, 0, list(), 0))
+        maximumSums = tuple(reversed(maximumSums))
+        result = self.recursiveSolve(task, maximumSums, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things], 0))
 
         return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
 

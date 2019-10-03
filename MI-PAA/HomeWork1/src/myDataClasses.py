@@ -3,6 +3,7 @@ from typing import List
 
 @dataclass
 class Thing:
+    position: int
     weight: int
     cost: int
 
