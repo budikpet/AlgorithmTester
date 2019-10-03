@@ -10,7 +10,7 @@
             "request": "launch",
             "args": [
                 "--dataFile", "${workspaceFolder}/HomeWork1/data/NR/NR4_inst.dat",
-                "-s", "BranchBorder"
+                "-s", "BranchBound"
             ],
             "program": "${workspaceFolder}/HomeWork1/src/knapsackSolver.py",
             // "program": "${file}",

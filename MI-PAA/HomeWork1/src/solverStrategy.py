@@ -66,7 +66,7 @@ class BruteForce(SolverStrategy):
 
         return Solution(task.id, task.count, result.maxValue, result.numberOfConfigurations, result.things)
 
-class BranchBorder(SolverStrategy):
+class BranchBound(SolverStrategy):
     
     def recursiveSolve(self, task: Task, maximumSums: [int], thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
         currThing = task.things[thingAtIndex]
@@ -98,12 +98,12 @@ class BranchBorder(SolverStrategy):
         return self.recursiveSolve(task, maximumSums, thingAtIndex + 1, currState.newSolution())
     
     def solve(self, task: Task) -> Solution:
-        # print(f"BranchBorder#{task.id} solving.")
+        # print(f"BranchBound#{task.id} solving.")
 
         # Sort things by cost/weight comparison
         # task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
-        # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBorder alg.
+        # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximumSums = list()
         currSum = 0
         for thing in reversed(task.things):
@@ -117,4 +117,4 @@ class BranchBorder(SolverStrategy):
 
 class Strategies(Enum):
     BruteForce = BruteForce()
-    BranchBorder = BranchBorder()
+    BranchBound = BranchBound()
