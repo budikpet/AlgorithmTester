@@ -2,6 +2,12 @@
 
 source ../venv/bin/activate
 
+startWithFile=$1	# Which file should we start from (for example N4_inst
+algorithmToRun=$2	# 0 == BruteForce, 1 == UnsortedBranchBound, 2 == BranchBound
+endWithFile=$3""
+
+echo $algorithmToRun
+
 srcPath="./src"
 dataPath="./data"
 outputPath="./analysisOutput"
@@ -11,19 +17,32 @@ dataFiles=$(python $srcPath/helpers.py $dataPath"/NR")
 
 mkdir $outputPath
 
-counter=0
+startFileFound=0
 for f in $dataFiles
 do
     name=$(basename "$f" ".dat")
     echo $name
-    if [ $counter -le 4 ]
-    then
-        python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "BruteForce" >> $outputPath/$name"_BruteForce.dat"
-        echo $counter
-    fi
-
-    counter=$((counter+1))
     
-    python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "BranchBound" >> $outputPath/$name"_BranchBound.dat"
-    python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "UnsortedBranchBound" >> $outputPath/$name"_UnsortedBranchBound.dat"
+    if [ $startWithFile != $name ]  && [ $startFileFound -eq 0 ]
+    then
+    	continue
+    else
+    	startFileFound=1
+    fi
+    
+    if [ $endWithFile"_" = $name"_" ]
+    then
+    	break
+    fi
+    
+    if [ $algorithmToRun -eq 0 ]
+    then
+    	python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "BruteForce" >> $outputPath/$name"_BruteForce.dat"
+    elif [ $algorithmToRun -eq 1 ]
+    then
+    	python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "UnsortedBranchBound" >> $outputPath/$name"_UnsortedBranchBound.dat"
+    elif [ $algorithmToRun -eq 2 ]
+    then
+    	python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "BranchBound" >> $outputPath/$name"_BranchBound.dat"
+    fi
 done
