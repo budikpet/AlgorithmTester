@@ -16,7 +16,7 @@ for f in $dataFiles
 do
     name=$(basename "$f" ".dat")
     echo $name
-    if [ $counter -le 5 ]
+    if [ $counter -le 4 ]
     then
         python $srcPath/knapsackSolver.py --dataFile $f --mode $MODE -s "BruteForce" >> $outputPath/$name"_BruteForce.dat"
         echo $counter
