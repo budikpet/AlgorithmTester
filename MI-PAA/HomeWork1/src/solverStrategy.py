@@ -1,6 +1,7 @@
 from myDataClasses import Task, Solution, Thing
 from dataclasses import dataclass
 from enum import Enum
+from copy import deepcopy
 
 @dataclass
 class RecursiveResult:
@@ -11,11 +12,11 @@ class RecursiveResult:
 
     def newSolution(self, thing: Thing = None, configurationsToAdd: int = 0):        
         if thing is not None:
-            things = self.things
+            things = deepcopy(self.things)
             things[thing.position] = 1
             return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, things, self.numberOfConfigurations + configurationsToAdd)
         else:
-            return RecursiveResult(self.remainingCapacity, self.maxValue, self.things, self.numberOfConfigurations + configurationsToAdd)
+            return RecursiveResult(self.remainingCapacity, self.maxValue, deepcopy(self.things), self.numberOfConfigurations + configurationsToAdd)
 
 class Context():
 
