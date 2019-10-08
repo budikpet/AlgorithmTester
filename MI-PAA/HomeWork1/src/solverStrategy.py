@@ -71,6 +71,9 @@ class BruteForce(SolverStrategy):
     def solve(self, mode: Modes, task: Task) -> Solution:
         # print(f"BruteForce#{task.id} solving.")
 
+        # Sort things by cost/weight comparison
+        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
+
         result = self.recursiveSolve(mode, task, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things], 0))
 
         return Solution(task.id, task.count, result.maxValue, task.minValue, result.numberOfConfigurations, result.things)
