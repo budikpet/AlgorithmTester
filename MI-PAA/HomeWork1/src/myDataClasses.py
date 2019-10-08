@@ -1,5 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List
+from enum import Enum
+
+class Modes(Enum):
+    Decision = 0
+    Constructive = 1
 
 @dataclass
 class Thing:

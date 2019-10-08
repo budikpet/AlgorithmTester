@@ -15,6 +15,10 @@ def checkFile(cliRunner, filePair: FilePair, strategy, mode):
                 break
             line = solutionFile.readline().split(" ")
             solution = solution.split(" ")
+
+            if len(line) == 1:
+                return
+
             if mode == Modes.Constructive:
                 assert int(line[2]) == int(solution[3])
             else:
