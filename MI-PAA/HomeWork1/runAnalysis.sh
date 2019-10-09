@@ -2,18 +2,18 @@
 
 source ../venv/bin/activate
 
-startWithFile=$1	# Which file should we start from (for example N4_inst
-algorithmToRun=$2	# 0 == BruteForce, 1 == UnsortedBranchBound, 2 == BranchBound
-endWithFile=$3""
+dataPath=$1			# data/ NR or ZR
+startWithFile=$2	# Which file should we start from (for example NR4_inst)
+algorithmToRun=$3	# 0 == BruteForce, 1 == UnsortedBranchBound, 2 == BranchBound
+endWithFile=$4""
 
 echo $algorithmToRun
 
 srcPath="./src"
-dataPath="./data"
 outputPath="./analysisOutput"
 MODE="Decision"
 
-dataFiles=$(python $srcPath/helpers.py $dataPath"/NR")
+dataFiles=$(python $srcPath/helpers.py $dataPath)
 
 mkdir $outputPath
 
