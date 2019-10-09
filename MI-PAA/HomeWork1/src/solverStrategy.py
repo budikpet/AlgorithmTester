@@ -4,6 +4,7 @@ from enum import Enum
 from copy import deepcopy
 from typing import List
 
+# TODO: Počet konfigurací musí být asi všechny nody, ne jen listy
 @dataclass
 class RecursiveResult:
     remainingCapacity: int
@@ -42,13 +43,14 @@ class BruteForce(SolverStrategy):
             if currState.maxValue >= task.minValue:
                 return currState
         
+        currState.numberOfConfigurations += 1
         currThing = task.things[thingAtIndex]
         if thingAtIndex >= task.count - 1:
             # Last thing
             if currThing.weight <= currState.remainingCapacity:
-                return currState.newSolution(currThing, configurationsToAdd=1)
+                return currState.newSolution(currThing)
             else:
-                return currState.newSolution(configurationsToAdd=1)
+                return currState.newSolution()
         
         # Check all possibilities
         if currThing.weight <= currState.remainingCapacity:
@@ -94,13 +96,14 @@ class BranchBound(SolverStrategy):
             # Found good enough value
             return currState
         
+        currState.numberOfConfigurations += 1
         currThing = task.things[thingAtIndex]
         if thingAtIndex >= task.count - 1:
             # Last thing
             if currThing.weight <= currState.remainingCapacity:
-                return currState.newSolution(currThing, configurationsToAdd=1)
+                return currState.newSolution(currThing)
             else:
-                return currState.newSolution(configurationsToAdd=1)
+                return currState.newSolution()
         
         # Check all possibilities
         if currThing.weight <= currState.remainingCapacity:
