@@ -19,7 +19,7 @@ inputModes = [mode.name for mode in Modes]
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
-@click.option("-f", "--input-file", type=click.File("r"), required=True)
+@click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
 def file(strategy, input_file, output_dir):
     program = "/home/petr/Documents/LocalShared/PythonSamples/MI-PAA/HomeWork1/src/knapsackSolver.py"

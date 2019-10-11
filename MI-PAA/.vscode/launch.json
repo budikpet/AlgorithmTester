@@ -37,7 +37,7 @@
             "args": [
                 "file",
                 "-s", "BranchBound",
-                "-f", "${workspaceFolder}/HomeWork1/data/NR/NR22_inst.dat",
+                "${workspaceFolder}/HomeWork1/data/NR/NR22_inst.dat",
                 "${workspaceFolder}/HomeWork1/analysisOutput/results"
             ],
             "program": "${workspaceFolder}/HomeWork1/src/output_generator.py",
