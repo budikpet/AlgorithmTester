@@ -15,6 +15,19 @@
             "program": "${workspaceFolder}/HomeWork1/src/knapsackSolver.py",
             // "program": "${file}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Helpers: output_to_csv",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "agregated-results", 
+                "--value", "22",
+                "${workspaceFolder}/HomeWork1/analysisOutput/results", 
+                "${workspaceFolder}/HomeWork1/analysisOutput"
+            ],
+            "program": "${workspaceFolder}/HomeWork1/src/helpers.py",
+            "console": "integratedTerminal"
         }
     ]
 }

@@ -13,7 +13,7 @@ dataPath="./data"
 outputPath="./analysisOutput"
 MODE="Decision"
 
-dataFiles=$(python $srcPath/helpers.py $dataPath"/NR")
+dataFiles=$(python $srcPath/helpers.py get-test-files $dataPath"/NR")
 
 mkdir $outputPath
 
