@@ -4,6 +4,7 @@ import re
 import shutil
 from math import log, ceil
 from solverStrategy import Strategies
+from myDataClasses import Modes
 
 class FilePair:
     def __init__(self, file1, file2):
@@ -109,11 +110,12 @@ def get_sums_dict(filepath, strategy, sums_dict, item_num):
             sums_dict[item_num][strategy] += currSum
 
     return lines
-        
 
-def write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp):
+0, 1, 2,   3,  4,  5,  6,  7,  8,  9        
+4, 7, 10, 13, 16, 19, 22, 25, 28, 31
+def write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp, step):
     if strategy not in hist_dict:
-        hist_dict[strategy] = [0 for exp in range(startExp, endExp)]
+        hist_dict[strategy] = [0 for exp in range(startExp, endExp, step)]
     
     for line in lines:
         split = line.split(" ")
@@ -124,11 +126,14 @@ def write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp):
         index = max(ceil(log(numOfConfigs + 1, 2)), startExp)
         index = min(index, endExp)
         index -= startExp
+        index = ceil(index/step)
         hist_dict[strategy][index] += 1
 
 def agregate(sorted_files, histogram_for_value: int, output_folder):
+    step = 2
     startExp = 4
-    endExp = 27
+    endExp = 32
+
     sums_dict = dict()
     hist_dict = dict()
     for item_num in sorted(sorted_files):
@@ -138,7 +143,7 @@ def agregate(sorted_files, histogram_for_value: int, output_folder):
             lines = get_sums_dict(filepath, strategy, sums_dict, item_num)
             if item_num == histogram_for_value:
                 # Create histogram file for current file
-                write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp)
+                write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp, step)
     
     with open(f'{output_folder}/sums.csv', "w") as sums_file:
         sums_file.write(f"file;Sum_{Strategies.BruteForce.name};Sum_{Strategies.BranchBound.name}\n")
@@ -151,9 +156,17 @@ def agregate(sorted_files, histogram_for_value: int, output_folder):
         hist_file.write(f"maximum_num;Count_{Strategies.BruteForce.name};Count_{Strategies.BranchBound.name}\n")
         count_tuples = list(zip(hist_dict[Strategies.BruteForce.name], hist_dict[Strategies.BranchBound.name]))
         for i, (brute_count, branch_count) in enumerate(count_tuples):
-            hist_file.write(f'2^{i + startExp};{brute_count};{branch_count}\n')
+            if i != 0:
+                hist_file.write(f'(2^{(i - 1)*step + startExp}, 2^{i*step + startExp}>;{brute_count};{branch_count}\n')
+            else:
+                hist_file.write(f'(0, 2^{i*step + startExp}>;{brute_count};{branch_count}\n')
             
     print
+
+def create_clean_folder(path):
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+    os.makedirs(path)
 
 @helpers.command()
 @click.option("--value", type=int, default=4, help="File for which to get histogram values for.")
@@ -163,14 +176,20 @@ def agregate(sorted_files, histogram_for_value: int, output_folder):
 def agregated_results(dir_name, value, input_dir, output_dir):
     output_folder = f'{output_dir}/{dir_name}'
 
-    if os.path.isdir(output_folder):
-        shutil.rmtree(output_folder)
-    os.mkdir(output_folder)
+    create_clean_folder(output_folder)
 
     sorted_files = get_files_dict(input_dir)
     agregate(sorted_files, value, output_folder)
             
     print
+
+@helpers.command()
+@click.option("--stop", type=int, default=1000)
+def test(stop):
+    from time import sleep
+    for i in range(1, stop):
+        sleep(1)
+        print(f'Test: {i}')
 
 if __name__ == "__main__":
     helpers()   # pylint: disable=no-value-for-parameter

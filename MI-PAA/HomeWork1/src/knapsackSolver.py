@@ -34,7 +34,7 @@ def knapsackSolver(datafile, strategy, mode):
 
         data = datafile.readline()
 
-    print(numOfConfigs)
+    #print(numOfConfigs)
     return solutions
 
 
