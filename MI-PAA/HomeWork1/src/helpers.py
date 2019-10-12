@@ -138,7 +138,7 @@ def get_sums(sorted_files, output_folder):
             get_sums_dict(filepath, strategy, sums_dict, item_num)
     
     with open(f'{output_folder}/sums.csv', "w") as sums_file:
-        sums_file.write(f"file;Sum_{Strategies.BruteForce.name};Sum_{Strategies.BranchBound.name};Sum_{Strategies.UnsortedBranchBound.name}\n")
+        sums_file.write(f"N;Sum_{Strategies.BruteForce.name};Sum_{Strategies.BranchBound.name};Sum_{Strategies.UnsortedBranchBound.name}\n")
         for (item_num, sums_by_methods) in sums_dict.items():
             bf_sum = sums_by_methods.get(Strategies.BruteForce.name)
             bb_sum = sums_by_methods.get(Strategies.BranchBound.name) 
@@ -173,14 +173,6 @@ def sums(dir_name, input_dir, output_dir):
     get_sums(sorted_files, output_folder)
             
     print
-
-@helpers.command()
-@click.option("--stop", type=int, default=1000)
-def test(stop):
-    from time import sleep
-    for i in range(1, stop):
-        sleep(1)
-        print(f'Test: {i}')
 
 if __name__ == "__main__":
     helpers()   # pylint: disable=no-value-for-parameter
