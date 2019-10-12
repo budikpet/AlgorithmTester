@@ -15,7 +15,6 @@ def knapsackSolver(datafile, strategy, mode):
     data = datafile.readline()
     context = solverStrategy.Context(Modes[mode], Strategies[strategy].value)
     solutions = list()
-    numOfConfigs = 0
 
     while data:
         values = data.split(" ")
@@ -30,11 +29,9 @@ def knapsackSolver(datafile, strategy, mode):
         # Print necessery for unit tests
         print(solution)
         solutions.append(solution)
-        numOfConfigs += solution.numberOfConfigurations
 
         data = datafile.readline()
 
-    #print(numOfConfigs)
     return solutions
 
 
