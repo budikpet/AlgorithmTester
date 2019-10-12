@@ -17,10 +17,11 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Output_generator",
+            "name": "Output_generator: files",
             "type": "python",
             "request": "launch",
             "args": [
+                "files",
                 "-s", "BranchBound",
                 "--start-count", "22",
                 "${workspaceFolder}/HomeWork1/data/NR", 
