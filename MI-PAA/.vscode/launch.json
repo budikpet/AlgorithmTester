@@ -28,6 +28,30 @@
             ],
             "program": "${workspaceFolder}/HomeWork1/src/output_generator.py",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "output_to_csv",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "output-to-csv",
+                "${workspaceFolder}/HomeWork1/analysisOutput/results",
+                "${workspaceFolder}/HomeWork1/analysisOutput"
+            ],
+            "program": "${workspaceFolder}/HomeWork1/src/helpers.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "sums",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "sums",
+                "${workspaceFolder}/HomeWork1/analysisOutput/results",
+                "${workspaceFolder}/HomeWork1/analysisOutput"
+            ],
+            "program": "${workspaceFolder}/HomeWork1/src/helpers.py",
+            "console": "integratedTerminal"
+        },
     ]
 }

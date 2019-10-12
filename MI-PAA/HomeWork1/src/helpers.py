@@ -129,38 +129,30 @@ def write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp, step
         index = ceil(index/step)
         hist_dict[strategy][index] += 1
 
-def agregate(sorted_files, histogram_for_value: int, output_folder):
-    step = 2
-    startExp = 4
-    endExp = 32
-
+def get_sums(sorted_files, output_folder):
     sums_dict = dict()
-    hist_dict = dict()
     for item_num in sorted(sorted_files):
         for filepath in sorted_files[item_num]:
             filename = filepath.split("/")[-1]
             strategy = filename.split("_inst_")[1].replace(".dat", "")
-            lines = get_sums_dict(filepath, strategy, sums_dict, item_num)
-            if item_num == histogram_for_value:
-                # Create histogram file for current file
-                write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp, step)
+            get_sums_dict(filepath, strategy, sums_dict, item_num)
     
     with open(f'{output_folder}/sums.csv', "w") as sums_file:
-        sums_file.write(f"file;Sum_{Strategies.BruteForce.name};Sum_{Strategies.BranchBound.name}\n")
+        sums_file.write(f"file;Sum_{Strategies.BruteForce.name};Sum_{Strategies.BranchBound.name};Sum_{Strategies.UnsortedBranchBound.name}\n")
         for (item_num, sums_by_methods) in sums_dict.items():
-            bf_sum = sums_by_methods[Strategies.BruteForce.name]
-            bb_sum = sums_by_methods[Strategies.BranchBound.name]
-            sums_file.write(f'{item_num};{ceil(bf_sum/500)};{ceil(bb_sum/500)}\n')
+            bf_sum = sums_by_methods.get(Strategies.BruteForce.name)
+            bb_sum = sums_by_methods.get(Strategies.BranchBound.name) 
+            ubb_sum = sums_by_methods.get(Strategies.UnsortedBranchBound.name)
 
-    with open(f'{output_folder}/hist.csv', "w") as hist_file:
-        hist_file.write(f"maximum_num;Count_{Strategies.BruteForce.name};Count_{Strategies.BranchBound.name}\n")
-        count_tuples = list(zip(hist_dict[Strategies.BruteForce.name], hist_dict[Strategies.BranchBound.name]))
-        for i, (brute_count, branch_count) in enumerate(count_tuples):
-            if i != 0:
-                hist_file.write(f'(2^{(i - 1)*step + startExp}, 2^{i*step + startExp}>;{brute_count};{branch_count}\n')
-            else:
-                hist_file.write(f'(0, 2^{i*step + startExp}>;{brute_count};{branch_count}\n')
-            
+            if bf_sum is None:
+                bf_sum = 0
+            if bb_sum is None:
+                bb_sum = 0
+            if ubb_sum is None:
+                ubb_sum = 0
+
+            sums_file.write(f'{item_num};{ceil(bf_sum)};{ceil(bb_sum)};{ceil(ubb_sum)}\n')
+
     print
 
 def create_clean_folder(path):
@@ -169,17 +161,16 @@ def create_clean_folder(path):
     os.makedirs(path)
 
 @helpers.command()
-@click.option("--value", type=int, default=4, help="File for which to get histogram values for.")
-@click.option("--dir_name", "--output_folder_name", type=str, default="agregatedResults")
+@click.option("--dir_name", "--output_folder_name", type=str, default="results_aggregated")
 @click.argument("input_dir", required=True)
 @click.argument("output_dir", required=True)
-def agregated_results(dir_name, value, input_dir, output_dir):
+def sums(dir_name, input_dir, output_dir):
     output_folder = f'{output_dir}/{dir_name}'
 
     create_clean_folder(output_folder)
 
     sorted_files = get_files_dict(input_dir)
-    agregate(sorted_files, value, output_folder)
+    get_sums(sorted_files, output_folder)
             
     print
 
