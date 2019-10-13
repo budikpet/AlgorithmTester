@@ -109,7 +109,11 @@ class BranchBound(SolverStrategy):
         
         # Check all possibilities
         if currThing.weight <= currState.remainingCapacity:
-            # Can add current thing
+            if mode == Modes.Decision and maximumSum + currState.maxValue < task.minValue:
+                # Value of (things in bag + current thing + all things in the subtree) is not high enough
+                return currState
+            
+            # The subtree has high enough value, need to check if things can fit
             resultAdded = self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution(currThing))
             
             if resultAdded.maxValue >= currState.maxValue + maximumSum - currThing.cost:
@@ -117,18 +121,27 @@ class BranchBound(SolverStrategy):
                 # so we do not need to check it
                 return resultAdded
 
-            if mode == Modes.Decision and resultAdded.maxValue >= task.minValue:
-                # Found good enough value
-                return resultAdded
+            if mode == Modes.Decision:
+                if resultAdded.maxValue >= task.minValue:
+                    # Found good enough value
+                    return resultAdded
+                elif maximumSum - currThing.cost + currState.maxValue < task.minValue:
+                    # Value of (things in bag + all things in the subtree) is not high enough
+                    return currState
             
+            # The subtree has high enough value, need to check if things can fit
             resultNotAdded = self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution())
             
             if resultAdded.maxValue >= resultNotAdded.maxValue:
                 return resultAdded.newSolution()
             else:
                 return resultNotAdded.newSolution()
+
+        if mode == Modes.Decision and maximumSum - currThing.cost + currState.maxValue < task.minValue:
+                # Value of (things in bag + all things in the subtree) is not high enough
+                return currState        
         
-        # Current thing too heavy
+        # Current thing too heavy. The subtree has high enough value, need to check if items fit
         return self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution())
     
     def solve(self, mode: Modes, task: Task) -> Solution:
