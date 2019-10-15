@@ -31,7 +31,7 @@ def checkFile(cliRunner, filePair: FilePair, strategy, mode):
             print
 
 def test_constructive_bruteForce_NR():
-    path = './HomeWork1/data'
+    path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NR')[0:2]
@@ -40,7 +40,7 @@ def test_constructive_bruteForce_NR():
         checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Constructive)
 
 def test_constructive_branchBound_NR():
-    path = './HomeWork1/data'
+    path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NR')[0:2]
@@ -49,7 +49,7 @@ def test_constructive_branchBound_NR():
         checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Constructive)
 
 def test_constructive_unsortedBranchBound_NR():
-    path = './HomeWork1/data'
+    path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NR')[0:2]
@@ -58,7 +58,7 @@ def test_constructive_unsortedBranchBound_NR():
         checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound, Modes.Constructive)
 
 def test_decision_bruteForce_NR():
-    path = './HomeWork1/data'
+    path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NR')[0:2]
@@ -67,7 +67,7 @@ def test_decision_bruteForce_NR():
         checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Decision)
 
 def test_decision_branchBound_NR():
-    path = './HomeWork1/data'
+    path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NR')[0:3]
@@ -76,7 +76,7 @@ def test_decision_branchBound_NR():
         checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Decision)
 
 def test_decision_unsortedBranchBound_NR():
-    path = './HomeWork1/data'
+    path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NR')[0:3]
@@ -85,7 +85,7 @@ def test_decision_unsortedBranchBound_NR():
         checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound, Modes.Decision)
 
 # def test_constructive_bruteForce_ZR():
-#     path = './HomeWork1/data'
+#     path = './data'
 #     cliRunner = CliRunner()
 
 #     dataFiles = getFiles(f'{path}/ZR')[0:2]
@@ -94,7 +94,7 @@ def test_decision_unsortedBranchBound_NR():
 #         checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Constructive)
 
 # def test_constructive_branchBound_ZR():
-#     path = './HomeWork1/data'
+#     path = './data'
 #     cliRunner = CliRunner()
 
 #     dataFiles = getFiles(f'{path}/ZR')[0:2]

@@ -1,0 +1,11 @@
+{
+    "python.envFile": "${workspaceFolder}/dev.env",
+    "python.pythonPath": "../venv/bin/python",
+    
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pyTestArgs": [
+        "tests"
+    ],
+    "python.testing.pyTestEnabled": true,
+}

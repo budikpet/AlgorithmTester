@@ -9,10 +9,10 @@
             "type": "python",
             "request": "launch",
             "args": [
-                "--dataFile", "${workspaceFolder}/HomeWork1/data/NR/NR4_inst.dat",
+                "--dataFile", "${workspaceFolder}/data/NR/NR4_inst.dat",
                 "-s", "BranchBound"
             ],
-            "program": "${workspaceFolder}/HomeWork1/src/knapsackSolver.py",
+            "program": "${workspaceFolder}/src/knapsackSolver.py",
             // "program": "${file}",
             "console": "integratedTerminal"
         },
@@ -24,10 +24,10 @@
                 "files",
                 "-s", "BranchBound",
                 "--start-count", "22",
-                "${workspaceFolder}/HomeWork1/data/NR", 
-                "${workspaceFolder}/HomeWork1/analysisOutput/results"
+                "${workspaceFolder}/data/NR", 
+                "${workspaceFolder}/analysisOutput/results"
             ],
-            "program": "${workspaceFolder}/HomeWork1/src/output_generator.py",
+            "program": "${workspaceFolder}/src/output_generator.py",
             "console": "integratedTerminal"
         },
         {
@@ -36,10 +36,10 @@
             "request": "launch",
             "args": [
                 "output-to-csv",
-                "${workspaceFolder}/HomeWork1/analysisOutput/results",
-                "${workspaceFolder}/HomeWork1/analysisOutput"
+                "${workspaceFolder}/analysisOutput/results",
+                "${workspaceFolder}/analysisOutput"
             ],
-            "program": "${workspaceFolder}/HomeWork1/src/helpers.py",
+            "program": "${workspaceFolder}/src/helpers.py",
             "console": "integratedTerminal"
         },
         {
@@ -48,10 +48,10 @@
             "request": "launch",
             "args": [
                 "sums",
-                "${workspaceFolder}/HomeWork1/analysisOutput/results",
-                "${workspaceFolder}/HomeWork1/analysisOutput"
+                "${workspaceFolder}/analysisOutput/results",
+                "${workspaceFolder}/analysisOutput"
             ],
-            "program": "${workspaceFolder}/HomeWork1/src/helpers.py",
+            "program": "${workspaceFolder}/src/helpers.py",
             "console": "integratedTerminal"
         },
     ]
