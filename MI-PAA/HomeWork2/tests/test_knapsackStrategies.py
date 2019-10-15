@@ -25,79 +25,40 @@ def checkFile(cliRunner, filePair: FilePair, strategy, mode):
 
             if mode == Modes.Constructive:
                 assert int(line[2]) == int(solution[3])
-            else:
-                # Either we got higher value than the wanted minValue, or the optimal value is lesser then the wanted minValue
-                assert int(solution[3]) >= int(solution[4]) or int(line[2]) < int(solution[4])
             print
 
-def test_constructive_bruteForce_NR():
-    path = './HomeWork1/data'
+def test_constructive_DP_NK():
+    path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.DP, Modes.Constructive)
 
-def test_constructive_branchBound_NR():
-    path = './HomeWork1/data'
+def test_constructive_GreedySimple_NK():
+    path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.GreedySimple, Modes.Constructive)
 
-def test_constructive_unsortedBranchBound_NR():
-    path = './HomeWork1/data'
+def test_constructive_Greedy_NK():
+    path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.Greedy, Modes.Constructive)
 
-def test_decision_bruteForce_NR():
-    path = './HomeWork1/data'
+def test_constructive_FPTAS_NK():
+    path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Decision)
-
-def test_decision_branchBound_NR():
-    path = './HomeWork1/data'
-    cliRunner = CliRunner()
-
-    dataFiles = getFiles(f'{path}/NR')[0:3]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Decision)
-
-def test_decision_unsortedBranchBound_NR():
-    path = './HomeWork1/data'
-    cliRunner = CliRunner()
-
-    dataFiles = getFiles(f'{path}/NR')[0:3]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound, Modes.Decision)
-
-# def test_constructive_bruteForce_ZR():
-#     path = './HomeWork1/data'
-#     cliRunner = CliRunner()
-
-#     dataFiles = getFiles(f'{path}/ZR')[0:2]
-    
-#     for filePair in dataFiles:
-#         checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Constructive)
-
-# def test_constructive_branchBound_ZR():
-#     path = './HomeWork1/data'
-#     cliRunner = CliRunner()
-
-#     dataFiles = getFiles(f'{path}/ZR')[0:2]
-    
-#     for filePair in dataFiles:
-#         checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.FPTAS, Modes.Constructive)

@@ -24,63 +24,46 @@ class RecursiveResult:
 
 class Context():
 
-    def __init__(self, mode, strategy):
-        self.mode = mode
+    def __init__(self, strategy):
         self.strategy = strategy
 
     def solve(self, task: Task) -> Solution:
-        return self.strategy.solve(self.mode, task)
+        return self.strategy.solve(task)
 
 class SolverStrategy(object):
     
-    def solve(self, Modes: str, task: Task) -> Solution:
+    def solve(self, task: Task) -> Solution:
         pass
 
-class BruteForce(SolverStrategy):
-    """ Uses Brute force  """
+class DynamicProgramming(SolverStrategy):
+    """ Uses DynamicProgramming algorithm. """
 
-    def recursiveSolve(self, configCtr: ConfigCounter, mode: Modes, task: Task, thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
-        if mode == Modes.Decision:
-            if currState.maxValue >= task.minValue:
-                return currState
-        
-        configCtr.value += 1
-        currThing = task.things[thingAtIndex]
-        if thingAtIndex >= task.count - 1:
-            # Last thing
-            if currThing.weight <= currState.remainingCapacity:
-                return currState.newSolution(currThing)
-            else:
-                return currState.newSolution()
-        
-        # Check all possibilities
-        if currThing.weight <= currState.remainingCapacity:
-            # Can add current thing
-            resultAdded = self.recursiveSolve(configCtr, mode, task, thingAtIndex + 1, currState.newSolution(currThing))
-            
-            if mode == Modes.Decision and resultAdded.maxValue >= task.minValue:
-                # Found good enough value
-                return resultAdded.newSolution()
-            
-            resultNotAdded = self.recursiveSolve(configCtr, mode, task, thingAtIndex + 1, currState.newSolution())
-            
-            if resultAdded.maxValue >= resultNotAdded.maxValue:
-                return resultAdded.newSolution()
-            else:
-                return resultNotAdded.newSolution()
-        
-        return self.recursiveSolve(configCtr, mode, task, thingAtIndex + 1, currState.newSolution())
-    
-    def solve(self, mode: Modes, task: Task) -> Solution:
-        # print(f"BruteForce#{task.id} solving.")
+    def solve(self, task: Task) -> Solution:
+        pass
 
-        # Sort things by cost/weight comparison
-        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
+class GreedySimple(SolverStrategy):
+    """ Uses simple Greedy heuristics. """
 
-        configCtr = ConfigCounter(0)
-        result = self.recursiveSolve(configCtr, mode, task, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
+    def solve(self, task: Task) -> Solution:
+        pass
 
-        return Solution(task.id, task.count, result.maxValue, task.minValue, configCtr.value, result.things)
+class Greedy(SolverStrategy):
+    """ Uses modified Greedy heuristics. """
+
+    def solve(self, task: Task) -> Solution:
+        pass
+
+class FPTAS(SolverStrategy):
+    """ Uses FPTAS algorithm. """
+
+    def solve(self, task: Task) -> Solution:
+        pass
+
+class Strategies(Enum):
+    DP = DynamicProgramming()
+    GreedySimple = GreedySimple()
+    Greedy = Greedy()
+    FPTAS = FPTAS()
 
 class BranchBound(SolverStrategy):
     """ Uses BranchBound algorithm. """
@@ -93,7 +76,7 @@ class BranchBound(SolverStrategy):
         return currSum
     
     # maximumSum: A sum of all objects that are after the current object
-    def recursiveSolve(self, configCtr: ConfigCounter, mode: Modes, task: Task, maximumSum: int, thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
+    def recursiveSolve(self, mode, configCtr: ConfigCounter, task: Task, maximumSum: int, thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
         if mode == Modes.Decision and currState.maxValue >= task.minValue:
             # Found good enough value
             return currState
@@ -144,7 +127,7 @@ class BranchBound(SolverStrategy):
         # Current thing too heavy. The subtree has high enough value, need to check if items fit
         return self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution())
     
-    def solve(self, mode: Modes, task: Task) -> Solution:
+    def solve(self, task: Task) -> Solution:
         # print(f"BranchBound#{task.id} solving.")
 
         # Sort things by cost/weight comparison
@@ -153,25 +136,7 @@ class BranchBound(SolverStrategy):
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximumSum = self.getMaxSum(task)
         configCtr = ConfigCounter(0)
-        result = self.recursiveSolve(configCtr, mode, task, maximumSum, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
+        mode = None
+        result = self.recursiveSolve(mode, configCtr, task, maximumSum, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
 
         return Solution(task.id, task.count, result.maxValue, task.minValue, configCtr.value, result.things)
-
-class UnsortedBranchBound(SolverStrategy):
-    """ Uses BranchBound algorithm without sorting the input first. """
-    
-    def solve(self, mode: Modes, task: Task) -> Solution:
-        # print(f"UnsortedBranchBound#{task.id} solving.")
-        solver = Strategies.BranchBound.value
-
-        # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
-        maximumSum = solver.getMaxSum(task)
-        configCtr = ConfigCounter(0)
-        result = solver.recursiveSolve(configCtr, mode, task, maximumSum, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
-
-        return Solution(task.id, task.count, result.maxValue, task.minValue, configCtr.value, result.things)
-
-class Strategies(Enum):
-    BruteForce = BruteForce()
-    BranchBound = BranchBound()
-    UnsortedBranchBound = UnsortedBranchBound()

@@ -1,0 +1,58 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "KnapsackSolver",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "--dataFile", "${workspaceFolder}/data/NK/NK4_inst.dat",
+                "-s", "Greedy"
+            ],
+            "program": "${workspaceFolder}/src/knapsackSolver.py",
+            // "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Output_generator: files",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "files",
+                "-s", "BranchBound",
+                "--start-count", "22",
+                "${workspaceFolder}/data/NR", 
+                "${workspaceFolder}/analysisOutput/results"
+            ],
+            "program": "${workspaceFolder}/src/output_generator.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "output_to_csv",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "output-to-csv",
+                "${workspaceFolder}/analysisOutput/results",
+                "${workspaceFolder}/analysisOutput"
+            ],
+            "program": "${workspaceFolder}/src/helpers.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "sums",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "sums",
+                "${workspaceFolder}/analysisOutput/results",
+                "${workspaceFolder}/analysisOutput"
+            ],
+            "program": "${workspaceFolder}/src/helpers.py",
+            "console": "integratedTerminal"
+        },
+    ]
+}

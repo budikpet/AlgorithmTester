@@ -111,24 +111,6 @@ def get_sums_dict(filepath, strategy, sums_dict, item_num):
 
     return lines
 
-0, 1, 2,   3,  4,  5,  6,  7,  8,  9        
-4, 7, 10, 13, 16, 19, 22, 25, 28, 31
-def write_hist(output_folder, strategy, hist_dict, lines, startExp, endExp, step):
-    if strategy not in hist_dict:
-        hist_dict[strategy] = [0 for exp in range(startExp, endExp, step)]
-    
-    for line in lines:
-        split = line.split(" ")
-        if len(split) < 2:
-            continue
-
-        numOfConfigs = int(split[1])
-        index = max(ceil(log(numOfConfigs + 1, 2)), startExp)
-        index = min(index, endExp)
-        index -= startExp
-        index = ceil(index/step)
-        hist_dict[strategy][index] += 1
-
 def get_sums(sorted_files, output_folder):
     sums_dict = dict()
     for item_num in sorted(sorted_files):
