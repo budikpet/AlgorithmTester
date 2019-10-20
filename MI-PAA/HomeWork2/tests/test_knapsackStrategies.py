@@ -6,7 +6,7 @@ from click.testing import CliRunner
 
 def checkFile(cliRunner, filePair: FilePair, strategy):
     print(f"Testing file: {filePair.dataFile}")
-    solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "-s", strategy.name]).output.split("\n")
+    solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "--check-time", False, "-s", strategy.name]).output.split("\n")
 
     # Check values
     with open(filePair.solutionFile, "r") as solutionFile:

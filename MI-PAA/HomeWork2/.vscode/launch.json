@@ -24,6 +24,8 @@
                 "files",
                 "-s", "DP",
                 "--start-count", "4",
+                "--check-time", "True",
+                "--time-retries", "100",
                 "${workspaceFolder}/data/NK", 
                 "${workspaceFolder}/analysisOutput/results"
             ],

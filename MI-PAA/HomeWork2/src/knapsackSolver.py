@@ -21,9 +21,9 @@ inputStrategies = [strategy.name for strategy in Strategies]
 @click.command()
 @click.option("--dataFile", type=click.File("r"), required=True)
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
-@click.option("--retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
+@click.option("--time_retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0])
-def knapsackSolver(datafile, check_time: bool, retries: int, strategy):
+def knapsackSolver(datafile, check_time: bool, time_retries: int, strategy):
     data = datafile.readline()
     context = Context(Strategies[strategy].value)
     solutions = list()
@@ -40,8 +40,8 @@ def knapsackSolver(datafile, check_time: bool, retries: int, strategy):
         if check_time:
             # Use timeit to get time
             t = timeit.Timer(lambda: context.solve(task))
-            elapsed_time, solution = t.timeit(number=retries)
-            solution.elapsed_time = round((elapsed_time*1000)/retries, 10)   # Store in millis
+            elapsed_time, solution = t.timeit(number=time_retries)
+            solution.elapsed_time = round((elapsed_time*1000)/time_retries, 10)   # Store in millis
         else:
             solution = context.solve(task)
 
