@@ -24,11 +24,11 @@ class CostRow:
 class Solution:
     id: int
     count: int
-    maxValue: int
+    max_value: int
     things: tuple = field(default_factory=tuple)
 
     def __str__(self):
-        return f'{abs(self.id)} {self.count} {self.maxValue} | {";".join(map(str, self.things))}'
+        return f'{abs(self.id)};{self.count};{self.max_value};|;{";".join(map(str, self.things))}'
 
     def __repr__(self):
         return self.__str__()

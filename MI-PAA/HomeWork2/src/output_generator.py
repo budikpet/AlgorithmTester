@@ -3,7 +3,6 @@ import click
 from typing import Dict
 import os
 from solverStrategy import Strategies
-from myDataClasses import Modes
 from helpers import get_files_dict
 
 def create_path(path):
@@ -15,7 +14,6 @@ def generate_output():
     pass
 
 inputStrategies = [strategy.name for strategy in Strategies]
-inputModes = [mode.name for mode in Modes]
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
