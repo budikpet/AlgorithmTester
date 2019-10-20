@@ -10,7 +10,7 @@
             "request": "launch",
             "args": [
                 "--dataFile", "${workspaceFolder}/data/NK/NK4_inst.dat",
-                "-s", "Greedy"
+                "-s", "DP"
             ],
             "program": "${workspaceFolder}/src/knapsackSolver.py",
             // "program": "${file}",
