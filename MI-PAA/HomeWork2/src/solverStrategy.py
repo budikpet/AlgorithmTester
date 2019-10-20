@@ -72,7 +72,6 @@ class DynamicProgramming(SolverStrategy):
                 self.dp_table_dict[curr_sum] = CostRow(things=things, row=row)
 
             count += 1
-            print
 
         print
 

@@ -25,10 +25,15 @@ class Solution:
     id: int
     count: int
     max_value: int
+    # Elapsed time in millis
+    elapsed_time: float = None
     things: tuple = field(default_factory=tuple)
 
     def __str__(self):
-        return f'{abs(self.id)};{self.count};{self.max_value};|;{";".join(map(str, self.things))}'
+        if self.elapsed_time is None:
+            return f'{abs(self.id)};{self.count};{self.max_value};|;{";".join(map(str, self.things))}'
+        else:
+            return f'{abs(self.id)};{self.count};{self.max_value};{self.elapsed_time};|;{";".join(map(str, self.things))}'
 
     def __repr__(self):
         return self.__str__()
