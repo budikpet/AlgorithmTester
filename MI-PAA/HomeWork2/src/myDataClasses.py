@@ -2,10 +2,6 @@ from dataclasses import dataclass, field
 from typing import List
 from enum import Enum
 
-class Modes(Enum):
-    Constructive = 0
-    Decision = 1
-
 @dataclass
 class Thing:
     position: int
@@ -20,15 +16,19 @@ class Task:
     things: List[Thing] = field(default_factory=list)
 
 @dataclass
+class CostRow:
+    things: tuple = field(default_factory=tuple)
+    row: list = field(default_factory=list)
+
+@dataclass
 class Solution:
     id: int
     count: int
     maxValue: int
-    numberOfConfigurations: int
-    things: [int] = field(default_factory=list)
+    things: tuple = field(default_factory=tuple)
 
     def __str__(self):
-        return f'{abs(self.id)} {self.numberOfConfigurations} {self.count} {self.maxValue} | {" ".join(map(str, self.things))}'
+        return f'{abs(self.id)} {self.count} {self.maxValue} | {";".join(map(str, self.things))}'
 
     def __repr__(self):
         return self.__str__()

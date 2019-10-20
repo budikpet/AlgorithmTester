@@ -4,7 +4,6 @@ import re
 import shutil
 from math import log, ceil
 from solverStrategy import Strategies
-from myDataClasses import Modes
 
 class FilePair:
     def __init__(self, file1, file2):
@@ -58,103 +57,6 @@ def get_test_files(mode, directory):
             print(pair.dataFile)
         else:
             print(pair.solutionFile)
-
-def to_csv(output_folder, input_folder, file_name: str):
-    with open(f'{input_folder}/{file_name}', "r") as inF:
-        with open(f'{output_folder}/{file_name.replace(".dat", ".csv")}', "w") as outF:
-            line = inF.readline()
-            while line:
-                split = line.split("|")
-
-                if len(split) < 2:
-                    line = inF.readline()
-                    continue
-
-                data = split[0].strip().replace(" ", ";")
-                bag = split[1].strip().replace(" ", "")
-
-                outF.write(f'{data};{bag}\n')
-
-                line = inF.readline()
-
-@helpers.command()
-@click.option("--dir_name", "--output_folder_name", type=str, default="result_csv")
-@click.argument("input_dir", required=True)
-@click.argument("output_dir", required=True)
-def output_to_csv(dir_name, input_dir, output_dir):
-    output_folder = f'{output_dir}/{dir_name}'
-
-    if os.path.isdir(output_folder):
-        shutil.rmtree(output_folder)
-    os.mkdir(output_folder)
-
-    for root, _, files in os.walk(input_dir):
-        for file_name in files:
-            to_csv(output_folder, root, file_name)
-    print
-
-def get_sums_dict(filepath, strategy, sums_dict, item_num):
-    lines = list()
-    with open(filepath, "r") as input_file:
-        lines = input_file.readlines()
-        currSum = 0
-        for line in lines:
-            currSum += int(line.split(" ")[1])
-
-        if item_num not in sums_dict:
-            sums_dict[item_num] = dict()
-
-        if strategy not in sums_dict[item_num]:
-            sums_dict[item_num][strategy] = currSum
-        else:
-            sums_dict[item_num][strategy] += currSum
-
-    return lines
-
-def get_sums(sorted_files, output_folder):
-    sums_dict = dict()
-    for item_num in sorted(sorted_files):
-        for filepath in sorted_files[item_num]:
-            filename = filepath.split("/")[-1]
-            strategy = filename.split("_inst_")[1].replace(".dat", "")
-            get_sums_dict(filepath, strategy, sums_dict, item_num)
-    
-    with open(f'{output_folder}/sums.csv', "w") as sums_file:
-        sums_file.write(f"N;Sum_{Strategies.BruteForce.name};Sum_{Strategies.BranchBound.name};Sum_{Strategies.UnsortedBranchBound.name}\n")
-        for (item_num, sums_by_methods) in sums_dict.items():
-            bf_sum = sums_by_methods.get(Strategies.BruteForce.name)
-            bb_sum = sums_by_methods.get(Strategies.BranchBound.name) 
-            ubb_sum = sums_by_methods.get(Strategies.UnsortedBranchBound.name)
-
-            if bf_sum is None:
-                bf_sum = 0
-            if bb_sum is None:
-                bb_sum = 0
-            if ubb_sum is None:
-                ubb_sum = 0
-
-            sums_file.write(f'{item_num};{ceil(bf_sum)};{ceil(bb_sum)};{ceil(ubb_sum)}\n')
-
-    print
-
-def create_clean_folder(path):
-    if os.path.isdir(path):
-        shutil.rmtree(path)
-    os.makedirs(path)
-
-@helpers.command()
-@click.option("--dir_name", "--output_folder_name", type=str, default="results_aggregated")
-@click.argument("input_dir", required=True)
-@click.argument("output_dir", required=True)
-def sums(dir_name, input_dir, output_dir):
-    output_folder = f'{output_dir}/{dir_name}'
-
-    create_clean_folder(output_folder)
-
-    sorted_files = get_files_dict(input_dir)
-    get_sums(sorted_files, output_folder)
-            
-    print
 
 if __name__ == "__main__":
     helpers()   # pylint: disable=no-value-for-parameter
