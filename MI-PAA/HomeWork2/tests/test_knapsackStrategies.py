@@ -27,7 +27,7 @@ def test_constructive_DP_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NK')[0:4]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.DP)
