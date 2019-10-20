@@ -22,9 +22,9 @@
             "request": "launch",
             "args": [
                 "files",
-                "-s", "BranchBound",
-                "--start-count", "22",
-                "${workspaceFolder}/data/NR", 
+                "-s", "DP",
+                "--start-count", "4",
+                "${workspaceFolder}/data/NK", 
                 "${workspaceFolder}/analysisOutput/results"
             ],
             "program": "${workspaceFolder}/src/output_generator.py",
