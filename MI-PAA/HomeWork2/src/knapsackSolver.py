@@ -8,7 +8,7 @@ inputStrategies = [strategy.name for strategy in Strategies]
 @click.command()
 @click.option("--dataFile", type=click.File("r"), required=True)
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0])
-def knapsackSolver(datafile, strategy, mode):
+def knapsackSolver(datafile, strategy):
     data = datafile.readline()
     context = Context(Strategies[strategy].value)
     solutions = list()

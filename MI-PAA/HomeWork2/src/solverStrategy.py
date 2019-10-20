@@ -1,4 +1,4 @@
-from myDataClasses import Task, Solution, Thing, Modes
+from myDataClasses import Task, Solution, Thing, CostRow
 from dataclasses import dataclass
 from enum import Enum
 from copy import deepcopy
@@ -20,12 +20,52 @@ class SolverStrategy(object):
 class DynamicProgramming(SolverStrategy):
     """ Uses DynamicProgramming algorithm. """
 
+    def get_things_tuple(self, count: int, set_bits: List[int]):
+        output = [0 for _ in range(count - len(set_bits))]
+        output.extend(set_bits)
+        return tuple(output)
+
+    def prepare_table(self, task: Task):
+        """ Prepare the DP table & other important values """
+
+        # The infinite value == (sum of all weights + 1)
+        self.infinite_value = sum(thing.weight for thing in task.things) + 1
+        self.dp_table_dict = dict()
+        
+        # Add 0th row
+        self.dp_table_dict[0] = CostRow(things=tuple([0 for _ in range(task.count)]), row=[0 for _ in range(task.count)])
+        
+        count: int = 1
+        max_count: int = pow(2, task.count)
+        while count <= max_count:
+            # Get binary representation of count in a list
+            bits = [int(bit) for bit in bin(count)[2:]]
+
+            # Get sum of subset
+            curr_sum: int = 0
+            for (i, bit) in enumerate(bits):
+                if bit == 1:
+                    curr_sum += task.things[i].cost
+            things = self.get_things_tuple(count=task.count, set_bits=bits)
+            
+            # Add row to the table
+            if curr_sum not in self.dp_table_dict:
+                row = [self.infinite_value]
+                row.extend([None for _ in range(task.count - 1)])
+                self.dp_table_dict[curr_sum] = CostRow(things=things, row=row)
+
+            count += 1
+            print
+
+        print
+
     def solve(self, task: Task) -> Solution:
-        pass
+        self.prepare_table(task)
+        self.key_list = sorted(self.dp_table_dict, reverse=True)
+        print
 
 class GreedySimple(SolverStrategy):
     """ Uses simple Greedy heuristics. """
-
     def solve(self, task: Task) -> Solution:
         pass
 
