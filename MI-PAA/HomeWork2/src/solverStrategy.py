@@ -186,7 +186,7 @@ class FPTAS(SolverStrategy):
 
         # Simplify task
         for thing in task.things:
-            thing.cost /= simplifier_constant
+            thing.cost = int(thing.cost // simplifier_constant)
 
         # Use DP on the simplified solution
         return Strategies.DP.value.solve(task)

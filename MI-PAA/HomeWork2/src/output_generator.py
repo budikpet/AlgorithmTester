@@ -2,6 +2,7 @@ from subprocess import Popen, PIPE, STDOUT
 import click
 from typing import Dict
 import os
+import time
 from solverStrategy import Strategies
 from helpers import get_files_dict
 
@@ -63,13 +64,17 @@ def files(strategy, relative_mistake, check_time, time_retries, start_count, end
         # Run command
         p = Popen(["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "-e", str(relative_mistake), "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
-        output_file_name = files_dict[n_key].split("/")[-1].replace(".dat", f'_{strategy}.dat')
-        print(f'Running output for: {output_file_name}')
+        suffix = f"_{strategy}"
+
+        if relative_mistake is not None:
+            suffix = f"{suffix}_{str(relative_mistake).replace('.', ',')}"
+
+        output_file_name = files_dict[n_key].split("/")[-1].replace(".dat", f'{suffix}.dat')
+        print(f'Running output for: {output_file_name}. Started {time.strftime("Started %H:%M:%S %d.%m.")}')
         with open(f'{output_dir}/{output_file_name}', "w") as output_file:
             for line in p.stdout:
                 output_file.write(line.decode("utf-8"))
                 output_file.flush()
-        print
 
 if  __name__ == "__main__":
     generate_output()   # pylint: disable=no-value-for-parameter

@@ -35,30 +35,6 @@
             ],
             "program": "${workspaceFolder}/src/output_generator.py",
             "console": "integratedTerminal"
-        },
-        {
-            "name": "output_to_csv",
-            "type": "python",
-            "request": "launch",
-            "args": [
-                "output-to-csv",
-                "${workspaceFolder}/analysisOutput/results",
-                "${workspaceFolder}/analysisOutput"
-            ],
-            "program": "${workspaceFolder}/src/helpers.py",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "sums",
-            "type": "python",
-            "request": "launch",
-            "args": [
-                "sums",
-                "${workspaceFolder}/analysisOutput/results",
-                "${workspaceFolder}/analysisOutput"
-            ],
-            "program": "${workspaceFolder}/src/helpers.py",
-            "console": "integratedTerminal"
-        },
+        }
     ]
 }
