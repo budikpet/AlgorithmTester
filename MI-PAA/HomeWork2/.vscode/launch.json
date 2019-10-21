@@ -12,7 +12,8 @@
                 "--dataFile", "${workspaceFolder}/data/NK/NK4_inst.dat",
                 "--check-time", "False",
                 "--time-retries", "5",
-                "-s", "GreedyOne"
+                "-e", "10",
+                "-s", "FPTAS"
             ],
             "program": "${workspaceFolder}/src/knapsackSolver.py",
             // "program": "${file}",
@@ -24,7 +25,8 @@
             "request": "launch",
             "args": [
                 "files",
-                "-s", "Greedy",
+                "-s", "FPTAS",
+                "-e", "10",
                 "--start-count", "4",
                 "--check-time", "True",
                 "--time-retries", "1000",

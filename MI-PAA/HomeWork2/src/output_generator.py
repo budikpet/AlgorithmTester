@@ -17,16 +17,17 @@ inputStrategies = [strategy.name for strategy in Strategies]
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
+@click.option("-e", "--relative-mistake", type=float, default=None, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
-def file(strategy, check_time, time_retries, input_file, output_dir):
+def file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir):
     program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2/src/knapsackSolver.py"
     create_path(output_dir)
 
     # Run command
-    p = Popen(["python", program, "--dataFile", input_file.name, "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    p = Popen(["python", program, "--dataFile", input_file.name, "-s", strategy, "-e", str(relative_mistake), "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
     output_file_name = input_file.name.split("/")[-1].replace(".dat", f'_{strategy}.dat')
     print(f'Running output for: {output_file_name}')
@@ -37,13 +38,14 @@ def file(strategy, check_time, time_retries, input_file, output_dir):
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
+@click.option("-e", "--relative-mistake", type=float, default=None, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.option("--start-count", type=int, default=4)
 @click.option("--end-count", type=int, default=42)
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
-def files(strategy, check_time, time_retries, start_count, end_count, input_dir, output_dir):
+def files(strategy, relative_mistake, check_time, time_retries, start_count, end_count, input_dir, output_dir):
     program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2/src/knapsackSolver.py"
     create_path(output_dir)
 
@@ -59,7 +61,7 @@ def files(strategy, check_time, time_retries, start_count, end_count, input_dir,
             break
 
         # Run command
-        p = Popen(["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        p = Popen(["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "-e", str(relative_mistake), "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
         output_file_name = files_dict[n_key].split("/")[-1].replace(".dat", f'_{strategy}.dat')
         print(f'Running output for: {output_file_name}')

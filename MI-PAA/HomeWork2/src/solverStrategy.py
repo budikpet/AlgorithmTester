@@ -111,7 +111,7 @@ class DynamicProgramming(SolverStrategy):
                 if found_weight <= task.capacity:
                     # Found the highest value possible
                     things = self.dp_table_dict[curr_sum].things
-                    return Solution(id=task.id, count=task.count, max_value=curr_sum, things=things)
+                    return Solution(id=task.id, count=task.count, max_value=curr_sum, relative_mistake=task.relative_mistake, things=things)
 
         return None
 
@@ -142,7 +142,7 @@ class Greedy(SolverStrategy):
                 break
             print
 
-        return Solution(id=task.id, count=task.count, max_value=max_sum, things=tuple(output_things))
+        return Solution(id=task.id, count=task.count, max_value=max_sum, relative_mistake=task.relative_mistake, things=tuple(output_things))
 
 class GreedyOne(SolverStrategy):
     """ 
@@ -167,13 +167,29 @@ class GreedyOne(SolverStrategy):
                 break
             print
         
-        return Solution(id=task.id, count=task.count, max_value=max_value, things=tuple(output_things))
+        return Solution(id=task.id, count=task.count, max_value=max_value, relative_mistake=task.relative_mistake, things=tuple(output_things))
 
 class FPTAS(SolverStrategy):
-    """ Uses FPTAS algorithm. """
+    """ 
+    Uses FPTAS algorithm. 
+
+    Uses provided value e (relative mistake) to make the task simpler. 
+    Specifically, it is used to lower costs of all items.
+    The simplified task is then passed to DP algorithm.
+    
+    """
 
     def solve(self, task: Task) -> Solution:
-        pass
+        # Prepare important constants
+        max_cost = max([thing.cost for thing in task.things])
+        simplifier_constant: float = (task.relative_mistake*max_cost)/task.count
+
+        # Simplify task
+        for thing in task.things:
+            thing.cost /= simplifier_constant
+
+        # Use DP on the simplified solution
+        return Strategies.DP.value.solve(task)
 
 class Strategies(Enum):
     DP = DynamicProgramming()
