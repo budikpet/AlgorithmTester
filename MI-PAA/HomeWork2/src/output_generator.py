@@ -10,6 +10,12 @@ def create_path(path):
     if not os.path.isdir(path):
         os.makedirs(path)
 
+def create_columns_description_file(strategy: str, check_time: bool, output_dir: str):
+    column_descriptions = Strategies[strategy].value.get_column_descriptions(check_time)
+
+    with open(f'{output_dir}/column_description_{strategy}.dat', "w") as f:
+        f.write(f'{" ".join(column_descriptions)}\n')
+
 @click.group()
 def generate_output():
     pass
@@ -49,6 +55,8 @@ def file(strategy, relative_mistake, check_time, time_retries, input_file, outpu
 def files(strategy, relative_mistake, check_time, time_retries, start_count, end_count, input_dir, output_dir):
     program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2/src/knapsackSolver.py"
     create_path(output_dir)
+
+    create_columns_description_file(strategy, check_time, output_dir)
 
     files_dict = get_files_dict(input_dir)
 

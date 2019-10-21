@@ -13,6 +13,20 @@ class Context():
         return self.strategy.solve(task)
 
 class SolverStrategy(object):
+
+    def get_column_descriptions(self, show_time: bool = True):
+        output = [
+            "id",
+            "item_count",
+            "maximum_sum",
+            "|",
+            "items_in_bag"
+        ]
+
+        if show_time:
+            output.insert(output.index("|"), "time")
+
+        return output
     
     def solve(self, task: Task) -> Solution:
         pass
@@ -178,6 +192,13 @@ class FPTAS(SolverStrategy):
     The simplified task is then passed to DP algorithm.
     
     """
+
+    def get_column_descriptions(self, show_time: bool = True):
+        output = super().get_column_descriptions(show_time)
+
+        output.insert(output.index("|"), "relative_error")
+
+        return output
 
     def solve(self, task: Task) -> Solution:
         # Prepare important constants
