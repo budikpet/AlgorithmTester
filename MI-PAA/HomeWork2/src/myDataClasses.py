@@ -31,9 +31,9 @@ class Solution:
 
     def __str__(self):
         if self.elapsed_time is None:
-            return f'{abs(self.id)};{self.count};{self.max_value};|;{";".join(map(str, self.things))}'
+            return f'{abs(self.id)} {self.count} {self.max_value} | {" ".join(map(str, self.things))}'
         else:
-            return f'{abs(self.id)};{self.count};{self.max_value};{self.elapsed_time};|;{";".join(map(str, self.things))}'
+            return f'{abs(self.id)} {self.count} {self.max_value} {self.elapsed_time} | {" ".join(map(str, self.things))}'
 
     def __repr__(self):
         return self.__str__()

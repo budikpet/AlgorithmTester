@@ -14,7 +14,7 @@ def checkFile(cliRunner, filePair: FilePair, strategy):
             if solution == "":
                 break
             line = solutionFile.readline().split(" ")
-            solution = solution.split(";")
+            solution = solution.split(" ")
 
             if len(line) == 1:
                 return
