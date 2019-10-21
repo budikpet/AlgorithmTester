@@ -36,23 +36,23 @@ def test_constructive_DP_NK():
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.DP)
 
-def test_constructive_GreedySimple_NK():
+def test_constructive_Greedy_NK():
     path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NK')[0:5]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.GreedySimple)
+        checkFile(cliRunner, filePair, Strategies.Greedy)
 
-def test_constructive_GreedyImproved_NK():
+def test_constructive_GreedyOne_NK():
     path = './data'
     cliRunner = CliRunner()
 
     dataFiles = getFiles(f'{path}/NK')[0:5]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.GreedyImproved)
+        checkFile(cliRunner, filePair, Strategies.GreedyOne)
 
 def test_constructive_FPTAS_NK():
     path = './data'

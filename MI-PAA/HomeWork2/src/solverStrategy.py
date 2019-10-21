@@ -115,7 +115,7 @@ class DynamicProgramming(SolverStrategy):
 
         return None
 
-class GreedySimple(SolverStrategy):
+class Greedy(SolverStrategy):
     """ 
     Uses simple Greedy heuristics. 
 
@@ -144,16 +144,12 @@ class GreedySimple(SolverStrategy):
 
         return Solution(id=task.id, count=task.count, max_value=max_sum, things=tuple(output_things))
 
-class GreedyImproved(SolverStrategy):
+class GreedyOne(SolverStrategy):
     """ 
     Uses modified Greedy heuristics. 
 
     Things list are sorted by key cost in descending order. The list is iterated through and only 1 thing with the best
-    cost possible is added to the bag. This is solution_one.
-
-    Gets solution_multiple of the GreedySimple algorithm.
-
-    Returns solution_one or solution_multiple based on which has higher maximum_sum.
+    cost possible is added to the bag. 
     
     """
 
@@ -161,23 +157,17 @@ class GreedyImproved(SolverStrategy):
         # Sort things by cost comparison descending
         task.things = sorted(task.things, key=lambda thing: thing.cost, reverse=True)
 
-        solution_one: Solution = None
         output_things = [0 for _ in task.things]
         max_value = 0
 
-        # Find solution1
         for thing in task.things:
             if thing.weight <= task.capacity:
                 output_things[thing.position] = 1
                 max_value = thing.cost
                 break
             print
-        solution_one = Solution(id=task.id, count=task.count, max_value=max_value, things=tuple(output_things))
-
-        solution_multiple: Solution = Strategies.GreedySimple.value.solve(task)
-
-        # Return the better solution
-        return solution_one if solution_one.max_value >= solution_multiple.max_value else solution_multiple
+        
+        return Solution(id=task.id, count=task.count, max_value=max_value, things=tuple(output_things))
 
 class FPTAS(SolverStrategy):
     """ Uses FPTAS algorithm. """
@@ -187,8 +177,8 @@ class FPTAS(SolverStrategy):
 
 class Strategies(Enum):
     DP = DynamicProgramming()
-    GreedySimple = GreedySimple()
-    GreedyImproved = GreedyImproved()
+    Greedy = Greedy()
+    GreedyOne = GreedyOne()
     FPTAS = FPTAS()
 
 # class BranchBound(SolverStrategy):
