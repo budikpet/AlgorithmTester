@@ -116,9 +116,33 @@ class DynamicProgramming(SolverStrategy):
         return None
 
 class GreedySimple(SolverStrategy):
-    """ Uses simple Greedy heuristics. """
+    """ 
+    Uses simple Greedy heuristics. 
+
+    Things list are sorted by key (cost/weight) in descending order. The list is iterated through and things are added to the bag
+    if they fit.
+    
+    """
     def solve(self, task: Task) -> Solution:
-        pass
+        # Sort things by cost/weight comparison descending
+        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
+
+        output_things = [0 for _ in task.things]
+        max_sum = 0
+        remaining_capacity = task.capacity
+
+        # Find solution
+        for thing in task.things:
+            if thing.weight <= remaining_capacity:
+                remaining_capacity -= thing.weight
+                max_sum += thing.cost
+                output_things[thing.position] = 1
+
+            if remaining_capacity <= 0:
+                break
+            print
+
+        return Solution(id=task.id, count=task.count, max_value=max_sum, things=tuple(output_things))
 
 class Greedy(SolverStrategy):
     """ Uses modified Greedy heuristics. """

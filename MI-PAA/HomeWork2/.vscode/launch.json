@@ -10,7 +10,9 @@
             "request": "launch",
             "args": [
                 "--dataFile", "${workspaceFolder}/data/NK/NK4_inst.dat",
-                "-s", "DP"
+                "--check-time", "False",
+                "--time-retries", "5",
+                "-s", "GreedySimple"
             ],
             "program": "${workspaceFolder}/src/knapsackSolver.py",
             // "program": "${file}",
@@ -22,10 +24,10 @@
             "request": "launch",
             "args": [
                 "files",
-                "-s", "DP",
+                "-s", "GreedySimple",
                 "--start-count", "4",
                 "--check-time", "True",
-                "--time-retries", "100",
+                "--time-retries", "1000",
                 "${workspaceFolder}/data/NK", 
                 "${workspaceFolder}/analysisOutput/results"
             ],

@@ -4,7 +4,7 @@ from myDataClasses import Solution
 from helpers import FilePair, getFiles
 from click.testing import CliRunner
 
-def checkFile(cliRunner, filePair: FilePair, strategy):
+def checkFile(cliRunner, filePair: FilePair, strategy, exact: bool = False):
     print(f"Testing file: {filePair.dataFile}")
     solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "--check-time", False, "-s", strategy.name]).output.split("\n")
 
@@ -19,8 +19,12 @@ def checkFile(cliRunner, filePair: FilePair, strategy):
             if len(line) == 1:
                 return
 
-            # Check if found value matches
-            assert int(line[2]) == int(solution[2])
+            if exact:
+                # Check if found value matches exactly
+                assert int(line[2]) == int(solution[2])
+            else:
+                # Check if the found value is at most the best value
+                assert int(line[2]) >= int(solution[2])
             print
 
 def test_constructive_DP_NK():
@@ -36,7 +40,7 @@ def test_constructive_GreedySimple_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NK')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:5]
     
     for filePair in dataFiles:
         checkFile(cliRunner, filePair, Strategies.GreedySimple)

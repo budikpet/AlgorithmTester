@@ -27,6 +27,7 @@ class Solution:
     max_value: int
     # Elapsed time in millis
     elapsed_time: float = None
+    # Tuple of 1's and 0's
     things: tuple = field(default_factory=tuple)
 
     def __str__(self):

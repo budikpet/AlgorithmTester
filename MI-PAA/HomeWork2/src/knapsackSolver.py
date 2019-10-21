@@ -21,7 +21,7 @@ inputStrategies = [strategy.name for strategy in Strategies]
 @click.command()
 @click.option("--dataFile", type=click.File("r"), required=True)
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
-@click.option("--time_retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
+@click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0])
 def knapsackSolver(datafile, check_time: bool, time_retries: int, strategy):
     data = datafile.readline()

@@ -57,7 +57,7 @@ def files(strategy, check_time, time_retries, start_count, end_count, input_dir,
             break
 
         # Run command
-        p = Popen(["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "--check-time", str(check_time), "--time_retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        p = Popen(["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
         output_file_name = files_dict[n_key].split("/")[-1].replace(".dat", f'_{strategy}.dat')
         print(f'Running output for: {output_file_name}')
