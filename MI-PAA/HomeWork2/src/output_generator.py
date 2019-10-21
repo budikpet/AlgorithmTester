@@ -17,14 +17,16 @@ inputStrategies = [strategy.name for strategy in Strategies]
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
+@click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
+@click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
-def file(strategy, input_file, output_dir):
-    program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork1/src/knapsackSolver.py"
+def file(strategy, check_time, time_retries, input_file, output_dir):
+    program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2/src/knapsackSolver.py"
     create_path(output_dir)
 
     # Run command
-    p = Popen(["python", program, "--dataFile", input_file.name, "-s", strategy], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    p = Popen(["python", program, "--dataFile", input_file.name, "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
     output_file_name = input_file.name.split("/")[-1].replace(".dat", f'_{strategy}.dat')
     print(f'Running output for: {output_file_name}')

@@ -144,11 +144,40 @@ class GreedySimple(SolverStrategy):
 
         return Solution(id=task.id, count=task.count, max_value=max_sum, things=tuple(output_things))
 
-class Greedy(SolverStrategy):
-    """ Uses modified Greedy heuristics. """
+class GreedyImproved(SolverStrategy):
+    """ 
+    Uses modified Greedy heuristics. 
+
+    Things list are sorted by key cost in descending order. The list is iterated through and only 1 thing with the best
+    cost possible is added to the bag. This is solution_one.
+
+    Gets solution_multiple of the GreedySimple algorithm.
+
+    Returns solution_one or solution_multiple based on which has higher maximum_sum.
+    
+    """
 
     def solve(self, task: Task) -> Solution:
-        pass
+        # Sort things by cost comparison descending
+        task.things = sorted(task.things, key=lambda thing: thing.cost, reverse=True)
+
+        solution_one: Solution = None
+        output_things = [0 for _ in task.things]
+        max_value = 0
+
+        # Find solution1
+        for thing in task.things:
+            if thing.weight <= task.capacity:
+                output_things[thing.position] = 1
+                max_value = thing.cost
+                break
+            print
+        solution_one = Solution(id=task.id, count=task.count, max_value=max_value, things=tuple(output_things))
+
+        solution_multiple: Solution = Strategies.GreedySimple.value.solve(task)
+
+        # Return the better solution
+        return solution_one if solution_one.max_value >= solution_multiple.max_value else solution_multiple
 
 class FPTAS(SolverStrategy):
     """ Uses FPTAS algorithm. """
@@ -159,7 +188,7 @@ class FPTAS(SolverStrategy):
 class Strategies(Enum):
     DP = DynamicProgramming()
     GreedySimple = GreedySimple()
-    Greedy = Greedy()
+    GreedyImproved = GreedyImproved()
     FPTAS = FPTAS()
 
 # class BranchBound(SolverStrategy):
