@@ -171,14 +171,13 @@ class DynamicProgramming(SolverStrategy):
         self.key_list = sorted(self.dp_table_dict, reverse=True)
 
         for curr_sum in self.key_list:
-            for dp_index in range(1, task.count + 1):
-                # Recursively find the best value
-                found_weight: int = self.recursive_solve(task, dp_index, curr_sum)
-                
-                if found_weight <= task.capacity:
-                    # Found the highest value possible
-                    things = self.dp_table_dict[curr_sum].things
-                    return Solution(id=task.id, count=task.count, max_value=curr_sum, relative_mistake=task.relative_mistake, things=things)
+            # Recursively find the best value
+            found_weight: int = self.recursive_solve(task, task.count, curr_sum)
+            
+            if found_weight <= task.capacity:
+                # Found the highest value possible
+                things = self.dp_table_dict[curr_sum].things
+                return Solution(id=task.id, count=task.count, max_value=curr_sum, relative_mistake=task.relative_mistake, things=things)
 
         return None
 
