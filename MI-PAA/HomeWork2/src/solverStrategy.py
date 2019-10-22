@@ -259,11 +259,21 @@ class FPTAS(SolverStrategy):
         simplifier_constant: float = (task.relative_mistake*max_cost)/task.count
 
         # Simplify task
+        old_costs = [thing.cost for thing in task.things]
         for thing in task.things:
             thing.cost = int(thing.cost // simplifier_constant)
 
         # Use DP on the simplified solution
-        return Strategies.DP.value.solve(task)
+        solution: Solution = Strategies.DP.value.solve(task)
+
+        # Get non-updated maximum value
+        max_value = 0
+        for (i, bit) in enumerate(solution.things):
+            if bit == 1:
+                max_value += old_costs[i]
+        solution.max_value = max_value
+
+        return solution
 
 class Strategies(Enum):
     DP = DynamicProgramming()
