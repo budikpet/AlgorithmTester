@@ -13,7 +13,7 @@
                 "--check-time", "False",
                 "--time-retries", "5",
                 "-e", "10",
-                "-s", "DP_Weight"
+                "-s", "DP"
             ],
             "program": "${workspaceFolder}/src/knapsackSolver.py",
             // "program": "${file}",
@@ -25,8 +25,8 @@
             "request": "launch",
             "args": [
                 "files",
-                "-s", "FPTAS",
-                "-e", "10",
+                "-s", "DP_Weight",
+                // "-e", "10",
                 "--start-count", "4",
                 "--check-time", "True",
                 "--time-retries", "1000",

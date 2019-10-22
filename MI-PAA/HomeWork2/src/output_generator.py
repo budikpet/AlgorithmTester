@@ -24,7 +24,7 @@ inputStrategies = [strategy.name for strategy in Strategies]
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
-@click.option("-e", "--relative-mistake", type=float, default=None, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
+@click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.argument("input-file", type=click.File("r"), required=True)
@@ -45,7 +45,7 @@ def file(strategy, relative_mistake, check_time, time_retries, input_file, outpu
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
-@click.option("-e", "--relative-mistake", type=float, default=None, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
+@click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.option("--start-count", type=int, default=4)
@@ -70,7 +70,12 @@ def files(strategy, relative_mistake, check_time, time_retries, start_count, end
             break
 
         # Run command
-        p = Popen(["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "-e", str(relative_mistake), "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+        popen_command = ["python", program, "--dataFile", files_dict[n_key], "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)]
+
+        if relative_mistake is not None:
+            popen_command.extend(["-e", str(relative_mistake)])
+        
+        p = Popen(popen_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
         suffix = f"_{strategy}"
 
@@ -78,7 +83,7 @@ def files(strategy, relative_mistake, check_time, time_retries, start_count, end
             suffix = f"{suffix}_{str(relative_mistake).replace('.', ',')}"
 
         output_file_name = files_dict[n_key].split("/")[-1].replace(".dat", f'{suffix}.dat')
-        print(f'Running output for: {output_file_name}. Started {time.strftime("Started %H:%M:%S %d.%m.")}')
+        print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{output_dir}/{output_file_name}', "w") as output_file:
             for line in p.stdout:
                 output_file.write(line.decode("utf-8"))
