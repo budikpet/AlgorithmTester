@@ -13,7 +13,7 @@
                 "--check-time", "False",
                 "--time-retries", "5",
                 "-e", "10",
-                "-s", "FPTAS"
+                "-s", "DP_Weight"
             ],
             "program": "${workspaceFolder}/src/knapsackSolver.py",
             // "program": "${file}",

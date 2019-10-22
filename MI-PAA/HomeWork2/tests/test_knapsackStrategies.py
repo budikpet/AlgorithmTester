@@ -27,6 +27,15 @@ def checkFile(cliRunner, filePair: FilePair, strategy, exact: bool = False):
                 assert int(line[2]) >= int(solution[2])
             print
 
+def test_constructive_DP_Weight_NK():
+    path = './data'
+    cliRunner = CliRunner()
+
+    dataFiles = getFiles(f'{path}/NK')[0:2]
+    
+    for filePair in dataFiles:
+        checkFile(cliRunner, filePair, Strategies.DP_Weight)
+
 def test_constructive_DP_NK():
     path = './data'
     cliRunner = CliRunner()

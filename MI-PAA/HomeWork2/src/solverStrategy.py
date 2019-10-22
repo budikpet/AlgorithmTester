@@ -31,6 +31,59 @@ class SolverStrategy(object):
     def solve(self, task: Task) -> Solution:
         pass
 
+class DynamicProgramming_Weight(SolverStrategy):
+    """ 
+    Uses DynamicProgramming iterative algorithm. 
+
+    The DP table is a 2D table. Number of rows == capacity. 
+    Each row is a list with exactly (number_of_items + 1) members.
+
+    Algorithm fills the table from the bottom up.
+
+    """
+
+    def get_solution(self, task: Task):
+        # Get the best possible value
+        for i in range(1, task.count+1): 
+            for w in range(1, task.capacity+1): 
+                last_thing: Thing = task.things[i-1]
+                if last_thing.weight <= w: 
+                    # Possible to add thing to the bag
+                    self.dp_table[i][w] = max(last_thing.cost + self.dp_table[i-1][w-last_thing.weight], self.dp_table[i-1][w]) 
+                else: 
+                    self.dp_table[i][w] = self.dp_table[i-1][w]
+        
+        best_value = self.dp_table[task.count][task.capacity]
+        
+        # Get things in the bag
+        remaining_value: int = best_value
+        output_things = [0 for i in range(task.count)]
+        
+        for i in reversed(range(task.count)):
+            row = self.dp_table[i]
+            
+            if remaining_value not in row:
+                # The remaining_value is not present in i-th row so it came with i-th item
+                thing: Thing = task.things[i]
+                remaining_value -= thing.cost
+                output_things[thing.position] = 1
+
+            if remaining_value == 0:
+                break
+
+        return Solution(id=task.id, count=task.count, max_value=best_value, things=tuple(output_things))
+
+    def prepare_table(self, task: Task):
+        dummy_row = [None for i in range(task.capacity + 1)]
+        dummy_row[0] = 0
+
+        self.dp_table = [[0 for i in range(task.capacity + 1)]]
+        self.dp_table.extend([deepcopy(dummy_row) for i in range(task.count)])
+
+    def solve(self, task: Task) -> Solution:
+        self.prepare_table(task)
+        return self.get_solution(task)
+
 class DynamicProgramming(SolverStrategy):
     """ 
     Uses DynamicProgramming recursive algorithm. 
@@ -214,6 +267,7 @@ class FPTAS(SolverStrategy):
 
 class Strategies(Enum):
     DP = DynamicProgramming()
+    DP_Weight = DynamicProgramming_Weight()
     Greedy = Greedy()
     GreedyOne = GreedyOne()
     FPTAS = FPTAS()
