@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from copy import deepcopy
 from typing import List
+import numpy as np
 
 class Context():
 
@@ -129,10 +130,14 @@ class DynamicProgramming(SolverStrategy):
         self.infinite_value = max(task.capacity, max_weight_sum) + 1
         
         # Create dp_table
-        dummy_row = [None for _ in range(self.work_count + 1)]
-        dummy_row[0] = self.infinite_value
-        self.dp_table = [deepcopy(dummy_row) for _ in range(1, self.max_cost_sum + 1)]
-        self.dp_table[0] = [0 for _ in range(self.work_count + 1)]
+        # dummy_row = [None for _ in range(self.work_count + 1)]
+        # dummy_row[0] = self.infinite_value
+        # self.dp_table = [deepcopy(dummy_row) for _ in range(self.max_cost_sum + 1)]
+        # self.dp_table[0] = [0 for _ in range(self.work_count + 1)]
+
+        self.dp_table = np.zeros((self.max_cost_sum + 1, self.work_count + 1))
+        self.dp_table[:,0] = self.infinite_value
+        self.dp_table[0,0] = 0
 
         return True
 
@@ -147,10 +152,12 @@ class DynamicProgramming(SolverStrategy):
 
         curr_thing: Thing = self.work_things[dp_index - 1]
 
-        result: int = min(
-            self.recursive_solve(dp_index - 1, curr_sum), 
-            self.recursive_solve(dp_index - 1, curr_sum - curr_thing.cost) + curr_thing.weight
-            )
+        result1, result2 = self.recursive_solve(dp_index - 1, curr_sum), self.infinite_value
+
+        if curr_sum - curr_thing.cost >= 0:
+            result2 = self.recursive_solve(dp_index - 1, curr_sum - curr_thing.cost) + curr_thing.weight
+
+        result: int = min(result1, result2)
 
         row[dp_index] = result
 
@@ -186,13 +193,28 @@ class DynamicProgramming(SolverStrategy):
             # No item can be added to the bag
             return Solution(id=task.id, count=task.count, max_value=0, relative_mistake=task.relative_mistake, things=tuple(0 for _ in range(task.count)))
         
-        for curr_sum in reversed(range(self.max_cost_sum)):
-            # Recursively find the best value
-            found_weight: int = self.recursive_solve(self.work_count, curr_sum)
+        best_sum = 0
+        for curr_sum in range(1, self.max_cost_sum + 1):
+            for i in range(1, self.work_count + 1):
+                result1, result2 = self.dp_table[curr_sum][i - 1], self.infinite_value
+                curr_thing: Thing = self.work_things[i - 1]
+                if curr_sum - curr_thing.cost >= 0:
+                    result2 = self.dp_table[curr_sum - curr_thing.cost][i - 1] + curr_thing.weight
+
+                self.dp_table[curr_sum][i] = min(result1, result2)
             
-            if found_weight <= task.capacity:
-                # Found the highest value possible
-                return self.construct_solution(task, curr_sum, found_weight)
+            if self.dp_table[curr_sum][i] <= task.capacity:
+                best_sum = curr_sum
+
+        return self.construct_solution(task, best_sum, self.dp_table[best_sum][self.work_count])
+        
+        # for curr_sum in reversed(range(self.max_cost_sum)):
+        #     # Recursively find the best value
+        #     found_weight: int = self.recursive_solve(self.work_count, curr_sum)
+            
+        #     if found_weight <= task.capacity:
+        #         # Found the highest value possible
+        #         return self.construct_solution(task, curr_sum, found_weight)
 
         return None
 
