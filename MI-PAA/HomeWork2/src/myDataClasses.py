@@ -19,8 +19,9 @@ class Task:
 
 @dataclass
 class CostRow:
-    things: tuple = field(default_factory=tuple)
-    row: list = field(default_factory=list)
+    # Holds positions (for the original things list) of things that make the sum.
+    things_positions: tuple = field(default_factory=tuple)
+    row: List[int] = field(default_factory=list)
 
 @dataclass
 class Solution:

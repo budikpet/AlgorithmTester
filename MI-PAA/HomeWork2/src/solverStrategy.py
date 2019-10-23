@@ -103,23 +103,29 @@ class DynamicProgramming(SolverStrategy):
     - ∞ = infinity. Here it's (max(capacity, sum_of_all_weights) + 1)
     """
 
-    def get_things_tuple(self, count: int, set_bits: List[int]):
-        output = deepcopy(set_bits)
-        output.extend([0 for _ in range(count - len(set_bits))])
-        return tuple(output)
+    def simplify_task(self, task: Task) -> bool:
+        # Remove items with cost == 0 or weight > capacity
+        self.work_things = [thing for thing in self.work_things if thing.cost > 0 and thing.weight <= task.capacity]
+        self.work_count = len(self.work_things)
 
-    def prepare_table(self, task: Task):
+        return self.work_count != 0
+
+    def prepare_table(self, task: Task) -> bool:
         """ Prepare the DP table & other important values """
 
+        if not self.simplify_task(task):
+            # No item can be added to the bag
+            return False
+
         # The infinite value == (sum of all weights + 1)
-        self.infinite_value = max(task.capacity, sum(thing.weight for thing in task.things)) + 1
+        self.infinite_value = max(task.capacity, sum(thing.weight for thing in self.work_things)) + 1
         self.dp_table_dict = dict()
         
         # Add 0th row
-        self.dp_table_dict[0] = CostRow(things=tuple([0 for _ in range(task.count)]), row=[0 for _ in range(task.count + 1)])
+        self.dp_table_dict[0] = CostRow(things_positions=tuple(), row=[0 for _ in range(self.work_count + 1)])
         
         count: int = 1
-        max_count: int = pow(2, task.count)
+        max_count: int = pow(2, self.work_count)
         while count < max_count:
             # Get binary representation of count in a list
             bits = [int(bit) for bit in bin(count)[2:]]
@@ -127,22 +133,24 @@ class DynamicProgramming(SolverStrategy):
 
             # Get sum of subset
             curr_sum: int = 0
+            things_positions = list()
             for (i, bit) in enumerate(bits):
                 if bit == 1:
-                    curr_sum += task.things[i].cost
-            things = self.get_things_tuple(count=task.count, set_bits=bits)
+                    curr_thing: Thing = self.work_things[i]
+                    curr_sum += curr_thing.cost
+                    things_positions.append(curr_thing.position)
             
             # Add row to the table
             if curr_sum not in self.dp_table_dict:
                 row = [self.infinite_value]
-                row.extend([None for _ in range(task.count)])
-                self.dp_table_dict[curr_sum] = CostRow(things=things, row=row)
+                row.extend([None for _ in range(self.work_count)])
+                self.dp_table_dict[curr_sum] = CostRow(things_positions=tuple(things_positions), row=row)
 
             count += 1
 
-        print
+        return True
 
-    def recursive_solve(self, task: Task, dp_index: int, curr_sum: int,) -> int:
+    def recursive_solve(self, dp_index: int, curr_sum: int,) -> int:
         """ Recursively find weight for the current position in the table. Returns the found weight. """
 
         cost_row: CostRow = self.dp_table_dict.get(curr_sum)
@@ -155,29 +163,43 @@ class DynamicProgramming(SolverStrategy):
             # Value is already in the table.
             return cost_row.row[dp_index]
 
-        curr_thing: Thing = task.things[dp_index - 1]
+        curr_thing: Thing = self.work_things[dp_index - 1]
 
         result: int = min(
-            self.recursive_solve(task, dp_index - 1, curr_sum), 
-            self.recursive_solve(task, dp_index - 1, curr_sum - curr_thing.cost) + curr_thing.weight
+            self.recursive_solve(dp_index - 1, curr_sum), 
+            self.recursive_solve(dp_index - 1, curr_sum - curr_thing.cost) + curr_thing.weight
             )
 
         cost_row.row[dp_index] = result
 
         return result
 
-    def solve(self, task: Task) -> Solution:
-        self.prepare_table(task)
+    def construct_solution(self, task: Task, curr_sum: int) -> Solution:
+        things_positions = self.dp_table_dict[curr_sum].things_positions
+        things = [0 for _ in range(task.count)]
+        max_sum = 0
+        for pos in things_positions:
+            things[pos] = 1
+            max_sum += task.things[pos].cost
+        return Solution(id=task.id, count=task.count, max_value=max_sum, relative_mistake=task.relative_mistake, things=things)
+
+    def solve(self, task: Task) -> Solution:        
+        self.work_count = task.count
+        self.work_things = [Thing(thing.position, thing.weight, thing.cost) for thing in task.things]
+        
+        if not self.prepare_table(task):
+            # No item can be added to the bag
+            return self.construct_solution(task, 0)
+        
         self.key_list = sorted(self.dp_table_dict, reverse=True)
 
         for curr_sum in self.key_list:
             # Recursively find the best value
-            found_weight: int = self.recursive_solve(task, task.count, curr_sum)
+            found_weight: int = self.recursive_solve(self.work_count, curr_sum)
             
             if found_weight <= task.capacity:
                 # Found the highest value possible
-                things = self.dp_table_dict[curr_sum].things
-                return Solution(id=task.id, count=task.count, max_value=curr_sum, relative_mistake=task.relative_mistake, things=things)
+                return self.construct_solution(task, curr_sum)
 
         return None
 
@@ -257,19 +279,19 @@ class FPTAS(SolverStrategy):
         max_cost = max([thing.cost for thing in task.things])
         simplifier_constant: float = (task.relative_mistake*max_cost)/task.count
 
-        # Simplify task
-        old_costs = [thing.cost for thing in task.things]
-        for thing in task.things:
+        # Create simplified task
+        simplified_task: Task = Task(id=task.id, count=task.count, capacity=task.capacity, relative_mistake=task.relative_mistake, things=deepcopy(task.things))
+        for thing in simplified_task.things:
             thing.cost = int(thing.cost // simplifier_constant)
 
         # Use DP on the simplified solution
-        solution: Solution = Strategies.DP.value.solve(task)
+        solution: Solution = Strategies.DP.value.solve(simplified_task)
 
         # Get non-updated maximum value
         max_value = 0
         for (i, bit) in enumerate(solution.things):
             if bit == 1:
-                max_value += old_costs[i]
+                max_value += task.things[i].cost
         solution.max_value = max_value
 
         return solution
