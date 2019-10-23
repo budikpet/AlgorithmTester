@@ -11,7 +11,7 @@
             "request": "launch",
             "args": [
                 "--dataFile", "${workspaceFolder}/data/NK/NK4_inst.dat",
-                "--check-time", "True",
+                "--check-time", "False",
                 "--time-retries", "5",
                 "-e", "10",
                 "-s", "DP"

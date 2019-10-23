@@ -26,7 +26,7 @@ inputStrategies = [strategy.name for strategy in Strategies]
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
 @click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=True, help="Should the result also check elapsed time.")
-@click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
+@click.option("--time-retries", type=int, default=1, help="How many times should we retry if elapsed time is checked.")
 @click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
 def file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir):

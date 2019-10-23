@@ -110,58 +110,40 @@ class DynamicProgramming(SolverStrategy):
 
         return self.work_count != 0
 
+    def get_max_values(self):
+        max_cost_sum, max_weight_sum = 0, 0
+        for thing in self.work_things:
+            max_cost_sum += thing.cost
+            max_weight_sum += thing.weight
+        return max_cost_sum, max_weight_sum
+
     def prepare_table(self, task: Task) -> bool:
         """ Prepare the DP table & other important values """
 
-        if not self.simplify_task(task):
-            # No item can be added to the bag
-            return False
+        # if not self.simplify_task(task):
+        #     # No item can be added to the bag
+        #     return False
 
         # The infinite value == (sum of all weights + 1)
-        self.infinite_value = max(task.capacity, sum(thing.weight for thing in self.work_things)) + 1
-        self.dp_table_dict = dict()
+        self.max_cost_sum, max_weight_sum = self.get_max_values() 
+        self.infinite_value = max(task.capacity, max_weight_sum) + 1
         
-        # Add 0th row
-        self.dp_table_dict[0] = CostRow(things_positions=tuple(), row=[0 for _ in range(self.work_count + 1)])
-        
-        count: int = 1
-        max_count: int = pow(2, self.work_count)
-        while count < max_count:
-            # Get binary representation of count in a list
-            bits = [int(bit) for bit in bin(count)[2:]]
-            bits = list(reversed(bits))
-
-            # Get sum of subset
-            curr_sum: int = 0
-            things_positions = list()
-            for (i, bit) in enumerate(bits):
-                if bit == 1:
-                    curr_thing: Thing = self.work_things[i]
-                    curr_sum += curr_thing.cost
-                    things_positions.append(curr_thing.position)
-            
-            # Add row to the table
-            if curr_sum not in self.dp_table_dict:
-                row = [self.infinite_value]
-                row.extend([None for _ in range(self.work_count)])
-                self.dp_table_dict[curr_sum] = CostRow(things_positions=tuple(things_positions), row=row)
-
-            count += 1
+        # Create dp_table
+        dummy_row = [None for _ in range(self.work_count + 1)]
+        dummy_row[0] = self.infinite_value
+        self.dp_table = [deepcopy(dummy_row) for _ in range(1, self.max_cost_sum + 1)]
+        self.dp_table[0] = [0 for _ in range(self.work_count + 1)]
 
         return True
 
-    def recursive_solve(self, dp_index: int, curr_sum: int,) -> int:
+    def recursive_solve(self, dp_index: int, curr_sum: int) -> int:
         """ Recursively find weight for the current position in the table. Returns the found weight. """
 
-        cost_row: CostRow = self.dp_table_dict.get(curr_sum)
+        row: List[int] = self.dp_table[curr_sum]
 
-        if cost_row is None:
-            # We requested a sum that is not possible to get with currently specified items. Return infinite
-            return self.infinite_value
-
-        if cost_row.row[dp_index] is not None:
+        if row[dp_index] is not None:
             # Value is already in the table.
-            return cost_row.row[dp_index]
+            return row[dp_index]
 
         curr_thing: Thing = self.work_things[dp_index - 1]
 
@@ -170,18 +152,31 @@ class DynamicProgramming(SolverStrategy):
             self.recursive_solve(dp_index - 1, curr_sum - curr_thing.cost) + curr_thing.weight
             )
 
-        cost_row.row[dp_index] = result
+        row[dp_index] = result
 
         return result
 
-    def construct_solution(self, task: Task, curr_sum: int) -> Solution:
-        things_positions = self.dp_table_dict[curr_sum].things_positions
+    def construct_solution(self, task: Task, found_sum: int, found_weight: int) -> Solution:
+        """ Reconstructs vector of things using the filled table. """
+        things_positions = list()
+        curr_sum = found_sum
+        curr_weight = found_weight
+        for row_index in reversed(range(1, self.work_count + 1)):
+            if self.dp_table[curr_sum][row_index] != self.dp_table[curr_sum][row_index - 1]:
+                # Thing at row_index is in the bag
+                curr_thing: Thing = self.work_things[row_index - 1]
+                things_positions.append(curr_thing.position)
+                curr_weight -= curr_thing.weight
+                curr_sum -= curr_thing.cost
+
+            if curr_weight == 0:
+                break
+
         things = [0 for _ in range(task.count)]
-        max_sum = 0
         for pos in things_positions:
             things[pos] = 1
-            max_sum += task.things[pos].cost
-        return Solution(id=task.id, count=task.count, max_value=max_sum, relative_mistake=task.relative_mistake, things=things)
+
+        return Solution(id=task.id, count=task.count, max_value=found_sum, relative_mistake=task.relative_mistake, things=tuple(things))
 
     def solve(self, task: Task) -> Solution:        
         self.work_count = task.count
@@ -189,17 +184,15 @@ class DynamicProgramming(SolverStrategy):
         
         if not self.prepare_table(task):
             # No item can be added to the bag
-            return self.construct_solution(task, 0)
+            return Solution(id=task.id, count=task.count, max_value=0, relative_mistake=task.relative_mistake, things=tuple(0 for _ in range(task.count)))
         
-        self.key_list = sorted(self.dp_table_dict, reverse=True)
-
-        for curr_sum in self.key_list:
+        for curr_sum in reversed(range(self.max_cost_sum)):
             # Recursively find the best value
             found_weight: int = self.recursive_solve(self.work_count, curr_sum)
             
             if found_weight <= task.capacity:
                 # Found the highest value possible
-                return self.construct_solution(task, curr_sum)
+                return self.construct_solution(task, curr_sum, found_weight)
 
         return None
 
