@@ -87,13 +87,14 @@ class DynamicProgramming_Weight(SolverStrategy):
 
 class DynamicProgramming(SolverStrategy):
     """ 
-    Uses DynamicProgramming recursive algorithm. 
+    Uses DynamicProgramming iterative algorithm. 
 
-    The DP table is a dictionary of rows. Keys are all possible sums of cost of different items. 
+    Uses a DP table – a 2D MxN table. W(i, c) is a weight of filled knapsack when only the first i number of items are considered.
+    The table is filled according to Rules.
+
+    The table is built from bottom up.
     
-    Each row is a list with exactly (number_of_items + 1) members.
-
-    Recursion:
+    Rules:
     - W(0,0) = 0
     - W(0,c) = ∞ for all c > 0
     - W(i, c) = min(W(i-1, c), W(i-1, c-ci) + wi) for all i > 1.
@@ -102,6 +103,7 @@ class DynamicProgramming(SolverStrategy):
     - ci = cost of item at index i
     - wi = weight of item at index i
     - ∞ = infinity. Here it's (max(capacity, sum_of_all_weights) + 1)
+    - M = sum of costs of all things available
     """
 
     def simplify_task(self, task: Task) -> bool:
@@ -130,38 +132,11 @@ class DynamicProgramming(SolverStrategy):
         self.infinite_value = max(task.capacity, max_weight_sum) + 1
         
         # Create dp_table
-        # dummy_row = [None for _ in range(self.work_count + 1)]
-        # dummy_row[0] = self.infinite_value
-        # self.dp_table = [deepcopy(dummy_row) for _ in range(self.max_cost_sum + 1)]
-        # self.dp_table[0] = [0 for _ in range(self.work_count + 1)]
-
         self.dp_table = np.zeros((self.max_cost_sum + 1, self.work_count + 1))
         self.dp_table[:,0] = self.infinite_value
         self.dp_table[0,0] = 0
 
         return True
-
-    def recursive_solve(self, dp_index: int, curr_sum: int) -> int:
-        """ Recursively find weight for the current position in the table. Returns the found weight. """
-
-        row: List[int] = self.dp_table[curr_sum]
-
-        if row[dp_index] is not None:
-            # Value is already in the table.
-            return row[dp_index]
-
-        curr_thing: Thing = self.work_things[dp_index - 1]
-
-        result1, result2 = self.recursive_solve(dp_index - 1, curr_sum), self.infinite_value
-
-        if curr_sum - curr_thing.cost >= 0:
-            result2 = self.recursive_solve(dp_index - 1, curr_sum - curr_thing.cost) + curr_thing.weight
-
-        result: int = min(result1, result2)
-
-        row[dp_index] = result
-
-        return result
 
     def construct_solution(self, task: Task, found_sum: int, found_weight: int) -> Solution:
         """ Reconstructs vector of things using the filled table. """
@@ -207,16 +182,6 @@ class DynamicProgramming(SolverStrategy):
                 best_sum = curr_sum
 
         return self.construct_solution(task, best_sum, self.dp_table[best_sum][self.work_count])
-        
-        # for curr_sum in reversed(range(self.max_cost_sum)):
-        #     # Recursively find the best value
-        #     found_weight: int = self.recursive_solve(self.work_count, curr_sum)
-            
-        #     if found_weight <= task.capacity:
-        #         # Found the highest value possible
-        #         return self.construct_solution(task, curr_sum, found_weight)
-
-        return None
 
 class Greedy(SolverStrategy):
     """ 
@@ -317,79 +282,3 @@ class Strategies(Enum):
     Greedy = Greedy()
     GreedyOne = GreedyOne()
     FPTAS = FPTAS()
-
-# class BranchBound(SolverStrategy):
-#     """ Uses BranchBound algorithm. """
-
-#     def getMaxSum(self, task: Task) -> int:
-#         currSum = 0
-#         for thing in reversed(task.things):
-#             currSum += thing.cost
-
-#         return currSum
-    
-#     # maximumSum: A sum of all objects that are after the current object
-#     def recursiveSolve(self, mode, configCtr: ConfigCounter, task: Task, maximumSum: int, thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
-#         if mode == Modes.Decision and currState.max_value >= task.minValue:
-#             # Found good enough value
-#             return currState
-        
-#         configCtr.value += 1
-#         currThing = task.things[thingAtIndex]
-#         if thingAtIndex >= task.count - 1:
-#             # Last thing
-#             if currThing.weight <= currState.remainingCapacity:
-#                 return currState.newSolution(currThing)
-#             else:
-#                 return currState.newSolution()
-        
-#         # Check all possibilities
-#         if currThing.weight <= currState.remainingCapacity:
-#             if mode == Modes.Decision and maximumSum + currState.max_value < task.minValue:
-#                 # Value of (things in bag + current thing + all things in the subtree) is not high enough
-#                 return currState
-            
-#             # The subtree has high enough value, need to check if things can fit
-#             resultAdded = self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution(currThing))
-            
-#             if resultAdded.max_value >= currState.max_value + maximumSum - currThing.cost:
-#                 # The max_value of the entire branch where this item was not added is not high enough
-#                 # so we do not need to check it
-#                 return resultAdded
-
-#             if mode == Modes.Decision:
-#                 if resultAdded.max_value >= task.minValue:
-#                     # Found good enough value
-#                     return resultAdded
-#                 elif maximumSum - currThing.cost + currState.max_value < task.minValue:
-#                     # Value of (things in bag + all things in the subtree) is not high enough
-#                     return currState
-            
-#             # The subtree has high enough value, need to check if things can fit
-#             resultNotAdded = self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution())
-            
-#             if resultAdded.max_value >= resultNotAdded.max_value:
-#                 return resultAdded.newSolution()
-#             else:
-#                 return resultNotAdded.newSolution()
-
-#         if mode == Modes.Decision and maximumSum - currThing.cost + currState.max_value < task.minValue:
-#                 # Value of (things in bag + all things in the subtree) is not high enough
-#                 return currState        
-        
-#         # Current thing too heavy. The subtree has high enough value, need to check if items fit
-#         return self.recursiveSolve(configCtr, mode, task, maximumSum - currThing.cost, thingAtIndex + 1, currState.newSolution())
-    
-#     def solve(self, task: Task) -> Solution:
-#         # print(f"BranchBound#{task.id} solving.")
-
-#         # Sort things by cost/weight comparison
-#         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
-
-#         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
-#         maximumSum = self.getMaxSum(task)
-#         configCtr = ConfigCounter(0)
-#         mode = None
-#         result = self.recursiveSolve(mode, configCtr, task, maximumSum, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
-
-#         return Solution(task.id, task.count, result.max_value, task.minValue, configCtr.value, result.things)

@@ -21,6 +21,7 @@ def generate_output():
     pass
 
 inputStrategies = [strategy.name for strategy in Strategies]
+program_path = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2"
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
@@ -30,14 +31,24 @@ inputStrategies = [strategy.name for strategy in Strategies]
 @click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
 def file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir):
-    program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2/src/knapsackSolver.py"
+    program = f"{program_path}/src/knapsackSolver.py"
     create_path(output_dir)
 
     # Run command
-    p = Popen(["python", program, "--dataFile", input_file.name, "-s", strategy, "-e", str(relative_mistake), "--check-time", str(check_time), "--time-retries", str(time_retries)], stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+    popen_command = ["python", program, "--dataFile", input_file.name, "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)]
 
-    output_file_name = input_file.name.split("/")[-1].replace(".dat", f'_{strategy}.dat')
-    print(f'Running output for: {output_file_name}')
+    if relative_mistake is not None:
+        popen_command.extend(["-e", str(relative_mistake)])
+    
+    p = Popen(popen_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
+
+    suffix = f"_{strategy}"
+
+    if relative_mistake is not None:
+        suffix = f"{suffix}_{str(relative_mistake).replace('.', ',')}"
+
+    output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
+    print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
     with open(f'{output_dir}/{output_file_name}', "w") as output_file:
         for line in p.stdout:
             output_file.write(line.decode("utf-8"))
@@ -53,7 +64,7 @@ def file(strategy, relative_mistake, check_time, time_retries, input_file, outpu
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
 def files(strategy, relative_mistake, check_time, time_retries, start_count, end_count, input_dir, output_dir):
-    program = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeWork2/src/knapsackSolver.py"
+    program = f"{program_path}/src/knapsackSolver.py"
     create_path(output_dir)
 
     create_columns_description_file(strategy, check_time, output_dir)
