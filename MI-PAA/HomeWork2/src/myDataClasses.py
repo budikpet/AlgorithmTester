@@ -22,12 +22,14 @@ class AnalysisFile:
 
     def __init__(self, filename: str, full_path: str):
         parts = filename.replace(".dat", "").split("_")
-        self.numOfItems = int(re.findall("[0-9]+", parts[0])[0])
-        self.dataset = parts[0].replace(f"{self.numOfItems}", "")
+        self.num_of_items = int(re.findall("[0-9]+", parts[0])[0])
+        self.dataset = parts[0].replace(f"{self.num_of_items}", "")
         self.strategy = parts[2]
         
         if len(parts) > 3:
             self.relative_mistake = float(parts[3].replace(",", "."))
+        else:
+            self.relative_mistake = float(-1)
 
         self.full_path = full_path
 
