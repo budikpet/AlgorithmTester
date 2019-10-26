@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 from enum import Enum
+import re
 
 @dataclass
 class Thing:
@@ -17,11 +18,18 @@ class Task:
     relative_mistake: float
     things: List[Thing] = field(default_factory=list)
 
-@dataclass
-class CostRow:
-    # Holds positions (for the original things list) of things that make the sum.
-    things_positions: tuple = field(default_factory=tuple)
-    row: List[int] = field(default_factory=list)
+class AnalysisFile:
+
+    def __init__(self, filename: str, full_path: str):
+        parts = filename.replace(".dat", "").split("_")
+        self.numOfItems = int(re.findall("[0-9]+", parts[0])[0])
+        self.dataset = parts[0].replace(f"{self.numOfItems}", "")
+        self.strategy = parts[2]
+        
+        if len(parts) > 3:
+            self.relative_mistake = float(parts[3].replace(",", "."))
+
+        self.full_path = full_path
 
 @dataclass
 class Solution:

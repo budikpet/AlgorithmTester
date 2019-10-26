@@ -4,6 +4,8 @@ import re
 import shutil
 from math import log, ceil
 from solverStrategy import Strategies
+from myDataClasses import AnalysisFile
+from typing import List
 
 class FilePair:
     def __init__(self, file1, file2):
@@ -15,6 +17,23 @@ class FilePair:
 @click.group()
 def helpers():
     pass
+
+def get_analysis_files(path: str):
+    """ 
+    Reads analysisOutput files in path.
+
+    Returns a list of AnalysisFile objects
+
+    """
+    data = list()
+    
+    # r=root, d=directories, f = files
+    for root, _, files in os.walk(path):
+        for file in files:
+            if "column" not in file:
+                full_path = f'{root}/{file}'
+                data.append(AnalysisFile(file, full_path))
+    return data
 
 def get_files_dict(path: str):
     data = dict()

@@ -36,6 +36,13 @@
             ],
             "program": "${workspaceFolder}/src/output_generator.py",
             "console": "integratedTerminal"
-        }
+        },
+        {
+            "name": "Helpers",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/helpers.py",
+            "console": "integratedTerminal"
+        },
     ]
 }

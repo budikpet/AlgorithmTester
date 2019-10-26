@@ -1,4 +1,4 @@
-from myDataClasses import Task, Solution, Thing, CostRow
+from myDataClasses import Task, Solution, Thing
 from dataclasses import dataclass
 from enum import Enum
 from copy import deepcopy
@@ -278,7 +278,7 @@ class FPTAS(SolverStrategy):
 
 class Strategies(Enum):
     DP = DynamicProgramming()
-    DP_Weight = DynamicProgramming_Weight()
+    DPWeight = DynamicProgramming_Weight()
     Greedy = Greedy()
     GreedyOne = GreedyOne()
     FPTAS = FPTAS()
