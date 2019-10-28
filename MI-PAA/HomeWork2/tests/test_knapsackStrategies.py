@@ -34,7 +34,7 @@ def test_constructive_DP_Weight_NK():
     dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.DP_Weight, exact=True)
+        checkFile(cliRunner, filePair, Strategies.DPWeight, exact=True)
 
 def test_constructive_DP_NK():
     path = './data'
