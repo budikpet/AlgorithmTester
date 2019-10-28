@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
 
         {
             "name": "KnapsackSolver",
@@ -17,6 +18,23 @@
                 "-s", "DP"
             ],
             "program": "${workspaceFolder}/src/knapsackSolver.py",
+            // "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "OutputGenerator: file",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "file",
+                "--check-time", "False",
+                "--time-retries", "1",
+                "-e", "10",
+                "-s", "FPTAS",
+                "${workspaceFolder}/data/NK/NK4_inst.dat",
+                "${workspaceFolder}/analysisOutput/results"
+            ],
+            "program": "${workspaceFolder}/src/output_generator.py",
             // "program": "${file}",
             "console": "integratedTerminal"
         },
