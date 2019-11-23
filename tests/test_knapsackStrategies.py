@@ -1,12 +1,12 @@
 from knapsackSolver import knapsackSolver
-from solverStrategy import Strategies, Modes
+from solverStrategy import Strategies
 from myDataClasses import Solution
 from helpers import FilePair, getFiles
 from click.testing import CliRunner
 
-def checkFile(cliRunner, filePair: FilePair, strategy, mode):
+def checkFile(cliRunner, filePair: FilePair, strategy, exact: bool = False):
     print(f"Testing file: {filePair.dataFile}")
-    solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "-s", strategy.name, "--mode", mode.name]).output.split("\n")
+    solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "-t", False, "-s", strategy.name, "-e", 10]).output.split("\n")
 
     # Check values
     with open(filePair.solutionFile, "r") as solutionFile:
@@ -19,85 +19,55 @@ def checkFile(cliRunner, filePair: FilePair, strategy, mode):
             if len(line) == 1:
                 return
 
-            # solution = what the programme calculated
-            # line = what we got from the solution's file
-            assert int(solution[1]) <= pow(2, int(solution[2]))
-
-            if mode == Modes.Constructive:
-                assert int(line[2]) == int(solution[3])
+            if exact:
+                # Check if found value matches exactly
+                assert int(line[2]) == int(solution[2])
             else:
-                # Either we got higher value than the wanted minValue, or the optimal value is lesser then the wanted minValue
-                assert int(solution[3]) >= int(solution[4]) or int(line[2]) < int(solution[4])
+                # Check if the found value is at most the best value
+                assert int(line[2]) >= int(solution[2])
             print
 
-def test_constructive_bruteForce_NR():
+def test_constructive_DP_Weight_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.DPWeight, exact=True)
 
-def test_constructive_branchBound_NR():
+def test_constructive_DP_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.DP, exact=True)
 
-def test_constructive_unsortedBranchBound_NR():
+def test_constructive_Greedy_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:5]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.Greedy)
 
-def test_decision_bruteForce_NR():
+def test_constructive_GreedyOne_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:2]
+    dataFiles = getFiles(f'{path}/NK')[0:5]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Decision)
+        checkFile(cliRunner, filePair, Strategies.GreedyOne)
 
-def test_decision_branchBound_NR():
+def test_constructive_FPTAS_NK():
     path = './data'
     cliRunner = CliRunner()
 
-    dataFiles = getFiles(f'{path}/NR')[0:3]
+    dataFiles = getFiles(f'{path}/NK')[0:2]
     
     for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Decision)
-
-def test_decision_unsortedBranchBound_NR():
-    path = './data'
-    cliRunner = CliRunner()
-
-    dataFiles = getFiles(f'{path}/NR')[0:3]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.UnsortedBranchBound, Modes.Decision)
-
-# def test_constructive_bruteForce_ZR():
-#     path = './data'
-#     cliRunner = CliRunner()
-
-#     dataFiles = getFiles(f'{path}/ZR')[0:2]
-    
-#     for filePair in dataFiles:
-#         checkFile(cliRunner, filePair, Strategies.BruteForce, Modes.Constructive)
-
-# def test_constructive_branchBound_ZR():
-#     path = './data'
-#     cliRunner = CliRunner()
-
-#     dataFiles = getFiles(f'{path}/ZR')[0:2]
-    
-#     for filePair in dataFiles:
-#         checkFile(cliRunner, filePair, Strategies.BranchBound, Modes.Constructive)
+        checkFile(cliRunner, filePair, Strategies.FPTAS)
