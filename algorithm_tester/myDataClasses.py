@@ -44,7 +44,7 @@ class Solution:
     # Tuple of 1's and 0's
     things: tuple = field(default_factory=tuple)
 
-    def __str__(self):
+    def output_str(self) -> str:
         output = f'{abs(self.id)} {self.count} {self.max_value}'
 
         if self.elapsed_time is not None:
@@ -55,5 +55,16 @@ class Solution:
 
         return f'{output} | {" ".join(map(str, self.things))}'
 
-    def __repr__(self):
-        return self.__str__()
+    # def __str__(self):
+    #     output = f'{abs(self.id)} {self.count} {self.max_value}'
+
+    #     if self.elapsed_time is not None:
+    #         output = f'{output} {self.elapsed_time}'
+
+    #     if self.relative_mistake is not None:
+    #         output = f'{output} {self.relative_mistake}'
+
+    #     return f'{output} | {" ".join(map(str, self.things))}'
+
+    # def __repr__(self):
+    #     return self.__str__()

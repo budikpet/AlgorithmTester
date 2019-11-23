@@ -5,6 +5,8 @@ import os
 import time
 from solverStrategy import Strategies
 from helpers import get_files_dict
+from knapsackSolver import knapsackSolver
+from myDataClasses import Solution
 
 def create_path(path):
     if not os.path.isdir(path):
@@ -31,16 +33,7 @@ program_path = "/Users/petr/Documents/Projects/Python/PythonSamples/MI-PAA/HomeW
 @click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
 def file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir):
-    program = f"{program_path}/src/knapsackSolver.py"
     create_path(output_dir)
-
-    # Run command
-    popen_command = ["python", program, "--dataFile", input_file.name, "-s", strategy, "--check-time", str(check_time), "--time-retries", str(time_retries)]
-
-    if relative_mistake is not None:
-        popen_command.extend(["-e", str(relative_mistake)])
-    
-    p = Popen(popen_command, stdin=PIPE, stdout=PIPE, stderr=STDOUT)
 
     suffix = f"_{strategy}"
 
@@ -48,11 +41,16 @@ def file(strategy, relative_mistake, check_time, time_retries, input_file, outpu
         suffix = f"{suffix}_{str(relative_mistake).replace('.', ',')}"
 
     output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
+    
+    it = knapsackSolver(datafile=input_file, check_time=check_time, 
+        strategy=strategy, time_retries=time_retries, relative_mistake=relative_mistake)
+
     print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
     with open(f'{output_dir}/{output_file_name}', "w") as output_file:
-        for line in p.stdout:
-            output_file.write(line.decode("utf-8"))
-            output_file.flush()
+        for solution in it:
+            print(f'output_gen: {solution.output_str()}')
+            output_file.write(f"{solution.output_str()}\n")
+            output_file.flush()         
 
 @generate_output.command()
 @click.option("-s", "--strategy", type=click.Choice(inputStrategies), default=inputStrategies[0], show_default=True)
