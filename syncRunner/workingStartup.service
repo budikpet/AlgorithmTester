@@ -1,8 +1,0 @@
-Unit]
-Description=Startup
-
-[Service]
-ExecStart=/home/petr/Documents/LocalShared/syncRunner/test.sh
-
-[Install]
-WantedBy=multi-user.target
