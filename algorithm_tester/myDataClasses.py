@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import List
 from enum import Enum
 import re
+from copy import deepcopy
 
 @dataclass
 class Thing:
@@ -55,16 +56,20 @@ class Solution:
 
         return f'{output} | {" ".join(map(str, self.things))}'
 
-    # def __str__(self):
-    #     output = f'{abs(self.id)} {self.count} {self.max_value}'
+@dataclass
+class ConfigCounter:
+    value: int
 
-    #     if self.elapsed_time is not None:
-    #         output = f'{output} {self.elapsed_time}'
+@dataclass
+class RecursiveResult:
+    remainingCapacity: int
+    maxValue: int
+    things: List[int]
 
-    #     if self.relative_mistake is not None:
-    #         output = f'{output} {self.relative_mistake}'
-
-    #     return f'{output} | {" ".join(map(str, self.things))}'
-
-    # def __repr__(self):
-    #     return self.__str__()
+    def newSolution(self, thing: Thing = None):        
+        if thing is not None:
+            things = deepcopy(self.things)
+            things[thing.position] = 1
+            return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, things)
+        else:
+            return RecursiveResult(self.remainingCapacity, self.maxValue, deepcopy(self.things))

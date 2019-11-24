@@ -9,9 +9,12 @@ from algorithm_tester.helpers import FilePair, getFiles
 @pytest.mark.parametrize(
     ['strategy', 'exact', 'relative_mistake'],
     [
+        (Strategies.Brute, True, None),
+        (Strategies.BB, True, None),
+        (Strategies.UBB, True, None),
         (Strategies.DP, True, None),
-        (Strategies.Greedy, False, None),
-        (Strategies.FPTAS, True, 0.01)
+        (Strategies.DPWeight, True, None),
+        (Strategies.Greedy, False, None)
     ]
 )
 def test_algorithm(strategy: Strategies, exact: bool, relative_mistake: float):
