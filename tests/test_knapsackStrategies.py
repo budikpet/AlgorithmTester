@@ -1,9 +1,9 @@
 import pytest
 from click.testing import CliRunner
 from typing import List
-from algorithm_tester.knapsackSolver import knapsackSolver
-from algorithm_tester.solverStrategy import Strategies
-from algorithm_tester.myDataClasses import Solution
+from algorithm_tester.knapsack_solver import knapsack_solver
+from algorithm_tester.solver_strategy import Strategies
+from algorithm_tester.my_data_classes import Solution
 from algorithm_tester.helpers import FilePair, getFiles
 
 @pytest.mark.parametrize(
@@ -27,7 +27,7 @@ def test_algorithm(strategy: Strategies, exact: bool, relative_mistake: float):
             solutions: List[str] = solutionFile.readlines()
 
         with open(filepair.dataFile, "r") as datafile:
-            it = knapsackSolver(datafile=datafile, strategy=strategy.name, 
+            it = knapsack_solver(datafile=datafile, strategy=strategy.name, 
                 relative_mistake=relative_mistake, time_retries=1, check_time=False)
 
             # Compare solutions

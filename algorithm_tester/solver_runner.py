@@ -3,10 +3,10 @@ import click
 from typing import Dict
 import os
 import time
-from algorithm_tester.solverStrategy import Strategies
+from algorithm_tester.solver_strategy import Strategies
 from algorithm_tester.helpers import get_files_dict
-from algorithm_tester.knapsackSolver import knapsackSolver
-from algorithm_tester.myDataClasses import Solution
+from algorithm_tester.knapsack_solver import knapsack_solver
+from algorithm_tester.my_data_classes import Solution
 
 def create_path(path):
     if not os.path.isdir(path):
@@ -30,7 +30,7 @@ def run_algorithm_for_file(strategy, relative_mistake, check_time, time_retries,
 
     output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
     
-    it = knapsackSolver(datafile=input_file, check_time=check_time, 
+    it = knapsack_solver(datafile=input_file, check_time=check_time, 
         strategy=strategy, time_retries=time_retries, relative_mistake=relative_mistake)
 
     print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')

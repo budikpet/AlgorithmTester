@@ -1,7 +1,7 @@
 import os
 import timeit
-from algorithm_tester.myDataClasses import Task, Solution, Thing
-from algorithm_tester.solverStrategy import Strategies, Context
+from algorithm_tester.my_data_classes import Task, Solution, Thing
+from algorithm_tester.solver_strategy import Strategies, Context
 
 # Enable timeit to return elapsed time and return value
 new_template = """
@@ -15,7 +15,7 @@ def inner(_it, _timer{init}):
 """
 timeit.template = new_template
 
-def knapsackSolver(datafile, strategy: str, check_time: bool, time_retries: int, relative_mistake: float = None):
+def knapsack_solver(datafile, strategy: str, check_time: bool, time_retries: int, relative_mistake: float = None):
     data = datafile.readline()
     context = Context(Strategies[strategy].value)
 

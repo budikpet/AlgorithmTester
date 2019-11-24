@@ -4,8 +4,8 @@ import re
 import shutil
 from math import log, ceil
 from typing import List
-from algorithm_tester.solverStrategy import Strategies
-from algorithm_tester.myDataClasses import AnalysisFile
+from algorithm_tester.solver_strategy import Strategies
+from algorithm_tester.my_data_classes import AnalysisFile
 
 class FilePair:
     def __init__(self, file1, file2):

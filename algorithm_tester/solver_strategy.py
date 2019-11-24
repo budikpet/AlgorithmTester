@@ -3,7 +3,7 @@ from enum import Enum
 from copy import deepcopy
 from typing import List
 import numpy as np
-from algorithm_tester.myDataClasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
+from algorithm_tester.my_data_classes import Task, Solution, Thing, ConfigCounter, RecursiveResult
 
 class Context():
 
@@ -13,7 +13,7 @@ class Context():
     def solve(self, task: Task) -> Solution:
         return self.strategy.solve(task)
 
-class SolverStrategy(object):
+class solver_strategy(object):
 
     def get_column_descriptions(self, show_time: bool = True):
         output = [
@@ -32,7 +32,7 @@ class SolverStrategy(object):
     def solve(self, task: Task) -> Solution:
         pass
 
-class BruteForce(SolverStrategy):
+class BruteForce(solver_strategy):
     """ Uses Brute force  """
 
     def recursiveSolve(self, configCtr: ConfigCounter, task: Task, thingAtIndex: int, currState: RecursiveResult) -> RecursiveResult:
@@ -67,7 +67,7 @@ class BruteForce(SolverStrategy):
 
         return Solution(task.id, task.count, result.maxValue, configCtr.value, result.things)
 
-class BranchBound(SolverStrategy):
+class BranchBound(solver_strategy):
     """ Uses BranchBound algorithm. """
 
     def getMaxSum(self, task: Task) -> int:
@@ -120,7 +120,7 @@ class BranchBound(SolverStrategy):
 
         return Solution(task.id, task.count, result.maxValue, configCtr.value, result.things)
 
-class UnsortedBranchBound(SolverStrategy):
+class UnsortedBranchBound(solver_strategy):
     """ Uses BranchBound algorithm without sorting the input first. """
     
     def solve(self, task: Task) -> Solution:
@@ -133,7 +133,7 @@ class UnsortedBranchBound(SolverStrategy):
 
         return Solution(task.id, task.count, result.maxValue, configCtr.value, result.things)
 
-class DynamicProgramming_Weight(SolverStrategy):
+class DynamicProgramming_Weight(solver_strategy):
     """ 
     Uses DynamicProgramming iterative algorithm. 
 
@@ -186,7 +186,7 @@ class DynamicProgramming_Weight(SolverStrategy):
         self.prepare_table(task)
         return self.get_solution(task)
 
-class DynamicProgramming(SolverStrategy):
+class DynamicProgramming(solver_strategy):
     """ 
     Uses DynamicProgramming iterative algorithm. 
 
@@ -284,7 +284,7 @@ class DynamicProgramming(SolverStrategy):
 
         return self.construct_solution(task, best_sum, self.dp_table[best_sum][self.work_count])
 
-class Greedy(SolverStrategy):
+class Greedy(solver_strategy):
     """ 
     Uses simple Greedy heuristics. 
 
