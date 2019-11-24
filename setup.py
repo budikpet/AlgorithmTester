@@ -22,11 +22,11 @@ setup(
     url='https://github.com/budikpet/AlgorithmTester',
     zip_safe=False,
     packages=find_packages(),
-    # entry_points={
-    #     'console_scripts': [
-    #         'ghia = ghia:ghia',
-    #     ],
-    # },
+    entry_points={
+        'console_scripts': [
+            'solver = algorithm_tester:solver',
+        ],
+    },
     # package_data={
     #     'ghia': ['templates/*.html', 'static/*.css']
     #     },

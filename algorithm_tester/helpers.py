@@ -3,9 +3,9 @@ import click
 import re
 import shutil
 from math import log, ceil
-from solverStrategy import Strategies
-from myDataClasses import AnalysisFile
 from typing import List
+from algorithm_tester.solverStrategy import Strategies
+from algorithm_tester.myDataClasses import AnalysisFile
 
 class FilePair:
     def __init__(self, file1, file2):

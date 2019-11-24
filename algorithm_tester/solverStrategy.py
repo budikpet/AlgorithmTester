@@ -1,9 +1,9 @@
-from myDataClasses import Task, Solution, Thing
 from dataclasses import dataclass
 from enum import Enum
 from copy import deepcopy
 from typing import List
 import numpy as np
+from algorithm_tester.myDataClasses import Task, Solution, Thing
 
 class Context():
 

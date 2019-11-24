@@ -1,7 +1,7 @@
 import os
 import timeit
-from myDataClasses import Task, Solution, Thing
-from solverStrategy import Strategies, Context
+from algorithm_tester.myDataClasses import Task, Solution, Thing
+from algorithm_tester.solverStrategy import Strategies, Context
 
 # Enable timeit to return elapsed time and return value
 new_template = """
