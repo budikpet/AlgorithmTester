@@ -1,73 +1,43 @@
-from knapsackSolver import knapsackSolver
-from solverStrategy import Strategies
-from myDataClasses import Solution
-from helpers import FilePair, getFiles
+import pytest
 from click.testing import CliRunner
+from typing import List
+from algorithm_tester.knapsackSolver import knapsackSolver
+from algorithm_tester.solverStrategy import Strategies
+from algorithm_tester.myDataClasses import Solution
+from algorithm_tester.helpers import FilePair, getFiles
 
-def checkFile(cliRunner, filePair: FilePair, strategy, exact: bool = False):
-    print(f"Testing file: {filePair.dataFile}")
-    solutions = cliRunner.invoke(knapsackSolver, ["--dataFile", filePair.dataFile, "-t", False, "-s", strategy.name, "-e", 10]).output.split("\n")
-
-    # Check values
-    with open(filePair.solutionFile, "r") as solutionFile:
-        for solution in solutions:
-            if solution == "":
-                break
-            line = solutionFile.readline().split(" ")
-            solution = solution.split(" ")
-
-            if len(line) == 1:
-                return
-
-            if exact:
-                # Check if found value matches exactly
-                assert int(line[2]) == int(solution[2])
-            else:
-                # Check if the found value is at most the best value
-                assert int(line[2]) >= int(solution[2])
-            print
-
-def test_constructive_DP_Weight_NK():
+@pytest.mark.parametrize(
+    ['strategy', 'exact', 'relative_mistake'],
+    [
+        (Strategies.DP, True, None),
+        (Strategies.Greedy, False, None),
+        (Strategies.FPTAS, True, 0.01)
+    ]
+)
+def test_algorithm(strategy: Strategies, exact: bool, relative_mistake: float):
     path = './data'
-    cliRunner = CliRunner()
+    dataFiles = getFiles(f'{path}/NK')[0:1]
 
-    dataFiles = getFiles(f'{path}/NK')[0:2]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.DPWeight, exact=True)
+    for filepair in dataFiles:
+        # Get all solutions of the current problem
+        with open(filepair.solutionFile, "r") as solutionFile:
+            solutions: List[str] = solutionFile.readlines()
 
-def test_constructive_DP_NK():
-    path = './data'
-    cliRunner = CliRunner()
+        with open(filepair.dataFile, "r") as datafile:
+            it = knapsackSolver(datafile=datafile, strategy=strategy.name, 
+                relative_mistake=relative_mistake, time_retries=1, check_time=False)
 
-    dataFiles = getFiles(f'{path}/NK')[0:2]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.DP, exact=True)
+            # Compare solutions
+            for index, solution in enumerate(it):
+                given_solution = solutions[index].split(" ")
+                found_solution = solution.output_str().split(" ")
+                    
+                if exact:
+                    # Check if found value matches exactly
+                    assert int(given_solution[2]) == int(found_solution[2])
+                else:
+                    # Check if the found value is at most the best value
+                    assert int(given_solution[2]) >= int(found_solution[2])
+                print
 
-def test_constructive_Greedy_NK():
-    path = './data'
-    cliRunner = CliRunner()
-
-    dataFiles = getFiles(f'{path}/NK')[0:5]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.Greedy)
-
-def test_constructive_GreedyOne_NK():
-    path = './data'
-    cliRunner = CliRunner()
-
-    dataFiles = getFiles(f'{path}/NK')[0:5]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.GreedyOne)
-
-def test_constructive_FPTAS_NK():
-    path = './data'
-    cliRunner = CliRunner()
-
-    dataFiles = getFiles(f'{path}/NK')[0:2]
-    
-    for filePair in dataFiles:
-        checkFile(cliRunner, filePair, Strategies.FPTAS)
+    print

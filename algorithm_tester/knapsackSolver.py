@@ -15,7 +15,7 @@ def inner(_it, _timer{init}):
 """
 timeit.template = new_template
 
-def knapsackSolver(datafile, relative_mistake: float, check_time: bool, time_retries: int, strategy):
+def knapsackSolver(datafile, strategy: str, check_time: bool, time_retries: int, relative_mistake: float = None):
     data = datafile.readline()
     context = Context(Strategies[strategy].value)
 
