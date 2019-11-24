@@ -62,14 +62,14 @@ class ConfigCounter:
 
 @dataclass
 class RecursiveResult:
-    remainingCapacity: int
-    maxValue: int
+    remaining_capacity: int
+    max_value: int
     things: List[int]
 
-    def newSolution(self, thing: Thing = None):        
+    def new_solution(self, thing: Thing = None):        
         if thing is not None:
             things = deepcopy(self.things)
             things[thing.position] = 1
-            return RecursiveResult(self.remainingCapacity - thing.weight, self.maxValue + thing.cost, things)
+            return RecursiveResult(self.remaining_capacity - thing.weight, self.max_value + thing.cost, things)
         else:
-            return RecursiveResult(self.remainingCapacity, self.maxValue, deepcopy(self.things))
+            return RecursiveResult(self.remaining_capacity, self.max_value, deepcopy(self.things))
