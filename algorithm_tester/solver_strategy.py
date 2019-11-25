@@ -25,7 +25,11 @@ class solver_strategy(object):
         ]
 
         if show_time:
-            output.insert(output.index("|"), "time")
+            # time counted as real time
+            output.insert(output.index("|"), "time[ms]")
+        else:
+            # time counted as number of configurations
+            output.insert(output.index("|"), "time[#configs]")
 
         return output
     

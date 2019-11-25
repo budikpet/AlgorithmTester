@@ -11,8 +11,8 @@
             "args": [
                 "file",
                 "--check-time", "False",
-                "--time-retries", "1",
-                "-e", "10",
+                // "--time-retries", "1",
+                // "-e", "10",
                 "-s", "DP",
                 "${workspaceFolder}/data/NK/NK4_inst.dat",
                 "${workspaceFolder}/analysis/tester_results"
@@ -27,10 +27,10 @@
             "args": [
                 "files",
                 "-s", "DPWeight",
+                // "--time-retries", "1000",
                 // "-e", "10",
                 "--start-count", "4",
                 "--check-time", "True",
-                "--time-retries", "1000",
                 "${workspaceFolder}/data/NK", 
                 "${workspaceFolder}/analysis/tester_results"
             ],
