@@ -3,7 +3,7 @@ from enum import Enum
 from copy import deepcopy
 from typing import List
 import numpy as np
-from algorithm_tester.my_data_classes import Task, Solution, Thing, ConfigCounter, RecursiveResult
+from algorithm_tester.mydataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
 
 class Context():
 
@@ -65,7 +65,8 @@ class BruteForce(solver_strategy):
         config_ctr = ConfigCounter(0)
         result = self.recursive_solve(config_ctr, task, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
 
-        return Solution(task.id, task.count, result.max_value, config_ctr.value, result.things)
+        return Solution(id=task.id, count=task.count, max_value=result.max_value, 
+            elapsed_configs=config_ctr.value, things=result.things)
 
 class BranchBound(solver_strategy):
     """ Uses BranchBound algorithm. """
@@ -118,7 +119,8 @@ class BranchBound(solver_strategy):
         config_ctr = ConfigCounter(0)
         result = self.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
 
-        return Solution(task.id, task.count, result.max_value, config_ctr.value, result.things)
+        return Solution(id=task.id, count=task.count, max_value=result.max_value, 
+            elapsed_configs=config_ctr.value, things=result.things)
 
 class UnsortedBranchBound(solver_strategy):
     """ Uses BranchBound algorithm without sorting the input first. """
@@ -131,7 +133,8 @@ class UnsortedBranchBound(solver_strategy):
         config_ctr = ConfigCounter(0)
         result = solver.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(task.capacity, 0, [0 for i in task.things]))
 
-        return Solution(task.id, task.count, result.max_value, config_ctr.value, result.things)
+        return Solution(id=task.id, count=task.count, max_value=result.max_value, 
+            elapsed_configs=config_ctr.value, things=result.things)
 
 class DynamicProgramming_Weight(solver_strategy):
     """ 
@@ -144,10 +147,11 @@ class DynamicProgramming_Weight(solver_strategy):
 
     """
 
-    def get_solution(self, task: Task):
+    def get_solution(self, task: Task, config_ctr: ConfigCounter):
         # Get the best possible value
         for i in range(1, task.count+1): 
-            for w in range(1, task.capacity+1): 
+            for w in range(1, task.capacity+1):
+                config_ctr.value += 1
                 last_thing: Thing = task.things[i-1]
                 if last_thing.weight <= w: 
                     # Possible to add thing to the bag
@@ -173,7 +177,8 @@ class DynamicProgramming_Weight(solver_strategy):
             if remaining_value == 0:
                 break
 
-        return Solution(id=task.id, count=task.count, max_value=best_value, things=tuple(output_things))
+        return Solution(id=task.id, count=task.count, max_value=best_value, 
+            elapsed_configs=config_ctr.value, things=tuple(output_things))
 
     def prepare_table(self, task: Task):
         dummy_row = [None for i in range(task.capacity + 1)]
@@ -184,7 +189,9 @@ class DynamicProgramming_Weight(solver_strategy):
 
     def solve(self, task: Task) -> Solution:
         self.prepare_table(task)
-        return self.get_solution(task)
+
+        config_ctr = ConfigCounter(0)
+        return self.get_solution(task, config_ctr)
 
 class DynamicProgramming(solver_strategy):
     """ 
@@ -235,9 +242,9 @@ class DynamicProgramming(solver_strategy):
 
         return True
 
-    def construct_solution(self, task: Task, found_sum: int, found_weight: int) -> Solution:
+    def construct_solution(self, task: Task, found_sum: int, found_weight: int, config_ctr: int) -> Solution:
         """ Reconstructs vector of things using the filled table. """
-        
+
         things_positions = list()
         curr_sum = found_sum
         curr_weight = found_weight
@@ -256,7 +263,8 @@ class DynamicProgramming(solver_strategy):
         for pos in things_positions:
             things[pos] = 1
 
-        return Solution(id=task.id, count=task.count, max_value=found_sum, relative_mistake=task.relative_mistake, things=tuple(things))
+        return Solution(id=task.id, count=task.count, max_value=found_sum, 
+            relative_mistake=task.relative_mistake, elapsed_configs=config_ctr, things=tuple(things))
 
     def solve(self, task: Task) -> Solution:        
         self.work_count = task.count
@@ -267,8 +275,10 @@ class DynamicProgramming(solver_strategy):
             return Solution(id=task.id, count=task.count, max_value=0, relative_mistake=task.relative_mistake, things=tuple(0 for _ in range(task.count)))
         
         best_sum = 0
+        config_ctr: int = 0
         for curr_sum in range(1, self.max_cost_sum + 1):
             for i in range(1, self.work_count + 1):
+                config_ctr += 1
                 result1, result2 = self.dp_table[curr_sum][i - 1], self.infinite_value
                 curr_thing: Thing = self.work_things[i - 1]
                 if curr_sum - curr_thing.cost >= 0:
@@ -279,7 +289,8 @@ class DynamicProgramming(solver_strategy):
             if self.dp_table[curr_sum][i] <= task.capacity:
                 best_sum = curr_sum
 
-        return self.construct_solution(task, best_sum, self.dp_table[best_sum][self.work_count])
+        return self.construct_solution(task=task, found_sum=best_sum, 
+            found_weight=self.dp_table[best_sum][self.work_count], config_ctr=config_ctr)
 
 class Greedy(solver_strategy):
     """ 
@@ -298,8 +309,10 @@ class Greedy(solver_strategy):
         remaining_capacity = task.capacity
 
         # Find solution
+        config_ctr: int = 0
         for thing in task.things:
             if thing.weight <= remaining_capacity:
+                config_ctr += 1
                 remaining_capacity -= thing.weight
                 max_sum += thing.cost
                 output_things[thing.position] = 1
@@ -308,7 +321,8 @@ class Greedy(solver_strategy):
                 break
             print
 
-        return Solution(id=task.id, count=task.count, max_value=max_sum, relative_mistake=task.relative_mistake, things=tuple(output_things))
+        return Solution(id=task.id, count=task.count, max_value=max_sum, 
+            elapsed_configs=config_ctr, things=tuple(output_things))
 
 class Strategies(Enum):
     Brute = BruteForce()

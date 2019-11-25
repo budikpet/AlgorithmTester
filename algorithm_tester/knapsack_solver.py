@@ -1,6 +1,6 @@
 import os
 import timeit
-from algorithm_tester.my_data_classes import Task, Solution, Thing
+from algorithm_tester.mydataclasses import Task, Solution, Thing
 from algorithm_tester.solver_strategy import Strategies, Context
 
 # Enable timeit to return elapsed time and return value

@@ -40,16 +40,22 @@ class Solution:
     count: int
     max_value: int
     relative_mistake: float = None
-    # Elapsed time in millis
-    elapsed_time: float = None
     # Tuple of 1's and 0's
     things: tuple = field(default_factory=tuple)
+
+    # Elapsed time in millis
+    elapsed_time: float = None
+    # Elapsed time in number of configurations
+    elapsed_configs: int = None
 
     def output_str(self) -> str:
         output = f'{abs(self.id)} {self.count} {self.max_value}'
 
-        if self.elapsed_time is not None:
-            output = f'{output} {self.elapsed_time}'
+        if self.elapsed_time is not None or self.elapsed_configs is not None:
+            if self.elapsed_time is not None:
+                output = f'{output} {self.elapsed_time}'
+            else:
+                output = f'{output} {self.elapsed_configs}'
 
         if self.relative_mistake is not None:
             output = f'{output} {self.relative_mistake}'

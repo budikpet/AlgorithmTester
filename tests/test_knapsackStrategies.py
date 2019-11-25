@@ -3,7 +3,7 @@ from click.testing import CliRunner
 from typing import List
 from algorithm_tester.knapsack_solver import knapsack_solver
 from algorithm_tester.solver_strategy import Strategies
-from algorithm_tester.my_data_classes import Solution
+from algorithm_tester.mydataclasses import Solution
 from algorithm_tester.helpers import FilePair, getFiles
 
 @pytest.mark.parametrize(
