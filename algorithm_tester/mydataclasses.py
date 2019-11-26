@@ -3,6 +3,7 @@ from typing import List
 from enum import Enum
 import re
 from copy import deepcopy
+import numpy as np
 
 @dataclass
 class Thing:
@@ -70,12 +71,12 @@ class ConfigCounter:
 class RecursiveResult:
     remaining_capacity: int
     max_value: int
-    things: List[int]
+    things: np.ndarray
 
     def new_solution(self, thing: Thing = None):        
         if thing is not None:
-            things = deepcopy(self.things)
+            things = np.copy(self.things)
             things[thing.position] = 1
             return RecursiveResult(self.remaining_capacity - thing.weight, self.max_value + thing.cost, things)
         else:
-            return RecursiveResult(self.remaining_capacity, self.max_value, deepcopy(self.things))
+            return RecursiveResult(self.remaining_capacity, self.max_value, np.copy(self.things))
