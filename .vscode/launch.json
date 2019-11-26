@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "OutputGenerator: file",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "file",
+                "--check-time", "False",
+                // "--time-retries", "1",
+                // "-e", "10",
+                "-s", "DP",
+                "${workspaceFolder}/data/Things/Thing5_inst.dat",
+                "${workspaceFolder}/analysis/tester_results"
+            ],
+            "module": "algorithm_tester",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Output_generator: files",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "files",
+                "-s", "DPWeight",
+                // "--time-retries", "1000",
+                // "-e", "10",
+                "--start-count", "4",
+                "--check-time", "True",
+                "${workspaceFolder}/data/Things", 
+                "${workspaceFolder}/analysis/tester_results"
+            ],
+            "module": "algorithm_tester",
+            "console": "integratedTerminal"
+        }
+    ]
+}
