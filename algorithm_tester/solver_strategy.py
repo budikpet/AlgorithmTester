@@ -185,11 +185,7 @@ class DynamicProgramming_Weight(solver_strategy):
             elapsed_configs=config_ctr.value, things=tuple(output_things))
 
     def prepare_table(self, task: Task):
-        dummy_row = [None for i in range(task.capacity + 1)]
-        dummy_row[0] = 0
-
-        self.dp_table = [[0 for i in range(task.capacity + 1)]]
-        self.dp_table.extend([deepcopy(dummy_row) for i in range(task.count)])
+        self.dp_table = np.zeros((task.count + 1, task.capacity + 1), dtype=int)
 
     def solve(self, task: Task) -> Solution:
         self.prepare_table(task)
