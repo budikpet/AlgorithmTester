@@ -14,7 +14,7 @@
                 // "--time-retries", "1",
                 // "-e", "10",
                 "-s", "DP",
-                "${workspaceFolder}/data/NK/NK4_inst.dat",
+                "${workspaceFolder}/data/Things/Thing5_inst.dat",
                 "${workspaceFolder}/analysis/tester_results"
             ],
             "module": "algorithm_tester",
@@ -31,7 +31,7 @@
                 // "-e", "10",
                 "--start-count", "4",
                 "--check-time", "True",
-                "${workspaceFolder}/data/NK", 
+                "${workspaceFolder}/data/Things", 
                 "${workspaceFolder}/analysis/tester_results"
             ],
             "module": "algorithm_tester",
