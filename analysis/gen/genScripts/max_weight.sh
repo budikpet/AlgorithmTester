@@ -7,17 +7,22 @@
 # -c	korelace s hmotností žádná/menší/silná [uni|corr|strong]
 # -k	granularita (pouze pokud je -w light|heavy)
 
-../kg2 -N 250 -n 20 -m 0.8 -W 50 -w bal -C 100 -c uni -k 1 \
->../../../data/MaxWeight/MaxWeight50_inst.dat
+path="../../../data"
+name="MaxWeight"
 
-../kg2 -N 250 -n 20 -m 0.8 -W 100 -w bal -C 100 -c uni -k 1 \
->../../../data/MaxWeight/MaxWeight100_inst.dat
+mkdir -p "$path"/"$name"
 
-../kg2 -N 250 -n 20 -m 0.8 -W 150 -w bal -C 100 -c uni -k 1 \
->../../../data/MaxWeight/MaxWeight150_inst.dat
+../kg2 -N 100 -n 10 -m 0.8 -W 50 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"50_inst.dat
 
-../kg2 -N 250 -n 20 -m 0.8 -W 200 -w bal -C 100 -c uni -k 1 \
->../../../data/MaxWeight/MaxWeight200_inst.dat
+../kg2 -N 100 -n 10 -m 0.8 -W 100 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"100_inst.dat
 
-../kg2 -N 250 -n 20 -m 0.8 -W 250 -w bal -C 100 -c uni -k 1 \
->../../../data/MaxWeight/MaxWeight250_inst.dat
+../kg2 -N 100 -n 10 -m 0.8 -W 150 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"150_inst.dat
+
+../kg2 -N 100 -n 10 -m 0.8 -W 200 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"200_inst.dat
+
+../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"250_inst.dat

@@ -7,17 +7,22 @@
 # -c	korelace s hmotností žádná/menší/silná [uni|corr|strong]
 # -k	granularita (pouze pokud je -w light|heavy)
 
-../kg2 -N 100 -n 10 -m 0.8 -W 100 -w bal -C 100 -c uni -k 1 \
->../../../data/Weight_Cap_Ration/Weight_Cap_Ration0,8_inst.dat
+path="../../../data"
+name="WeightCapRation"
 
-../kg2 -N 100 -n 10 -m 1.2 -W 100 -w bal -C 100 -c uni -k 1 \
->../../../data/Weight_Cap_Ration/Weight_Cap_Ration1,2_inst.dat
+mkdir -p "$path"/"$name"
 
-../kg2 -N 100 -n 10 -m 1.6 -W 100 -w bal -C 100 -c uni -k 1 \
->../../../data/Weight_Cap_Ration/Weight_Cap_Ration1,6_inst.dat
+../kg2 -N 100 -n 10 -m 0.2 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"0,2_inst.dat
 
-../kg2 -N 100 -n 10 -m 2.0 -W 100 -w bal -C 100 -c uni -k 1 \
->../../../data/Weight_Cap_Ration/Weight_Cap_Ration2,0_inst.dat
+../kg2 -N 100 -n 10 -m 0.4 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"0,4_inst.dat
 
-../kg2 -N 100 -n 10 -m 2.4 -W 100 -w bal -C 100 -c uni -k 1 \
->../../../data/Weight_Cap_Ration/Weight_Cap_Ration2,4_inst.dat
+../kg2 -N 100 -n 10 -m 0.6 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"0,6_inst.dat
+
+../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"0,8_inst.dat
+
+../kg2 -N 100 -n 10 -m 1.0 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"1,0_inst.dat
