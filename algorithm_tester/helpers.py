@@ -41,8 +41,9 @@ def get_files_dict(path: str):
     # r=root, d=directories, f = files
     for root, _, files in os.walk(path):
         for file in files:
+            parts = file.split("_")
             value = f'{root}/{file}'
-            key = int(re.findall("[0-9]+", file)[0])
+            key = parts[1]
 
             if key in data.keys():
                 data[key].append(value)
