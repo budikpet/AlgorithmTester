@@ -36,7 +36,7 @@ def run_algorithm_for_file(strategy, relative_mistake, check_time, time_retries,
     print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
     with open(f'{output_dir}/{output_file_name}', "w") as output_file:
         for solution in it:
-            print(solution.output_str())
+            # print(solution.output_str())
             output_file.write(f"{solution.output_str()}\n")
             output_file.flush()
 

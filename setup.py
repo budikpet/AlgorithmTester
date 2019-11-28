@@ -4,7 +4,7 @@ with open('README.rst') as f:
     long_description = ''.join(f.readlines())
 
 setup(
-    name='ghia_budikpet',
+    name='algorithm_tester',
     version='0.3',
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,

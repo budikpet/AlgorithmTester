@@ -67,8 +67,9 @@ class BruteForce(solver_strategy):
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         config_ctr = ConfigCounter(0)
+        things = np.zeros((task.count), dtype=int)
         result = self.recursive_solve(config_ctr, task, 0, RecursiveResult(remaining_capacity=task.capacity, 
-            max_value=0, things=np.zeros((task.count))))
+            max_value=0, things=things))
 
         return Solution(id=task.id, count=task.count, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
@@ -122,8 +123,9 @@ class BranchBound(solver_strategy):
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximum_sum = self.get_max_sum(task)
         config_ctr = ConfigCounter(0)
+        things = np.zeros((task.count), dtype=int)
         result = self.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
-            max_value=0, things=np.zeros((task.count))))
+            max_value=0, things=things))
 
         return Solution(id=task.id, count=task.count, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
@@ -137,8 +139,9 @@ class UnsortedBranchBound(solver_strategy):
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximum_sum = solver.get_max_sum(task)
         config_ctr = ConfigCounter(0)
+        things = np.zeros((task.count), dtype=int)
         result = solver.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
-            max_value=0, things=np.zeros((task.count))))
+            max_value=0, things=things))
 
         return Solution(id=task.id, count=task.count, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
