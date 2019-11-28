@@ -10,7 +10,7 @@ setup(
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
     setup_requires=['pytest-runner'],
-    install_requires=['click>=6', 'numpy', 'notebook', 'pandas'],
+    install_requires=['click>=6', 'numpy', 'notebook', 'pandas', 'openpyxl'],
     tests_require=['pytest==5.0.1', 'flexmock'],
     extras_require={
         'dev':  ["sphinx"]
