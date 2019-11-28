@@ -62,7 +62,7 @@ def file(strategy, relative_mistake, check_time, time_retries, input_file, outpu
 @click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.option("--start-count", type=int, default=4)
-@click.option("--end-count", type=int, default=42)
+@click.option("--end-count", type=int, default=1000)
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
 def files(strategy, relative_mistake, check_time, time_retries, start_count, end_count, input_dir, output_dir):
