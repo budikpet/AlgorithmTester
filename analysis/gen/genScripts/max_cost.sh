@@ -13,16 +13,16 @@ name="MaxCost"
 mkdir -p "$path"/"$name"
 
 ../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 100 -c uni -k 1.0 \
->$path/$name/"$name"100_inst.dat
-
-../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 150 -c uni -k 1.0 \
->$path/$name/"$name"150_inst.dat
+>$path/$name/"$name"_100_inst.dat
 
 ../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 200 -c uni -k 1.0 \
->$path/$name/"$name"200_inst.dat
-
-../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"250_inst.dat
+>$path/$name/"$name"_200_inst.dat
 
 ../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 300 -c uni -k 1.0 \
->$path/$name/"$name"300_inst.dat
+>$path/$name/"$name"_300_inst.dat
+
+../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 400 -c uni -k 1.0 \
+>$path/$name/"$name"_400_inst.dat
+
+../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 500 -c uni -k 1.0 \
+>$path/$name/"$name"_500_inst.dat

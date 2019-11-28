@@ -13,4 +13,4 @@ name="Base"
 mkdir -p "$path"/"$name"
 
 ../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"10_inst.dat
+>$path/$name/"$name"_10_inst.dat
