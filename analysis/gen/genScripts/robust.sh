@@ -11,7 +11,7 @@ name="Robust"
 mkdir -p "$path"/"$name"
 
 echo $SMALL | ../kg_perm -d 1 -N 1025 \
-> $path/$name/"$name"10.dat
+> $path/$name/"$name"10_inst.dat
 
 echo $LARGE | ../kg_perm -d 1 -N 32768 \
-> $path/$name/"$name"15.dat
+> $path/$name/"$name"15_inst.dat
