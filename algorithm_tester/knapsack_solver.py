@@ -28,7 +28,7 @@ def knapsack_solver(datafile, strategy: str, check_time: bool, time_retries: int
         it = iter(values)
         things = [Thing(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
 
-        task = Task(id=id, count=count, capacity=capacity, things=things, relative_mistake=relative_mistake)
+        task = Task(id=id, count=count, strategy=strategy, capacity=capacity, things=things, relative_mistake=relative_mistake)
         solution = None
 
         if check_time:

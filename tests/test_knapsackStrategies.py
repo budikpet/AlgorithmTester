@@ -35,7 +35,7 @@ def test_algorithm(strategy: Strategies, exact: bool, relative_mistake: float):
                 given_solution = solutions[index].split(" ")
                 found_solution = solution.output_str().split(" ")
 
-                assert int(found_solution[3]) >= 0
+                assert int(found_solution[4]) >= 0
                     
                 if exact:
                     # Check if found value matches exactly

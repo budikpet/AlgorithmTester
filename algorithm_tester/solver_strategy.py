@@ -20,6 +20,7 @@ class solver_strategy(object):
             "id",
             "item_count",
             "maximum_sum",
+            "strategy",
             "|",
             "items_in_bag"
         ]
@@ -71,7 +72,7 @@ class BruteForce(solver_strategy):
         result = self.recursive_solve(config_ctr, task, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
-        return Solution(id=task.id, count=task.count, max_value=result.max_value, 
+        return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
 class BranchBound(solver_strategy):
@@ -127,7 +128,7 @@ class BranchBound(solver_strategy):
         result = self.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
-        return Solution(id=task.id, count=task.count, max_value=result.max_value, 
+        return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
 class UnsortedBranchBound(solver_strategy):
@@ -143,7 +144,7 @@ class UnsortedBranchBound(solver_strategy):
         result = solver.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
-        return Solution(id=task.id, count=task.count, max_value=result.max_value, 
+        return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
 class DynamicProgramming_Weight(solver_strategy):
@@ -187,7 +188,7 @@ class DynamicProgramming_Weight(solver_strategy):
             if remaining_value == 0:
                 break
 
-        return Solution(id=task.id, count=task.count, max_value=best_value, 
+        return Solution(task=task, max_value=best_value, 
             elapsed_configs=config_ctr.value, things=tuple(output_things))
 
     def prepare_table(self, task: Task):
@@ -269,7 +270,7 @@ class DynamicProgramming(solver_strategy):
         for pos in things_positions:
             things[pos] = 1
 
-        return Solution(id=task.id, count=task.count, max_value=found_sum, 
+        return Solution(task=task, max_value=found_sum, 
             relative_mistake=task.relative_mistake, elapsed_configs=config_ctr, things=tuple(things))
 
     def solve(self, task: Task) -> Solution:        
@@ -325,9 +326,8 @@ class Greedy(solver_strategy):
 
             if remaining_capacity <= 0:
                 break
-            print
 
-        return Solution(id=task.id, count=task.count, max_value=max_sum, 
+        return Solution(task=task, max_value=max_sum, 
             elapsed_configs=config_ctr, things=tuple(output_things))
 
 class Strategies(Enum):

@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Tuple
 from enum import Enum
 import re
-from copy import deepcopy
 import numpy as np
 
 @dataclass
@@ -16,6 +15,7 @@ class Task:
     id: int
     count: int
     capacity: int
+    strategy: str
     # None if not used
     relative_mistake: float
     things: List[Thing] = field(default_factory=list)
@@ -35,22 +35,32 @@ class AnalysisFile:
 
         self.full_path = full_path
 
-@dataclass
 class Solution:
     id: int
     count: int
+    strategy: str
     max_value: int
     relative_mistake: float = None
     # Tuple of 1's and 0's
-    things: tuple = field(default_factory=tuple)
+    things: Tuple[int] = None
 
     # Elapsed time in millis
     elapsed_time: float = None
     # Elapsed time in number of configurations
     elapsed_configs: int = None
 
+    def __init__(self, task: Task, max_value: int, things, elapsed_configs: int = None, elapsed_time: float = None, relative_mistake: float = None):
+        self.things = things
+        self.max_value = max_value
+        self.elapsed_configs = elapsed_configs
+        self.elapsed_time = elapsed_time
+        self.relative_mistake = relative_mistake
+        self.id = task.id
+        self.count = task.count
+        self.strategy = task.strategy
+
     def output_str(self) -> str:
-        output = f'{abs(self.id)} {self.count} {self.max_value}'
+        output = f'{abs(self.id)} {self.count} {self.max_value} {self.strategy}'
 
         if self.elapsed_time is not None or self.elapsed_configs is not None:
             if self.elapsed_time is not None:
