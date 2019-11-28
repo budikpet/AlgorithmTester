@@ -26,12 +26,12 @@
             "request": "launch",
             "args": [
                 "files",
-                "-s", "DPWeight",
+                "-s", "Brute",
                 // "--time-retries", "1000",
                 // "-e", "10",
                 "--start-count", "4",
                 "--check-time", "True",
-                "${workspaceFolder}/data/Things", 
+                "${workspaceFolder}/data/Robust", 
                 "${workspaceFolder}/analysis/tester_results"
             ],
             "module": "algorithm_tester",

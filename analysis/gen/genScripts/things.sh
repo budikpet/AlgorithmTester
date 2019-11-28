@@ -26,3 +26,6 @@ mkdir -p "$path"/"$name"
 
 ../kg2 -N 100 -n 25 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
 >$path/$name/"$name"25_inst.dat
+
+../kg2 -N 100 -n 30 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"30_inst.dat
