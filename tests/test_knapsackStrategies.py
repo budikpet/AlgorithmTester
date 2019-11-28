@@ -11,7 +11,7 @@ from algorithm_tester.helpers import FilePair, getFiles
     [
         (Strategies.Brute, True, None),
         (Strategies.BB, True, None),
-        (Strategies.UBB, True, None),
+        (Strategies.SBB, True, None),
         (Strategies.DP, True, None),
         (Strategies.DPWeight, True, None),
         (Strategies.Greedy, False, None)

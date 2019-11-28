@@ -118,9 +118,6 @@ class BranchBound(solver_strategy):
         return self.recursive_solve(config_ctr, task, maximum_sum - curr_thing.cost, thing_at_index + 1, curr_state.new_solution())
     
     def solve(self, task: Task) -> Solution:
-        # Sort things by cost/weight comparison
-        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
-
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximum_sum = self.get_max_sum(task)
         config_ctr = ConfigCounter(0)
@@ -131,11 +128,14 @@ class BranchBound(solver_strategy):
         return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
-class UnsortedBranchBound(solver_strategy):
-    """ Uses BranchBound algorithm without sorting the input first. """
-    
+class SortedBranchBound(solver_strategy):
+    """ Uses BranchBound algorithm, sorts the input first. """
+
     def solve(self, task: Task) -> Solution:
         solver = Strategies.BB.value
+
+        # Sort things by cost/weight comparison
+        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximum_sum = solver.get_max_sum(task)
@@ -333,7 +333,7 @@ class Greedy(solver_strategy):
 class Strategies(Enum):
     Brute = BruteForce()
     BB = BranchBound()
-    UBB = UnsortedBranchBound()
+    SBB = SortedBranchBound()
     DP = DynamicProgramming()
     DPWeight = DynamicProgramming_Weight()
     Greedy = Greedy()
