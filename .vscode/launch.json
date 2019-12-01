@@ -26,13 +26,12 @@
             "request": "launch",
             "args": [
                 "files",
-                "-s", "DPWeight",
+                "-s", "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "--start-count", "4",
                 "--check-time", "True",
-                "${workspaceFolder}/data/Things", 
-                "${workspaceFolder}/analysis/tester_results"
+                "${workspaceFolder}/data/WeightCapRation", 
+                "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
             "console": "integratedTerminal"

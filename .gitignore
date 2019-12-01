@@ -102,8 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# other
 .DS_Store
-analysis/tester_results
+#analysis/tester_results
+analysis/excel
 
 ######## C ########
 

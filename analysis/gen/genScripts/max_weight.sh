@@ -12,17 +12,17 @@ name="MaxWeight"
 
 mkdir -p "$path"/"$name"
 
-../kg2 -N 100 -n 10 -m 0.8 -W 50 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"50_inst.dat
+../kg2 -N 250 -n 15 -m 0.8 -W 100 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"_100_inst.dat
 
-../kg2 -N 100 -n 10 -m 0.8 -W 100 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"100_inst.dat
+../kg2 -N 250 -n 15 -m 0.8 -W 200 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"_200_inst.dat
 
-../kg2 -N 100 -n 10 -m 0.8 -W 150 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"150_inst.dat
+../kg2 -N 250 -n 15 -m 0.8 -W 300 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"_300_inst.dat
 
-../kg2 -N 100 -n 10 -m 0.8 -W 200 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"200_inst.dat
+../kg2 -N 250 -n 15 -m 0.8 -W 400 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"_400_inst.dat
 
-../kg2 -N 100 -n 10 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
->$path/$name/"$name"250_inst.dat
+../kg2 -N 250 -n 15 -m 0.8 -W 500 -w bal -C 250 -c uni -k 1.0 \
+>$path/$name/"$name"_500_inst.dat
