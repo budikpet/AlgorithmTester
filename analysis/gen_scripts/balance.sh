@@ -7,16 +7,16 @@
 # -c	korelace s hmotností žádná/menší/silná [uni|corr|strong]
 # -k	granularita (pouze pokud je -w light|heavy)
 
-path="../../../data"
+path="../../data"
 name="Balance"
 
 mkdir -p "$path"/"$name"
 
-../kg2 -N 100 -n 15 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
+../gen/kg2 -N 100 -n 15 -m 0.8 -W 250 -w bal -C 250 -c uni -k 1.0 \
 >$path/$name/"$name"_Bal_inst.dat
 
-../kg2 -N 100 -n 15 -m 0.8 -W 250 -w light -C 250 -c uni -k 1.0 \
+../gen/kg2 -N 100 -n 15 -m 0.8 -W 250 -w light -C 250 -c uni -k 1.0 \
 >$path/$name/"$name"_Light_inst.dat
 
-../kg2 -N 100 -n 15 -m 0.8 -W 250 -w heavy -C 250 -c uni -k 1.0 \
+../gen/kg2 -N 100 -n 15 -m 0.8 -W 250 -w heavy -C 250 -c uni -k 1.0 \
 >$path/$name/"$name"_Heavy_inst.dat
