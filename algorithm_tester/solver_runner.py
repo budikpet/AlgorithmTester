@@ -4,9 +4,10 @@ from typing import Dict, List
 import os
 import time
 from algorithm_tester.solver_strategy import Strategies
-from algorithm_tester.helpers import get_files_dict
+from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.knapsack_solver import knapsack_solver
 from algorithm_tester.mydataclasses import Solution
+from algorithm_tester.decorators import docstring_parameters
 
 inputStrategies = [strategy.name for strategy in Strategies]
 
@@ -22,10 +23,6 @@ class PythonLiteralOption(click.Option):
             return values
         except:
             raise click.BadParameter(value)
-
-def create_path(path):
-    if not os.path.isdir(path):
-        os.makedirs(path)
 
 def create_columns_description_file(strategy: str, check_time: bool, output_dir: str):
     column_descriptions = Strategies[strategy].value.get_column_descriptions(check_time)
@@ -68,7 +65,9 @@ def solver():
 @click.option("--time-retries", type=int, default=1, help="How many times should we retry if elapsed time is checked.")
 @click.argument("input-file", type=click.File("r"), required=True)
 @click.argument("output-dir", required=True)
+@docstring_parameters(inputStrategies[0], 'Me', yeah='yeah')
 def file(strategy: List[str], relative_mistake: float, check_time: bool, time_retries: int, input_file, output_dir):
+    '''Oh Bring Back My {} To {}. {yeah}!'''
     run_algorithm_for_file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir)         
 
 @solver.command()

@@ -1,9 +1,4 @@
 import os
-import click
-import re
-import shutil
-from math import log, ceil
-from typing import List
 from algorithm_tester.solver_strategy import Strategies
 from algorithm_tester.mydataclasses import AnalysisFile
 
@@ -14,9 +9,9 @@ class FilePair:
         else:
             self.solutionFile, self.dataFile = file2, file1
 
-@click.group()
-def helpers():
-    pass
+def create_path(path):
+    if not os.path.isdir(path):
+        os.makedirs(path)
 
 def get_analysis_files(path: str):
     """ 
@@ -63,20 +58,3 @@ def getFiles(path: str):
     result = [pair for (_, pair) in result]
 
     return result
-
-inputModes = ["data", "solution"]
-
-@helpers.command()
-@click.option("--mode", type=click.Choice(inputModes), default=inputModes[0])
-@click.argument("directory", required=True)
-def get_test_files(mode, directory):
-    filePairs = getFiles(path=directory)
-
-    for pair in filePairs:
-        if mode == "data":
-            print(pair.dataFile)
-        else:
-            print(pair.solutionFile)
-
-if __name__ == "__main__":
-    helpers()   # pylint: disable=no-value-for-parameter
