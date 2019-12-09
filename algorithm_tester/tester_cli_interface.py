@@ -3,9 +3,9 @@ import click
 from typing import Dict, List
 import os
 import time
-from algorithm_tester.solver_strategy import Algorithms
+from algorithm_tester.tested_algorithms import Algorithms
 from algorithm_tester.helpers import get_files_dict, create_path
-from algorithm_tester.knapsack_solver import test_instance_file
+from algorithm_tester.tester_logic import test_instance_file
 from algorithm_tester.mydataclasses import Solution
 from algorithm_tester.decorators import docstring_parameters
 

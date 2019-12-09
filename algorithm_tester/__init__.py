@@ -1,3 +1,3 @@
-from algorithm_tester.solver_runner import run_tester
+from algorithm_tester.tester_cli_interface import run_tester
 
 __all__ = ["run_tester"]

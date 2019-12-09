@@ -1,5 +1,5 @@
 import os
-from algorithm_tester.solver_strategy import Algorithms
+from algorithm_tester.tested_algorithms import Algorithms
 from algorithm_tester.mydataclasses import AnalysisFile
 
 class FilePair:
@@ -54,7 +54,7 @@ def getFiles(path: str):
         value = FilePair(pair[0], pair[1])
         result.append((key, value))
 
-    result.sort()
+    # result.sort() # FIXME: Breaks sort
     result = [pair for (_, pair) in result]
 
     return result

@@ -1,8 +1,8 @@
 import pytest
 from click.testing import CliRunner
 from typing import List
-from algorithm_tester.knapsack_solver import test_instance_file
-from algorithm_tester.solver_strategy import Algorithms
+from algorithm_tester.tester_logic import test_instance_file
+from algorithm_tester.tested_algorithms import Algorithms
 from algorithm_tester.mydataclasses import Solution
 from algorithm_tester.helpers import FilePair, getFiles
 
