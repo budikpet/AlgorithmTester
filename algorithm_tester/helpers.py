@@ -1,5 +1,5 @@
 import os
-from algorithm_tester.solver_strategy import Strategies
+from algorithm_tester.solver_strategy import Algorithms
 from algorithm_tester.mydataclasses import AnalysisFile
 
 class FilePair:

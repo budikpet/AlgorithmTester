@@ -15,7 +15,7 @@ class Task:
     id: int
     count: int
     capacity: int
-    strategy: str
+    algorithm: str
     # None if not used
     relative_mistake: float
     things: List[Thing] = field(default_factory=list)
@@ -27,7 +27,7 @@ class AnalysisFile:
         # self.num_of_items = int(re.findall("[0-9]+", parts[0])[0])
         self.dataset = parts[0]
         self.instance_info = parts[1]
-        self.strategy = parts[3]
+        self.algorithm = parts[3]
         
         if len(parts) > 4:
             self.relative_mistake = float(parts[3].replace(",", "."))
@@ -39,7 +39,7 @@ class AnalysisFile:
 class Solution:
     id: int
     count: int
-    strategy: str
+    algorithm: str
     max_value: int
     relative_mistake: float = None
     # Tuple of 1's and 0's
@@ -58,10 +58,10 @@ class Solution:
         self.relative_mistake = relative_mistake
         self.id = task.id
         self.count = task.count
-        self.strategy = task.strategy
+        self.algorithm = task.algorithm
 
     def output_str(self) -> str:
-        output = f'{abs(self.id)} {self.count} {self.max_value} {self.strategy}'
+        output = f'{abs(self.id)} {self.count} {self.max_value} {self.algorithm}'
 
         if self.elapsed_time is not None or self.elapsed_configs is not None:
             if self.elapsed_time is not None:

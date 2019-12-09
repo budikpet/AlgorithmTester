@@ -7,20 +7,20 @@ from algorithm_tester.mydataclasses import Task, Solution, Thing, ConfigCounter,
 
 class Context():
 
-    def __init__(self, strategy):
-        self.strategy = strategy
+    def __init__(self, algorithm):
+        self.algorithm = algorithm
 
     def solve(self, task: Task) -> Solution:
-        return self.strategy.solve(task)
+        return self.algorithm.solve(task)
 
-class solver_strategy(object):
+class Algorithm(object):
 
     def get_column_descriptions(self, show_time: bool = True):
         output = [
             "id",
             "item_count",
             "maximum_sum",
-            "strategy",
+            "algorithm",
             "|",
             "items_in_bag"
         ]
@@ -37,7 +37,7 @@ class solver_strategy(object):
     def solve(self, task: Task) -> Solution:
         pass
 
-class BruteForce(solver_strategy):
+class BruteForce(Algorithm):
     """ Uses Brute force  """
 
     def recursive_solve(self, config_ctr: ConfigCounter, task: Task, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
@@ -75,7 +75,7 @@ class BruteForce(solver_strategy):
         return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
-class BranchBound(solver_strategy):
+class BranchBound(Algorithm):
     """ Uses BranchBound algorithm. """
 
     def get_max_sum(self, task: Task) -> int:
@@ -128,26 +128,26 @@ class BranchBound(solver_strategy):
         return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
-class SortedBranchBound(solver_strategy):
+class SortedBranchBound(Algorithm):
     """ Uses BranchBound algorithm, sorts the input first. """
 
     def solve(self, task: Task) -> Solution:
-        solver = Strategies.BB.value
+        algorithm = Algorithms.BB.value
 
         # Sort things by cost/weight comparison
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
-        maximum_sum = solver.get_max_sum(task)
+        maximum_sum = algorithm.get_max_sum(task)
         config_ctr = ConfigCounter(0)
         things = np.zeros((task.count), dtype=int)
-        result = solver.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
+        result = algorithm.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
         return Solution(task=task, max_value=result.max_value, 
             elapsed_configs=config_ctr.value, things=result.things)
 
-class DynamicProgramming_Weight(solver_strategy):
+class DynamicProgramming_Weight(Algorithm):
     """ 
     Uses DynamicProgramming iterative algorithm. 
 
@@ -200,7 +200,7 @@ class DynamicProgramming_Weight(solver_strategy):
         config_ctr = ConfigCounter(0)
         return self.get_solution(task, config_ctr)
 
-class DynamicProgramming(solver_strategy):
+class DynamicProgramming(Algorithm):
     """ 
     Uses DynamicProgramming iterative algorithm. 
 
@@ -299,7 +299,7 @@ class DynamicProgramming(solver_strategy):
         return self.construct_solution(task=task, found_sum=best_sum, 
             found_weight=self.dp_table[best_sum][self.work_count], config_ctr=config_ctr)
 
-class Greedy(solver_strategy):
+class Greedy(Algorithm):
     """ 
     Uses simple Greedy heuristics. 
 
@@ -330,7 +330,7 @@ class Greedy(solver_strategy):
         return Solution(task=task, max_value=max_sum, 
             elapsed_configs=config_ctr, things=tuple(output_things))
 
-class Strategies(Enum):
+class Algorithms(Enum):
     Brute = BruteForce()
     BB = BranchBound()
     SBB = SortedBranchBound()

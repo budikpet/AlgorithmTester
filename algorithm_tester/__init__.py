@@ -1,3 +1,3 @@
-from algorithm_tester.solver_runner import solver
+from algorithm_tester.solver_runner import run_tester
 
-__all__ = ["solver"]
+__all__ = ["run_tester"]

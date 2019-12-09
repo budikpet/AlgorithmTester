@@ -24,7 +24,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'solver = algorithm_tester:solver',
+            'run_tester = algorithm_tester:run_tester',
         ],
     },
     # package_data={
