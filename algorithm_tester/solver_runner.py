@@ -54,43 +54,29 @@ def run_algorithm_for_file(strategies: List[str], relative_mistake: float, check
                 output_file.write(f"{solution.output_str()}\n")
                 output_file.flush()
 
-@click.group()
-def solver():
-    pass
-
-@solver.command()
-@click.option("-s", "--strategy", cls=PythonLiteralOption, default=",".join(inputStrategies), show_default=True)
-@click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
-@click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
-@click.option("--time-retries", type=int, default=1, help="How many times should we retry if elapsed time is checked.")
-@click.argument("input-file", type=click.File("r"), required=True)
-@click.argument("output-dir", required=True)
-@docstring_parameters(inputStrategies[0], 'Me', yeah='yeah')
-def file(strategy: List[str], relative_mistake: float, check_time: bool, time_retries: int, input_file, output_dir):
-    '''Oh Bring Back My {} To {}. {yeah}!'''
-    run_algorithm_for_file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir)         
-
-@solver.command()
-@click.option("-s", "--strategy", cls=PythonLiteralOption, default=",".join(inputStrategies), show_default=True)
+@click.command()
+@click.option("-s", "--strategies", cls=PythonLiteralOption, required=True, default=",".join(inputStrategies), show_default=True, help="CSV string of names of available algorithms.")
 @click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
+@click.option("-p", "--parser", type=str, show_default=True, required=True, default="KnapsackBaseParser", help="Name of the parser that is used to parse input files.")
+@click.option("-c", "--communicators", type=str, required=False, help="CSV string of names of available communication interfaces.")
+@click.option("-n", "--max-num", type=int, required=False, help="If set then the solver uses only (0, max-num] of input files.")
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
-def files(strategy: List[str], relative_mistake: float, check_time: bool, time_retries: int, input_dir, output_dir):
+def solver(strategies: List[str], relative_mistake: float, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir):
     files_dict = get_files_dict(input_dir)
 
     for key, path in files_dict.items():
         files_dict[key] = [path for path in files_dict[key] if "_inst" in path][0]
 
-    for n_key in sorted(files_dict):
-        # if n_key < start_count:
-        #     continue
-        # elif n_key >= end_count:
-        #     break
+    for index, n_key in enumerate(sorted(files_dict)):
+        if max_num is not None:
+            if index >= max_num:
+                break
 
         with open(files_dict[n_key], "r") as input_file:
-            run_algorithm_for_file(strategy, relative_mistake, check_time, time_retries, input_file, output_dir)
+            run_algorithm_for_file(strategies, relative_mistake, check_time, time_retries, input_file, output_dir)
 
 def main():
-    solver(prog_name="solver")   # pylint: disable=no-value-for-parameter
+    solver(prog_name="tester")   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
