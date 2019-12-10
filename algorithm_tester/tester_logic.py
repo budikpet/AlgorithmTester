@@ -33,11 +33,11 @@ def test_instance_file(datafile, algorithm: str, check_time: bool, time_retries:
 
         if check_time:
             # Use timeit to get time
-            t = timeit.Timer(lambda: context.solve(task))
+            t = timeit.Timer(lambda: context.perform_algorithm(task))
             elapsed_time, solution = t.timeit(number=time_retries)
             solution.elapsed_time = round((elapsed_time*1000)/time_retries, 10)   # Store in millis
         else:
-            solution = context.solve(task)
+            solution = context.perform_algorithm(task)
 
         yield solution
 

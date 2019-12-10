@@ -10,8 +10,8 @@ class TesterContext():
     def __init__(self, algorithm):
         self.algorithm = algorithm
 
-    def solve(self, task: Task) -> Solution:
-        return self.algorithm.solve(task)
+    def perform_algorithm(self, task: Task) -> Solution:
+        return self.algorithm.perform_algorithm(task)
 
 class Algorithm(object):
 
@@ -34,7 +34,7 @@ class Algorithm(object):
 
         return output
     
-    def solve(self, task: Task) -> Solution:
+    def perform_algorithm(self, task: Task) -> Solution:
         pass
 
 class BruteForce(Algorithm):
@@ -63,7 +63,7 @@ class BruteForce(Algorithm):
         
         return self.recursive_solve(config_ctr, task, thing_at_index + 1, curr_state.new_solution())
     
-    def solve(self, task: Task) -> Solution:
+    def perform_algorithm(self, task: Task) -> Solution:
         # Sort things by cost/weight comparison
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
@@ -117,7 +117,7 @@ class BranchBound(Algorithm):
         # Current thing too heavy. The subtree has high enough value, need to check if items fit
         return self.recursive_solve(config_ctr, task, maximum_sum - curr_thing.cost, thing_at_index + 1, curr_state.new_solution())
     
-    def solve(self, task: Task) -> Solution:
+    def perform_algorithm(self, task: Task) -> Solution:
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         maximum_sum = self.get_max_sum(task)
         config_ctr = ConfigCounter(0)
@@ -131,7 +131,7 @@ class BranchBound(Algorithm):
 class SortedBranchBound(Algorithm):
     """ Uses BranchBound algorithm, sorts the input first. """
 
-    def solve(self, task: Task) -> Solution:
+    def perform_algorithm(self, task: Task) -> Solution:
         algorithm = Algorithms.BB.value
 
         # Sort things by cost/weight comparison
@@ -194,7 +194,7 @@ class DynamicProgramming_Weight(Algorithm):
     def prepare_table(self, task: Task):
         self.dp_table = np.zeros((task.count + 1, task.capacity + 1), dtype=int)
 
-    def solve(self, task: Task) -> Solution:
+    def perform_algorithm(self, task: Task) -> Solution:
         self.prepare_table(task)
 
         config_ctr = ConfigCounter(0)
@@ -273,7 +273,7 @@ class DynamicProgramming(Algorithm):
         return Solution(task=task, max_value=found_sum, 
             relative_mistake=task.relative_mistake, elapsed_configs=config_ctr, things=tuple(things))
 
-    def solve(self, task: Task) -> Solution:        
+    def perform_algorithm(self, task: Task) -> Solution:        
         self.work_count = task.count
         self.work_things = [Thing(thing.position, thing.weight, thing.cost) for thing in task.things]
         
@@ -307,7 +307,7 @@ class Greedy(Algorithm):
     if they fit.
     
     """
-    def solve(self, task: Task) -> Solution:
+    def perform_algorithm(self, task: Task) -> Solution:
         # Sort things by cost/weight comparison descending
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
