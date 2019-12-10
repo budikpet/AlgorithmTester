@@ -20,9 +20,9 @@
                 "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "--check-time",
+                // "--check-time",
                 "True",
-                "${workspaceFolder}/data/WeightCapRation",
+                "${workspaceFolder}/data/NK",
                 "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
