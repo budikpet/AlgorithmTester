@@ -1,5 +1,6 @@
 import pkg_resources
 import sys, inspect
+from enum import Enum
 from typing import Dict, List
 from algorithm_tester.algorithms import Algorithm
 
@@ -16,19 +17,14 @@ def get_subclasses(package, parent_class: type) -> List[type]:
     predicate = lambda member: inspect.isclass(member) and issubclass(member, parent_class) and member.__name__ != parent_class.__name__
     
     # clsmembers = inspect.getmembers(sys.modules[name], predicate=predicate)
-    return list(filter(predicate, package.__plugins__))
+    return [plugin() for plugin in package.__plugins__ if predicate(plugin)]
 
-def get_plugins() -> Dict[str, List[type]]:
-    package_algorithms = __discovered_plugins["algorithms"]
-    package_parsers = __discovered_plugins["parsers"]
+def get_plugins(key: str, parent_class: type) -> List[type]:
+    package_algorithms = __discovered_plugins[key]
 
-    result: Dict[str, List[type]] = {
-        "algorithms": get_subclasses(package_algorithms, Algorithm),
-        "parsers": get_subclasses(package_parsers, Algorithm)   #FIXME: Add parser interface
-    }
+    subclasses = get_subclasses(package_algorithms, parent_class)
+    return subclasses
 
-    # for clsmember in result["algorithms"]:
-    #     instance: Algorithm = clsmember()
-    #     print(instance.get_column_descriptions())
-
-get_plugins()
+class Plugins(Enum):
+    ALGORITHMS = get_plugins("algorithms", parent_class=Algorithm)
+    # PARSERS = get_plugins("parsers", parent_class=Parser)

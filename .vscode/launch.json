@@ -12,7 +12,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Output_generator",
+            "name": "AlgorithmTester: run",
             "type": "python",
             "request": "launch",
             "args": [
@@ -24,6 +24,16 @@
                 "True",
                 "${workspaceFolder}/data/WeightCapRation",
                 "${workspaceFolder}/analysis/tester_results/TEST"
+            ],
+            "module": "algorithm_tester",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "AlgorithmTester: help",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "--help"
             ],
             "module": "algorithm_tester",
             "console": "integratedTerminal"
