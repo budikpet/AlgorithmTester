@@ -1,5 +1,4 @@
 import os
-from algorithm_tester.algorithms import Algorithms
 from algorithm_tester.tester_dataclasses import AnalysisFile
 
 class FilePair:

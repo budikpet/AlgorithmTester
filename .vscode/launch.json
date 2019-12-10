@@ -5,16 +5,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Output_generator",
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "AlgorithmTester: run",
             "type": "python",
             "request": "launch",
             "args": [
-                "-s", "Brute,Greedy,BB",
+                "-s",
+                "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "--check-time", "True",
-                "${workspaceFolder}/data/WeightCapRation", 
+                // "--check-time",
+                "True",
+                "${workspaceFolder}/data/NK",
                 "${workspaceFolder}/analysis/tester_results/TEST"
+            ],
+            "module": "algorithm_tester",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "AlgorithmTester: help",
+            "type": "python",
+            "request": "launch",
+            "args": [
+                "--help"
             ],
             "module": "algorithm_tester",
             "console": "integratedTerminal"
