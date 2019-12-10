@@ -14,10 +14,10 @@ def algorithm_subclasses(plugins_package):
     return list(filter(predicate, plugins_package.__plugins__))
 
 discovered_plugins = {
-    entry_point.name: entry_point.load() for entry_point in pkg_resources.iter_entry_points('myapp.plugins')
+    entry_point.name: entry_point.load() for entry_point in pkg_resources.iter_entry_points('algorithm_tester.plugins')
 }
 
-plugins_package = discovered_plugins["a"]
+plugins_package = discovered_plugins["algorithms"]
 
 clsmembers = algorithm_subclasses(plugins_package)
 

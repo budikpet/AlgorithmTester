@@ -1,5 +1,5 @@
-from myapp_plugin_a.algorithms_outer import BruteForce_Outer
-from myapp_plugin_a.algorithms_outer2 import Greedy_Outer
+from algorithms_package.algorithms_outer import BruteForce_Outer
+from algorithms_package.algorithms_outer2 import Greedy_Outer
 from algorithm_tester.algorithms import Algorithm
 
 __plugins__ = [BruteForce_Outer, Greedy_Outer]
