@@ -29,7 +29,7 @@ setup(
         'console_scripts': [
             'run_tester = algorithm_tester:run_tester',
         ],
-        'myapp.plugins': 'a = myapp_plugin_a:algorithms_outer'
+        'myapp.plugins': 'a = myapp_plugin_a'
     },
     classifiers=[
         'Intended Audience :: Developers',

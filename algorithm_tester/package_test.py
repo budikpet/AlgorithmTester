@@ -7,21 +7,20 @@ This module should be used to automatically retrieve plugins (Algorithm classes,
 
 """
 
-def print_Algorithm_subclasses(name: str):
+def algorithm_subclasses(plugins_package):
     predicate = lambda member: inspect.isclass(member) and issubclass(member, Algorithm) and member.__name__ != Algorithm.__name__
     
-    clsmembers = inspect.getmembers(sys.modules[name], predicate=predicate)
-    for clsmember in clsmembers:
-        print(clsmember)
-
-    # for name, obj in inspect.getmembers(sys.modules[name]):
-    #     if inspect.isclass(obj):
-    #         print(obj)
+    # clsmembers = inspect.getmembers(sys.modules[name], predicate=predicate)
+    return list(filter(predicate, plugins_package.__plugins__))
 
 discovered_plugins = {
     entry_point.name: entry_point.load() for entry_point in pkg_resources.iter_entry_points('myapp.plugins')
 }
 
-plug_module = discovered_plugins["a"]
-test2 = plug_module.BruteForce_Outer()
-print(discovered_plugins)
+plugins_package = discovered_plugins["a"]
+
+clsmembers = algorithm_subclasses(plugins_package)
+
+for clsmember in clsmembers:
+    instance: Algorithm = clsmember()
+    print(instance.get_column_descriptions())
