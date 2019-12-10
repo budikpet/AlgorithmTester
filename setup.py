@@ -10,10 +10,13 @@ setup(
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
     setup_requires=['pytest-runner'],
-    install_requires=['click>=6', 'numpy', 'notebook', 'pandas', 'openpyxl'],
+    install_requires=['click>=6', 'numpy'],
     tests_require=['pytest==5.0.1', 'flexmock'],
+    
+    # All these 'dev' packages can then be installed by 'pip install .[dev]'
     extras_require={
-        'dev':  ["sphinx"]
+        'dev':  ["sphinx"],
+        'analysis': ['notebook', 'pandas', 'openpyxl']
     },
     python_requires='>=3.7',
     author='Petr Budík',
@@ -26,10 +29,8 @@ setup(
         'console_scripts': [
             'run_tester = algorithm_tester:run_tester',
         ],
+        'myapp.plugins': 'a = myapp_plugin_a:algorithms_outer'
     },
-    # package_data={
-    #     'ghia': ['templates/*.html', 'static/*.css']
-    #     },
     classifiers=[
         'Intended Audience :: Developers',
         'License :: Public Domain',
