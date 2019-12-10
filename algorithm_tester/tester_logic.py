@@ -1,7 +1,7 @@
 import os
 import timeit
-from algorithm_tester.mydataclasses import Task, Solution, Thing
-from algorithm_tester.solver_strategy import Strategies, Context
+from algorithm_tester.tester_dataclasses import Task, Solution, Thing
+from algorithm_tester.algorithms import Algorithms, TesterContext
 
 # Enable timeit to return elapsed time and return value
 new_template = """
@@ -15,9 +15,9 @@ def inner(_it, _timer{init}):
 """
 timeit.template = new_template
 
-def knapsack_solver(datafile, strategy: str, check_time: bool, time_retries: int, relative_mistake: float = None):
+def test_instance_file(datafile, algorithm: str, check_time: bool, time_retries: int, relative_mistake: float = None):
     data = datafile.readline()
-    context = Context(Strategies[strategy].value)
+    context = TesterContext(Algorithms[algorithm].value)
 
     if relative_mistake is not None:
         relative_mistake /= 100
@@ -28,16 +28,16 @@ def knapsack_solver(datafile, strategy: str, check_time: bool, time_retries: int
         it = iter(values)
         things = [Thing(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
 
-        task = Task(id=id, count=count, strategy=strategy, capacity=capacity, things=things, relative_mistake=relative_mistake)
+        task = Task(id=id, count=count, algorithm=algorithm, capacity=capacity, things=things, relative_mistake=relative_mistake)
         solution = None
 
         if check_time:
             # Use timeit to get time
-            t = timeit.Timer(lambda: context.solve(task))
+            t = timeit.Timer(lambda: context.perform_algorithm(task))
             elapsed_time, solution = t.timeit(number=time_retries)
             solution.elapsed_time = round((elapsed_time*1000)/time_retries, 10)   # Store in millis
         else:
-            solution = context.solve(task)
+            solution = context.perform_algorithm(task)
 
         yield solution
 
