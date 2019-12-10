@@ -30,8 +30,8 @@ setup(
             'run_tester = algorithm_tester:run_tester',
         ],
         'algorithm_tester.plugins': [
-            'algorithms = algorithms_package',
-            'parsers = parsers_package'
+            'algorithms = package_algorithms',
+            'parsers = package_parsers'
         ]
     },
     classifiers=[

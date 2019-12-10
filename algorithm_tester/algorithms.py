@@ -1,6 +1,4 @@
-from dataclasses import dataclass
 from enum import Enum
-from copy import deepcopy
 from typing import List
 import numpy as np
 from algorithm_tester.tester_dataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
@@ -33,12 +31,18 @@ class Algorithm(object):
             output.insert(output.index("|"), "time[#configs]")
 
         return output
+
+    def get_name() -> str:
+        pass
     
     def perform_algorithm(self, task: Task) -> Solution:
         pass
 
 class BruteForce(Algorithm):
     """ Uses Brute force  """
+
+    def get_name() -> str:
+        return "Brute"
 
     def recursive_solve(self, config_ctr: ConfigCounter, task: Task, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
         config_ctr.value += 1
@@ -77,6 +81,9 @@ class BruteForce(Algorithm):
 
 class BranchBound(Algorithm):
     """ Uses BranchBound algorithm. """
+
+    def get_name() -> str:
+        return "BB"
 
     def get_max_sum(self, task: Task) -> int:
         currSum = 0
@@ -131,6 +138,9 @@ class BranchBound(Algorithm):
 class SortedBranchBound(Algorithm):
     """ Uses BranchBound algorithm, sorts the input first. """
 
+    def get_name() -> str:
+        return "SBB"
+
     def perform_algorithm(self, task: Task) -> Solution:
         algorithm = Algorithms.BB.value
 
@@ -157,6 +167,9 @@ class DynamicProgramming_Weight(Algorithm):
     Algorithm fills the table from the bottom up.
 
     """
+
+    def get_name() -> str:
+        return "DPWeight"
 
     def get_solution(self, task: Task, config_ctr: ConfigCounter):
         # Get the best possible value
@@ -220,6 +233,9 @@ class DynamicProgramming(Algorithm):
     - ∞ = infinity. Here it's (max(capacity, sum_of_all_weights) + 1)
     - M = sum of costs of all things available
     """
+
+    def get_name() -> str:
+        return "DP"
 
     def simplify_task(self, task: Task) -> bool:
         # Remove items with cost == 0 or weight > capacity
@@ -307,6 +323,10 @@ class Greedy(Algorithm):
     if they fit.
     
     """
+
+    def get_name() -> str:
+        return "Greedy"
+
     def perform_algorithm(self, task: Task) -> Solution:
         # Sort things by cost/weight comparison descending
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)

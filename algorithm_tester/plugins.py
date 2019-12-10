@@ -1,5 +1,6 @@
 import pkg_resources
 import sys, inspect
+from typing import Dict, List
 from algorithm_tester.algorithms import Algorithm
 
 """
@@ -7,20 +8,27 @@ This module should be used to automatically retrieve plugins (Algorithm classes,
 
 """
 
-def algorithm_subclasses(plugins_package):
-    predicate = lambda member: inspect.isclass(member) and issubclass(member, Algorithm) and member.__name__ != Algorithm.__name__
-    
-    # clsmembers = inspect.getmembers(sys.modules[name], predicate=predicate)
-    return list(filter(predicate, plugins_package.__plugins__))
-
-discovered_plugins = {
+__discovered_plugins = {
     entry_point.name: entry_point.load() for entry_point in pkg_resources.iter_entry_points('algorithm_tester.plugins')
 }
 
-plugins_package = discovered_plugins["algorithms"]
+def get_subclasses(package, parent_class: type) -> List[type]:
+    predicate = lambda member: inspect.isclass(member) and issubclass(member, parent_class) and member.__name__ != parent_class.__name__
+    
+    # clsmembers = inspect.getmembers(sys.modules[name], predicate=predicate)
+    return list(filter(predicate, package.__plugins__))
 
-clsmembers = algorithm_subclasses(plugins_package)
+def get_plugins() -> Dict[str, List[type]]:
+    package_algorithms = __discovered_plugins["algorithms"]
+    package_parsers = __discovered_plugins["parsers"]
 
-for clsmember in clsmembers:
-    instance: Algorithm = clsmember()
-    print(instance.get_column_descriptions())
+    result: Dict[str, List[type]] = {
+        "algorithms": get_subclasses(package_algorithms, Algorithm),
+        "parsers": get_subclasses(package_parsers, Algorithm)   #FIXME: Add parser interface
+    }
+
+    # for clsmember in result["algorithms"]:
+    #     instance: Algorithm = clsmember()
+    #     print(instance.get_column_descriptions())
+
+get_plugins()
