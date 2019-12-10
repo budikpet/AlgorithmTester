@@ -3,9 +3,9 @@ from enum import Enum
 from copy import deepcopy
 from typing import List
 import numpy as np
-from algorithm_tester.mydataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
+from algorithm_tester.tester_dataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
 
-class Context():
+class TesterContext():
 
     def __init__(self, algorithm):
         self.algorithm = algorithm

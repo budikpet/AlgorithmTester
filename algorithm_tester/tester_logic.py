@@ -1,7 +1,7 @@
 import os
 import timeit
-from algorithm_tester.mydataclasses import Task, Solution, Thing
-from algorithm_tester.tested_algorithms import Algorithms, Context
+from algorithm_tester.tester_dataclasses import Task, Solution, Thing
+from algorithm_tester.tested_algorithms import Algorithms, TesterContext
 
 # Enable timeit to return elapsed time and return value
 new_template = """
@@ -17,7 +17,7 @@ timeit.template = new_template
 
 def test_instance_file(datafile, algorithm: str, check_time: bool, time_retries: int, relative_mistake: float = None):
     data = datafile.readline()
-    context = Context(Algorithms[algorithm].value)
+    context = TesterContext(Algorithms[algorithm].value)
 
     if relative_mistake is not None:
         relative_mistake /= 100

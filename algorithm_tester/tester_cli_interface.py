@@ -6,7 +6,7 @@ import time
 from algorithm_tester.tested_algorithms import Algorithms
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_logic import test_instance_file
-from algorithm_tester.mydataclasses import Solution
+from algorithm_tester.tester_dataclasses import Solution
 from algorithm_tester.decorators import docstring_parameters
 
 input_algorithms = [algorithm.name for algorithm in Algorithms]

@@ -1,6 +1,6 @@
 import os
 from algorithm_tester.tested_algorithms import Algorithms
-from algorithm_tester.mydataclasses import AnalysisFile
+from algorithm_tester.tester_dataclasses import AnalysisFile
 
 class FilePair:
     def __init__(self, file1, file2):
