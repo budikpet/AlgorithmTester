@@ -3,7 +3,7 @@ import click
 from typing import Dict, List
 import os
 import time
-from algorithm_tester.tested_algorithms import Algorithms
+from algorithm_tester.algorithms import Algorithms
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_logic import test_instance_file
 from algorithm_tester.tester_dataclasses import Solution
@@ -64,7 +64,13 @@ def run_algorithm_for_file(algorithms: List[str], relative_mistake: float, check
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
+@docstring_parameters("helm", "yes")
 def run_tester(algorithms: List[str], relative_mistake: float, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir):
+    """
+
+    {} is {}.
+    """
+    
     files_dict = get_files_dict(input_dir)
 
     for key, path in files_dict.items():
