@@ -1,6 +1,7 @@
-from package_algorithms.algorithms_outer import BruteForce_Outer
-from package_algorithms.algorithms_outer2 import Greedy_Outer
 from algorithm_tester.algorithms import Algorithm
+from package_algorithms.bb import BranchBound, SortedBranchBound
+from package_algorithms.dp import DynamicProgramming, DynamicProgramming_Weight
+from package_algorithms.basic import BruteForce, Greedy
 
-__plugins__ = [BruteForce_Outer, Greedy_Outer]
+__plugins__ = [BranchBound, BruteForce, DynamicProgramming, DynamicProgramming_Weight, Greedy, SortedBranchBound]
 __all__ = [plugin.__name__ for plugin in __plugins__]
