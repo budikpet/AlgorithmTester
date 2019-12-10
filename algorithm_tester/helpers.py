@@ -46,7 +46,7 @@ def get_files_dict(path: str):
                 data[key] = [value]
     return data
 
-def getFiles(path: str):
+def get_files(path: str):
     data = get_files_dict(path)
     
     result = list()

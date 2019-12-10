@@ -4,7 +4,7 @@ from typing import List
 from algorithm_tester.tester_logic import test_instance_file
 from algorithm_tester.tested_algorithms import Algorithms
 from algorithm_tester.tester_dataclasses import Solution
-from algorithm_tester.helpers import FilePair, getFiles
+from algorithm_tester.helpers import FilePair, get_files
 
 @pytest.mark.parametrize(
     ['algorithm', 'exact', 'relative_mistake'],
@@ -19,7 +19,7 @@ from algorithm_tester.helpers import FilePair, getFiles
 )
 def test_algorithm(algorithm: Algorithms, exact: bool, relative_mistake: float):
     path = './data'
-    dataFiles = getFiles(f'{path}/NK')[0:1]
+    dataFiles = get_files(f'{path}/NK')[0:1]
 
     for filepair in dataFiles:
         # Get all solutions of the current problem
