@@ -7,19 +7,7 @@ from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_logic import get_instance_file_results
 from algorithm_tester.decorators import docstring_parameters
-
-class PythonLiteralOption(click.Option):
-
-    def type_cast_value(self, ctx, value: str):
-        try:
-            values = [c.strip() for c in value.split(",")]
-            for out_value in values:
-                if out_value not in plugins.get_algorithm_names():
-                    raise click.BadParameter(value)
-
-            return values
-        except:
-            raise click.BadParameter(value)
+from algorithm_tester.validators import validate_algorithms
 
 def create_columns_description_file(algorithm: str, check_time: bool, output_dir: str):
     column_descriptions = plugins.get_algorithm(name=algorithm).get_column_descriptions(check_time)
@@ -57,7 +45,7 @@ def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, chec
                 output_file.flush()
 
 @click.command()
-@click.option("-s", "--algorithms", cls=PythonLiteralOption, required=True, default=",".join(plugins.get_algorithm_names()), show_default=True, help="CSV string of names of available algorithms.")
+@click.option("-s", "--algorithms", callback=validate_algorithms, required=True, default=",".join(plugins.get_algorithm_names()), show_default=True, help="CSV string of names of available algorithms.")
 @click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
