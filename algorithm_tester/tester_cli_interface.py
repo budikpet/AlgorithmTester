@@ -6,7 +6,7 @@ import time
 from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_logic import get_instance_file_results
-from algorithm_tester.decorators import docstring_parameters
+from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms
 
 def create_columns_description_file(algorithm: str, check_time: bool, output_dir: str):
@@ -20,7 +20,7 @@ def write_solution(output_file, parsed_data: Dict[str, object]):
     output: str = f'{parsed_data["id"]} {parsed_data["count"]} {parsed_data["max_value"]} {parsed_data["algorithm"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
     output_file.write(f'{output}\n')
 
-def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, check_time: bool, time_retries: int, input_file, output_dir):
+def run_algorithms_for_file(algorithms: List[str], check_time: bool, time_retries: int, input_file, output_dir):
     create_path(output_dir)
 
     for algorithm in algorithms:
@@ -29,13 +29,10 @@ def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, chec
 
         suffix = f"_{algorithm}"
 
-        if relative_mistake is not None:
-            suffix = f"{suffix}_{str(relative_mistake).replace('.', ',')}"
-
         output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
         
         it = get_instance_file_results(datafile=input_file, check_time=check_time, 
-            algorithm=algorithm, time_retries=time_retries, relative_mistake=relative_mistake)
+            algorithm=algorithm, time_retries=time_retries)
 
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{output_dir}/{output_file_name}', "w") as output_file:
@@ -46,16 +43,16 @@ def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, chec
 
 @click.command()
 @click.option("-s", "--algorithms", callback=validate_algorithms, required=True, default=",".join(plugins.get_algorithm_names()), show_default=True, help="CSV string of names of available algorithms.")
-@click.option("-e", "--relative-mistake", type=float, required=False, help="Useful only for FPTAS. A float number from interval (0; 100]. Represents highest possible mistake in percents.")
 @click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
 @click.option("-p", "--parser", type=str, show_default=True, required=True, default="KnapsackBaseParser", help="Name of the parser that is used to parse input files.")
 @click.option("-c", "--communicators", type=str, required=False, help="CSV string of names of available communication interfaces.")
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")
+@use_dynamic_options(plugins.get_dynamic_options())
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
 @docstring_parameters("Parametric docstring", "very nice!")
-def run_tester(algorithms: List[str], relative_mistake: float, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir):
+def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, **kwargs):
     """
 
     {} is {}.
@@ -72,7 +69,7 @@ def run_tester(algorithms: List[str], relative_mistake: float, check_time: bool,
                 break
 
         with open(files_dict[n_key], "r") as input_file:
-            run_algorithms_for_file(algorithms, relative_mistake, check_time, time_retries, input_file, output_dir)
+            run_algorithms_for_file(algorithms, check_time, time_retries, input_file, output_dir)
 
 def main(prog_name: str):
     run_tester(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg

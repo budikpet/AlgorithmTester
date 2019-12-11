@@ -15,12 +15,9 @@ def inner(_it, _timer{init}):
 """
 timeit.template = new_template
 
-def get_instance_file_results(datafile, algorithm: str, check_time: bool, time_retries: int, relative_mistake: float = None):
+def get_instance_file_results(datafile, algorithm: str, check_time: bool, time_retries: int):
     data = datafile.readline()
     context = TesterContext(plugins.get_algorithm(name=algorithm))
-
-    if relative_mistake is not None:
-        relative_mistake /= 100
 
     while data:
         solution: Dict[str, object] = None
@@ -34,7 +31,6 @@ def get_instance_file_results(datafile, algorithm: str, check_time: bool, time_r
             "algorithm": algorithm,
             "count": count,
             "capacity": capacity,
-            "relative_mistake": relative_mistake,
             "things": things
         }
 

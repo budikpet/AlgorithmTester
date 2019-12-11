@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List, Dict
 import numpy as np
+from algorithm_tester.tester_dataclasses import DynamicClickOption
 
 class TesterContext():
 
@@ -11,6 +12,9 @@ class TesterContext():
         return self.algorithm.perform_algorithm(parsed_data)
 
 class Algorithm(object):
+
+    def required_click_params(self) -> List[DynamicClickOption]:
+        pass
 
     def get_column_descriptions(self, show_time: bool = True):
         output = [

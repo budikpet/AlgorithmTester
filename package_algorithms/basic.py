@@ -1,10 +1,16 @@
 from typing import List, Dict
 import numpy as np
 from algorithm_tester.algorithms import Algorithm
+from algorithm_tester.tester_dataclasses import DynamicClickOption
 from package_algorithms.tester_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
 
 class BruteForce(Algorithm):
     """ Uses Brute force  """
+
+    def required_click_params(self) -> List[DynamicClickOption]:
+        opt = DynamicClickOption(name="relative_mistake", data_type=str, short_opt="e", long_opt="relative-mistake", 
+            required=False, doc_help="A float number from interval (0; 100]. Represents highest possible mistake in percents.")
+        return [opt]
 
     def get_name(self) -> str:
         return "Brute"

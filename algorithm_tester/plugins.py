@@ -1,7 +1,8 @@
 import pkg_resources
 import sys, inspect
-from typing import Dict, List
+from typing import Dict, List, Set
 from algorithm_tester.algorithms import Algorithm
+from algorithm_tester.tester_dataclasses import DynamicClickOption
 
 """
 This module should be used to automatically retrieve plugins (Algorithm classes, Parser classes) from setup.py entrypoints.
@@ -29,6 +30,16 @@ class Plugins():
     def __init__(self):
         self.__algorithms: List[Algorithm] = get_plugins("algorithms", parent_class=Algorithm)
         # self.parsers = get_plugins("parsers", parent_class=Parser)
+
+    def get_dynamic_options(self) -> List[DynamicClickOption]:
+        options: Set[DynamicClickOption] = set("")
+        for alg in self.__algorithms:
+            params: List[DynamicClickOption] = alg.required_click_params()
+            
+            if params is not None:
+                options.update(params)
+        
+        return list(options)
 
     def get_algorithms(self, with_names: List[str] = None):
         if with_names is None:

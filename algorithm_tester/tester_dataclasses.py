@@ -19,3 +19,23 @@ class AnalysisFile:
             self.relative_mistake = float(-1)
 
         self.full_path = full_path
+
+@dataclass
+class DynamicClickOption():
+    name: str
+    data_type: type
+    short_opt: str
+    long_opt: str = None
+    required: bool = False
+    doc_help: str = None
+
+    def __key(self):
+        return (self.name)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, DynamicClickOption):
+            return self.__key() == other.__key()
+        return NotImplemented

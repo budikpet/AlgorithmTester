@@ -27,8 +27,8 @@ def test_algorithm(algorithm: Algorithm, exact: bool, relative_mistake: float):
             solutions: List[str] = solutionFile.readlines()
 
         with open(filepair.dataFile, "r") as datafile:
-            it = get_instance_file_results(datafile=datafile, algorithm=algorithm.get_name(), 
-                relative_mistake=relative_mistake, time_retries=1, check_time=False)
+            it = get_instance_file_results(datafile=datafile, algorithm=algorithm.get_name(),
+                time_retries=1, check_time=False)
 
             # Compare solutions
             for index, solution in enumerate(it):
