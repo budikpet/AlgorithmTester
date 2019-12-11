@@ -2,7 +2,7 @@ import pytest
 from click.testing import CliRunner
 from typing import List
 from algorithm_tester.algorithms import Algorithm
-from algorithm_tester.tester_logic import test_instance_file
+from algorithm_tester.tester_logic import get_instance_file_results
 from algorithm_tester.helpers import FilePair, get_files
 from algorithm_tester.plugins import plugins
 
@@ -27,7 +27,7 @@ def test_algorithm(algorithm: Algorithm, exact: bool, relative_mistake: float):
             solutions: List[str] = solutionFile.readlines()
 
         with open(filepair.dataFile, "r") as datafile:
-            it = test_instance_file(datafile=datafile, algorithm=algorithm.get_name(), 
+            it = get_instance_file_results(datafile=datafile, algorithm=algorithm.get_name(), 
                 relative_mistake=relative_mistake, time_retries=1, check_time=False)
 
             # Compare solutions

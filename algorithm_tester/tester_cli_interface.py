@@ -5,7 +5,7 @@ import os
 import time
 from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import get_files_dict, create_path
-from algorithm_tester.tester_logic import test_instance_file
+from algorithm_tester.tester_logic import get_instance_file_results
 from algorithm_tester.decorators import docstring_parameters
 
 class PythonLiteralOption(click.Option):
@@ -46,7 +46,7 @@ def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, chec
 
         output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
         
-        it = test_instance_file(datafile=input_file, check_time=check_time, 
+        it = get_instance_file_results(datafile=input_file, check_time=check_time, 
             algorithm=algorithm, time_retries=time_retries, relative_mistake=relative_mistake)
 
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
