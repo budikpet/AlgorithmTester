@@ -67,10 +67,12 @@ Nové algoritmy pro testování lze aplikaci předat prostřednictvím pluginů.
 .. code-block:: python
 
   class Algorithm(object):
-      def get_name(self) -> str:
-          pass
-     def perform_algorithm(self, parsed_data) -> str:
-          pass
+  
+    def get_name(self) -> str:
+      pass
+      
+    def perform_algorithm(self, parsed_data) -> str:
+      pass
 
 Propojení s komunikačním rozhraním
 =====================================
