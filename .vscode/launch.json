@@ -16,10 +16,11 @@
             "type": "python",
             "request": "launch",
             "args": [
-                "-s", "Brute", // "Brute,Greedy,BB",
+                // "-s", "Greedy", // "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
                 // "--check-time","True",
+                "-n", "1",
                 "${workspaceFolder}/data/NK",
                 "${workspaceFolder}/analysis/tester_results/TEST"
             ],

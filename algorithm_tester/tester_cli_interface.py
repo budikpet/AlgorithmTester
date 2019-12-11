@@ -29,7 +29,7 @@ def create_columns_description_file(algorithm: str, check_time: bool, output_dir
 
 def write_solution(output_file, parsed_data: Dict[str, object]):
     # output_file.write(f"{solution.output_str()}\n")
-    output: str = f'{parsed_data["id"]} {parsed_data["count"]} {parsed_data["max_value"]} {parsed_data["algorithm"]} {parsed_data["elapsed_configs"]} {parsed_data["things"]}'
+    output: str = f'{parsed_data["id"]} {parsed_data["count"]} {parsed_data["max_value"]} {parsed_data["algorithm"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
     output_file.write(f'{output}\n')
 
 def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, check_time: bool, time_retries: int, input_file, output_dir):

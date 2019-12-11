@@ -33,7 +33,8 @@ class DynamicProgramming_Weight(Algorithm):
         
         # Get things in the bag
         remaining_value: int = best_value
-        output_things = [0 for i in range(task.count)]
+        # output_things = [0 for i in range(task.count)]
+        output_things = np.zeros((task.count), dtype=int)
         
         for i in reversed(range(task.count)):
             row = self.dp_table[i]
@@ -50,7 +51,7 @@ class DynamicProgramming_Weight(Algorithm):
         parsed_data.update({
             "max_value": best_value,
             "elapsed_configs": config_ctr.value,
-            "things": "tmp_output_things"
+            "things": output_things
         })
 
         return parsed_data
@@ -120,28 +121,24 @@ class DynamicProgramming(Algorithm):
     def construct_solution(self, task: Task, parsed_data: Dict[str, object], found_sum: int, found_weight: int, config_ctr: int) -> Dict[str, object]:
         """ Reconstructs vector of things using the filled table. """
 
-        things_positions = list()
+        output_things = np.zeros((task.count), dtype=int)
         curr_sum = found_sum
         curr_weight = found_weight
         for row_index in reversed(range(1, self.work_count + 1)):
             if self.dp_table[curr_sum][row_index] != self.dp_table[curr_sum][row_index - 1]:
                 # Thing at row_index is in the bag
                 curr_thing: Thing = self.work_things[row_index - 1]
-                things_positions.append(curr_thing.position)
+                output_things[curr_thing.position] = 1
                 curr_weight -= curr_thing.weight
                 curr_sum -= curr_thing.cost
 
             if curr_weight == 0:
                 break
 
-        things = [0 for _ in range(task.count)]
-        for pos in things_positions:
-            things[pos] = 1
-
         parsed_data.update({
             "max_value": found_sum,
             "elapsed_configs": config_ctr,
-            "things": "tmp_things"
+            "things": output_things
         })
 
         return parsed_data

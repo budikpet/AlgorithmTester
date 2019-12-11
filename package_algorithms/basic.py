@@ -45,7 +45,7 @@ class BruteForce(Algorithm):
         parsed_data.update({
             "max_value": result.max_value,
             "elapsed_configs": config_ctr.value,
-            "things": "tmp_result.things"
+            "things": result.things
         })
 
         return parsed_data
@@ -67,7 +67,7 @@ class Greedy(Algorithm):
         task: Task = Task(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
-        output_things = [0 for _ in task.things]
+        output_things = np.zeros((task.count), dtype=int)
         max_sum = 0
         remaining_capacity = task.capacity
 
@@ -86,7 +86,7 @@ class Greedy(Algorithm):
         parsed_data.update({
             "max_value": max_sum,
             "elapsed_configs": config_ctr,
-            "things": "tmp_output_things"
+            "things": output_things
         })
 
         return parsed_data
