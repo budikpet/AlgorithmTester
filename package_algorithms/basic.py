@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Dict
 import numpy as np
 from algorithm_tester.algorithms import Algorithm
-from algorithm_tester.tester_dataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
+from package_algorithms.tester_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
 
 class BruteForce(Algorithm):
     """ Uses Brute force  """
@@ -32,8 +32,9 @@ class BruteForce(Algorithm):
         
         return self.recursive_solve(config_ctr, task, thing_at_index + 1, curr_state.new_solution())
     
-    def perform_algorithm(self, task: Task) -> Solution:
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison
+        task: Task = Task(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         config_ctr = ConfigCounter(0)
@@ -41,8 +42,13 @@ class BruteForce(Algorithm):
         result = self.recursive_solve(config_ctr, task, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
-        return Solution(task=task, max_value=result.max_value, 
-            elapsed_configs=config_ctr.value, things=result.things)
+        parsed_data.update({
+            "max_value": result.max_value,
+            "elapsed_configs": config_ctr.value,
+            "things": "tmp_result.things"
+        })
+
+        return parsed_data
 
 class Greedy(Algorithm):
     """ 
@@ -56,8 +62,9 @@ class Greedy(Algorithm):
     def get_name(self) -> str:
         return "Greedy"
 
-    def perform_algorithm(self, task: Task) -> Solution:
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison descending
+        task: Task = Task(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         output_things = [0 for _ in task.things]
@@ -76,5 +83,10 @@ class Greedy(Algorithm):
             if remaining_capacity <= 0:
                 break
 
-        return Solution(task=task, max_value=max_sum, 
-            elapsed_configs=config_ctr, things=tuple(output_things))
+        parsed_data.update({
+            "max_value": max_sum,
+            "elapsed_configs": config_ctr,
+            "things": "tmp_output_things"
+        })
+
+        return parsed_data

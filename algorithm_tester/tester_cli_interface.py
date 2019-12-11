@@ -6,7 +6,6 @@ import time
 from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_logic import test_instance_file
-from algorithm_tester.tester_dataclasses import Solution
 from algorithm_tester.decorators import docstring_parameters
 
 class PythonLiteralOption(click.Option):
@@ -28,6 +27,11 @@ def create_columns_description_file(algorithm: str, check_time: bool, output_dir
     with open(f'{output_dir}/column_description_{algorithm}.dat', "w") as f:
         f.write(f'{" ".join(column_descriptions)}\n')
 
+def write_solution(output_file, parsed_data: Dict[str, object]):
+    # output_file.write(f"{solution.output_str()}\n")
+    output: str = f'{parsed_data["id"]} {parsed_data["count"]} {parsed_data["max_value"]} {parsed_data["algorithm"]} {parsed_data["elapsed_configs"]} {parsed_data["things"]}'
+    output_file.write(f'{output}\n')
+
 def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, check_time: bool, time_retries: int, input_file, output_dir):
     create_path(output_dir)
 
@@ -48,8 +52,8 @@ def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, chec
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{output_dir}/{output_file_name}', "w") as output_file:
             for solution in it:
-                # print(solution.output_str())
-                output_file.write(f"{solution.output_str()}\n")
+                # FIXME: Parse solution dict
+                write_solution(output_file, solution)
                 output_file.flush()
 
 @click.command()
@@ -62,7 +66,7 @@ def run_algorithms_for_file(algorithms: List[str], relative_mistake: float, chec
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
-@docstring_parameters("helm", "yes")
+@docstring_parameters("Parametric docstring", "very nice!")
 def run_tester(algorithms: List[str], relative_mistake: float, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir):
     """
 

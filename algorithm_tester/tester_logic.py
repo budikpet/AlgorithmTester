@@ -1,6 +1,5 @@
 import os
 import timeit
-from algorithm_tester.tester_dataclasses import Task, Solution, Thing
 from algorithm_tester.algorithms import TesterContext
 from algorithm_tester.plugins import plugins
 
@@ -24,21 +23,28 @@ def test_instance_file(datafile, algorithm: str, check_time: bool, time_retries:
         relative_mistake /= 100
 
     while data:
+        solution: Dict[str, object] = None
         values = data.split(" ")
         id, count, capacity = int(values.pop(0)), int(values.pop(0)), int(values.pop(0))
         it = iter(values)
-        things = [Thing(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
+        things = [(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
 
-        task = Task(id=id, count=count, algorithm=algorithm, capacity=capacity, things=things, relative_mistake=relative_mistake)
-        solution = None
+        input_data = {
+            "id": id,
+            "algorithm": algorithm,
+            "count": count,
+            "capacity": capacity,
+            "relative_mistake": relative_mistake,
+            "things": things
+        }
 
         if check_time:
             # Use timeit to get time
-            t = timeit.Timer(lambda: context.perform_algorithm(task))
+            t = timeit.Timer(lambda: context.perform_algorithm(input_data))
             elapsed_time, solution = t.timeit(number=time_retries)
-            solution.elapsed_time = round((elapsed_time*1000)/time_retries, 10)   # Store in millis
+            solution["elapsed_time"] = round((elapsed_time*1000)/time_retries, 10)   # Store in millis
         else:
-            solution = context.perform_algorithm(task)
+            solution = context.perform_algorithm(input_data)
 
         yield solution
 

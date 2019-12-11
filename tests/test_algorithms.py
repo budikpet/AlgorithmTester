@@ -3,7 +3,6 @@ from click.testing import CliRunner
 from typing import List
 from algorithm_tester.algorithms import Algorithm
 from algorithm_tester.tester_logic import test_instance_file
-from algorithm_tester.tester_dataclasses import Solution
 from algorithm_tester.helpers import FilePair, get_files
 from algorithm_tester.plugins import plugins
 
@@ -34,16 +33,18 @@ def test_algorithm(algorithm: Algorithm, exact: bool, relative_mistake: float):
             # Compare solutions
             for index, solution in enumerate(it):
                 given_solution = solutions[index].split(" ")
-                found_solution = solution.output_str().split(" ")
+                found_solution = solution
+                max_value: int = found_solution.get("max_value")
 
-                assert int(found_solution[4]) >= 0
-                    
+                assert max_value is not None
+                assert found_solution["elapsed_configs"] >= 0
+
                 if exact:
                     # Check if found value matches exactly
-                    assert int(given_solution[2]) == int(found_solution[2])
+                    assert int(given_solution[2]) == max_value
                 else:
                     # Check if the found value is at most the best value
-                    assert int(given_solution[2]) >= int(found_solution[2])
+                    assert int(given_solution[2]) >= max_value
                 print
 
     print

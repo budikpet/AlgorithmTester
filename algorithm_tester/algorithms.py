@@ -1,15 +1,14 @@
 from enum import Enum
-from typing import List
+from typing import List, Dict
 import numpy as np
-from algorithm_tester.tester_dataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
 
 class TesterContext():
 
     def __init__(self, algorithm):
         self.algorithm = algorithm
 
-    def perform_algorithm(self, task: Task) -> Solution:
-        return self.algorithm.perform_algorithm(task)
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        return self.algorithm.perform_algorithm(parsed_data)
 
 class Algorithm(object):
 
@@ -35,5 +34,5 @@ class Algorithm(object):
     def get_name(self) -> str:
         pass
     
-    def perform_algorithm(self, task: Task) -> Solution:
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         pass
