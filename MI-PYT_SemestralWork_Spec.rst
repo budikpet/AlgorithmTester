@@ -62,8 +62,7 @@ Přidání nových algoritmů
 
 Nové algoritmy pro testování lze aplikaci předat prostřednictvím pluginů. Každý z těchto algoritmů musí být dědicem třídy Algorithm. Aplikace pracuje pouze s metodami třídy Algorithm.
 
-Zjednodušená třída Algorithm:
-________________________________
+**Zjednodušená třída Algorithm:**
 
 .. code-block:: python
 
@@ -78,10 +77,9 @@ Propojení s komunikačním rozhraním
 
 Protože zpracování instancí může trvat velmi dlouho, může aplikace posílat události s informacemi o stavu zpracování. Způsoby komunikace jsou rozšiřitelné formou pluginů. Je možné současně použít 0..* způsobů komunikace zároveň.
 
-Využití:
-__________
+**Využití**
 
-- Zobrazení, kolik již bylo zpracováno souborů
-- Možnost stáhnout obsah složky s výstupními soubory
+- zobrazení, kolik již bylo zpracováno souborů
+- možnost stáhnout obsah složky s výstupními soubory
 
 Výchozím způsobem komunikace je Slack kanál, ke kterému se aplikace připojuje pomocí SlackClient_.
