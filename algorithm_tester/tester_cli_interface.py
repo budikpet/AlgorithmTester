@@ -9,8 +9,12 @@ from algorithm_tester.tester_logic import get_instance_file_results
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms
 
+# TODO: Parser pro parsování vstupních i výstupních souborů
+# TODO: Parser bude mít metodu přijímající output-dict, podle kterého je vráceno jméno výstupního souboru.
+# TODO: Parser určuje, jaké hodnoty (sloupce) jsou do výstupního souboru ukládány. Algoritmus může dodat hodnoty, které chce, aby byli přidány.
+
 def create_columns_description_file(algorithm: str, check_time: bool, output_dir: str):
-    column_descriptions = plugins.get_algorithm(name=algorithm).get_column_descriptions(check_time)
+    column_descriptions = plugins.get_algorithm(name=algorithm).get_additional_columns(check_time)
 
     with open(f'{output_dir}/column_description_{algorithm}.dat', "w") as f:
         f.write(f'{" ".join(column_descriptions)}\n')

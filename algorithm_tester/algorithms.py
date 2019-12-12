@@ -16,22 +16,12 @@ class Algorithm(object):
     def required_click_params(self) -> List[DynamicClickOption]:
         pass
 
-    def get_column_descriptions(self, show_time: bool = True):
+    def get_additional_columns(self, show_time: bool = True) -> List[str]:
         output = [
-            "id",
-            "item_count",
             "maximum_sum",
-            "algorithm_name",
-            "|",
+            "elapsed_configs",
             "items_in_bag"
         ]
-
-        if show_time:
-            # time counted as real time
-            output.insert(output.index("|"), "time[ms]")
-        else:
-            # time counted as number of configurations
-            output.insert(output.index("|"), "time[#configs]")
 
         return output
 

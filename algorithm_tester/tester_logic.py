@@ -32,7 +32,8 @@ def get_instance_file_results(datafile, algorithm: str, check_time: bool, time_r
             "algorithm_name": algorithm,
             "item_count": count,
             "capacity": capacity,
-            "things": things
+            "things": things,
+            "elapsed_time": 0.0
         }
         
         if other_options is not None:
