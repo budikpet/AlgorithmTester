@@ -40,14 +40,6 @@ class DynamicClickOption():
             return self.__key() == other.__key()
         return NotImplemented
 
-class TesterContext():
-
-    def __init__(self, algorithm):
-        self.algorithm = algorithm
-
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        return self.algorithm.perform_algorithm(parsed_data)
-
 class Algorithm(object):
 
     def required_click_params(self) -> List[DynamicClickOption]:
@@ -75,3 +67,16 @@ class Parser(object):
 
     def get_output_file_name(click_args: Dict[str, object]) -> str:
         pass
+
+class TesterContext():
+
+    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, other_options: Dict[str, object], input_dir, output_dir):
+        self.algorithm_names: List[str] = algorithms
+        self.parser_name: str = parser
+        self.communicator_names: List[str] = communicators
+        self.check_time: bool = check_time
+        self.time_retries: int = time_retries
+        self.max_num: int = max_num
+        self.other_options: Dict[str, object] = other_options
+        self.input_dir: str = input_dir
+        self.output_dir: str = output_dir

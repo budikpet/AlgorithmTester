@@ -1,7 +1,8 @@
 import click
 from typing import List
 from algorithm_tester.plugins import plugins
-from algorithm_tester.helpers import get_files_dict
+from algorithm_tester.helpers import get_files_dict, create_path
+from algorithm_tester.tester_dataclasses import TesterContext
 from algorithm_tester.tester_logic import run_algorithms_for_file
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms, validate_parser
@@ -29,8 +30,17 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
     
     files_dict = get_files_dict(input_dir)
 
+    context: TesterContext = TesterContext(
+        algorithms=algorithms, parser=parser, communicators=communicators,
+        max_num=max_num, check_time=check_time, time_retries=time_retries,
+        other_options=kwargs,
+        input_dir=input_dir, output_dir=output_dir
+        )
+
     for key, path in files_dict.items():
         files_dict[key] = [path for path in files_dict[key] if "_inst" in path][0]
+
+    create_path(output_dir)
 
     for index, n_key in enumerate(sorted(files_dict)):
         if max_num is not None:
@@ -38,7 +48,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
                 break
 
         with open(files_dict[n_key], "r") as input_file:
-            run_algorithms_for_file(parser, algorithms, check_time, time_retries, kwargs, input_file, output_dir)
+            run_algorithms_for_file(context, input_file)
 
 def main(prog_name: str):
     run_tester(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
