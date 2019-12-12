@@ -22,9 +22,10 @@
                 "--check-time","True",
                 "-n", "1",
                 // "--relative-mistake", "0.5",
+                // "--relative", "0.lll",
                 "-p", "KnapsackParser",
-                "${workspaceFolder}/data/NK",
-                "${workspaceFolder}/analysis/tester_results/TEST"
+                "--input-dir", "${workspaceFolder}/data/NK",
+                "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
             "console": "integratedTerminal"

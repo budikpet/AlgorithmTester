@@ -27,7 +27,7 @@ def test_algorithm(algorithm: Algorithm, exact: bool, relative_mistake: float):
     context = flexmock(
         time_retries=1,
         check_time=False,
-        other_options=dict()
+        extra_options=dict()
     )
 
     for filepair in dataFiles:

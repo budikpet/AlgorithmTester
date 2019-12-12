@@ -7,7 +7,7 @@ class BruteForce(Algorithm):
     """ Uses Brute force  """
 
     # def required_click_params(self) -> List[DynamicClickOption]:
-    #     opt = DynamicClickOption(name="relative_mistake", data_type=str, short_opt="e", long_opt="relative-mistake", 
+    #     opt = DynamicClickOption(name="relative_mistake", data_type=float, short_opt="e", long_opt="relative-mistake", 
     #         required=False, doc_help="A float number from interval (0; 100]. Represents highest possible mistake in percents.")
     #     return [opt]
 

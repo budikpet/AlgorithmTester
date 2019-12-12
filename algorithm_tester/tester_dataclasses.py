@@ -76,19 +76,19 @@ class Parser(object):
 
 class TesterContext():
 
-    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, other_options: Dict[str, object], input_dir, output_dir):
+    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], input_dir, output_dir):
         self.algorithm_names: List[str] = algorithms
         self.parser_name: str = parser
         self.communicator_names: List[str] = communicators
         self.check_time: bool = check_time
         self.time_retries: int = time_retries
         self.max_num: int = max_num
-        self.other_options: Dict[str, object] = other_options
+        self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
         self.output_dir: str = output_dir
 
-        if self.other_options is None:
-            self.other_options = dict()
+        if self.extra_options is None:
+            self.extra_options = dict()
 
     def get_options(self) -> Dict[str, object]:
         options = {
@@ -102,6 +102,6 @@ class TesterContext():
             "output_dir": self.output_dir
         }
 
-        options.update(self.other_options)
+        options.update(self.extra_options)
 
         return options

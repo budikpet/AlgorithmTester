@@ -30,7 +30,7 @@ def get_instance_file_results(context: TesterContext, algorithm_name: str, parse
 
     while parsed_data is not None:
         parsed_data["algorithm_name"] = algorithm_name
-        parsed_data.update(context.other_options)
+        parsed_data.update(context.extra_options)
 
         if context.check_time:
             # Use timeit to get time
