@@ -1,7 +1,7 @@
 import os
 import timeit
 from typing import Dict
-from algorithm_tester.algorithms import TesterContext
+from algorithm_tester.abstracts import TesterContext
 from algorithm_tester.plugins import plugins
 
 # Enable timeit to return elapsed time and return value

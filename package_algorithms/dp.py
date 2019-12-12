@@ -1,6 +1,6 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.algorithms import Algorithm, TesterContext
+from algorithm_tester.abstracts import Algorithm, TesterContext
 from package_algorithms.tester_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
 
 class DynamicProgramming_Weight(Algorithm):

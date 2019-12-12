@@ -1,7 +1,7 @@
 import pkg_resources
 import sys, inspect
 from typing import Dict, List, Set
-from algorithm_tester.algorithms import Algorithm
+from algorithm_tester.abstracts import Algorithm
 from algorithm_tester.tester_dataclasses import DynamicClickOption
 
 """

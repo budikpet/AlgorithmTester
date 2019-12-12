@@ -1,6 +1,6 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.algorithms import Algorithm
+from algorithm_tester.abstracts import Algorithm
 from algorithm_tester.tester_dataclasses import DynamicClickOption
 from package_algorithms.tester_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
 
