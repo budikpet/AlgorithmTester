@@ -62,10 +62,19 @@ class Algorithm(object):
 
 class Parser(object):
 
+    def set_input_file(self, input_file):
+        self.input_file = input_file
+
+    def reload_input_file(self):
+        self.input_file.seek(0)
+
     def get_name(self) -> str:
         pass
 
-    def get_output_file_name(click_args: Dict[str, object]) -> str:
+    def get_output_file_name(self, click_args: Dict[str, object]) -> str:
+        pass
+
+    def get_next_instance(self) -> Dict[str, object]:
         pass
 
 class TesterContext():

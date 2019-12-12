@@ -29,26 +29,13 @@ def write_solution(output_file, parsed_data: Dict[str, object]):
     output: str = f'{parsed_data["id"]} {parsed_data["item_count"]} {parsed_data["max_value"]} {parsed_data["algorithm_name"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
     output_file.write(f'{output}\n')
 
-def get_instance_file_results(context: TesterContext, datafile, algorithm_name: str):
-    data = datafile.readline()
+def get_instance_file_results(context: TesterContext, datafile, algorithm_name: str, parser: Parser):
+    parsed_data = parser.get_next_instance()
     algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
 
-    while data:
-        solution: Dict[str, object] = None
-        values = data.split(" ")
-        id, count, capacity = int(values.pop(0)), int(values.pop(0)), int(values.pop(0))
-        it = iter(values)
-        things = [(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
+    while parsed_data is not None:
+        parsed_data["algorithm_name"] = algorithm_name
 
-        parsed_data = {
-            "id": id,
-            "algorithm_name": algorithm_name,
-            "item_count": count,
-            "capacity": capacity,
-            "things": things,
-            "elapsed_time": 0.0
-        }
-        
         if context.other_options is not None:
             parsed_data.update(context.other_options)
 
@@ -62,21 +49,23 @@ def get_instance_file_results(context: TesterContext, datafile, algorithm_name: 
 
         yield solution
 
-        data = datafile.readline()
+        parsed_data = parser.get_next_instance()
     
     print
 
 def run_algorithms_for_file(context: TesterContext, input_file):
+    parser: Parser = plugins.get_parser(name=context.parser_name)
+    parser.set_input_file(input_file)
 
     for algorithm_name in context.algorithm_names:
-        input_file.seek(0)
+        parser.reload_input_file()
         create_columns_description_file(algorithm_name, context.check_time, context.output_dir)
 
         suffix = f"_{algorithm_name}"
 
         output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
         
-        it = get_instance_file_results(context=context, datafile=input_file, algorithm_name=algorithm_name)
+        it = get_instance_file_results(context=context, datafile=input_file, algorithm_name=algorithm_name, parser=parser)
 
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
