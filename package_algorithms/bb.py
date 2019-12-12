@@ -1,13 +1,16 @@
-from typing import List
+from typing import List, Dict
 import numpy as np
-from algorithm_tester.algorithms import Algorithm
-from algorithm_tester.tester_dataclasses import Task, Solution, Thing, ConfigCounter, RecursiveResult
+from algorithm_tester.tester_dataclasses import Algorithm
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
 
 class BranchBound(Algorithm):
     """ Uses BranchBound algorithm. """
 
     def get_name(self) -> str:
         return "BB"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def get_max_sum(self, task: Task) -> int:
         currSum = 0
@@ -48,16 +51,22 @@ class BranchBound(Algorithm):
         # Current thing too heavy. The subtree has high enough value, need to check if items fit
         return self.recursive_solve(config_ctr, task, maximum_sum - curr_thing.cost, thing_at_index + 1, curr_state.new_solution())
     
-    def perform_algorithm(self, task: Task) -> Solution:
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
+        task: Task = Task(parsed_data=parsed_data)
         maximum_sum = self.get_max_sum(task)
         config_ctr = ConfigCounter(0)
         things = np.zeros((task.count), dtype=int)
         result = self.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
-        return Solution(task=task, max_value=result.max_value, 
-            elapsed_configs=config_ctr.value, things=result.things)
+        parsed_data.update({
+            "max_value": result.max_value,
+            "elapsed_configs": config_ctr.value,
+            "things": result.things
+        })
+
+        return parsed_data
 
 class SortedBranchBound(Algorithm):
     """ Uses BranchBound algorithm, sorts the input first. """
@@ -65,10 +74,14 @@ class SortedBranchBound(Algorithm):
     def get_name(self) -> str:
         return "SBB"
 
-    def perform_algorithm(self, task: Task) -> Solution:
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
+
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         algorithm = BranchBound()
 
         # Sort things by cost/weight comparison
+        task: Task = Task(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
@@ -78,5 +91,10 @@ class SortedBranchBound(Algorithm):
         result = algorithm.recursive_solve(config_ctr, task, maximum_sum, 0, RecursiveResult(remaining_capacity=task.capacity, 
             max_value=0, things=things))
 
-        return Solution(task=task, max_value=result.max_value, 
-            elapsed_configs=config_ctr.value, things=result.things)
+        parsed_data.update({
+            "max_value": result.max_value,
+            "elapsed_configs": config_ctr.value,
+            "things": result.things
+        })
+
+        return parsed_data

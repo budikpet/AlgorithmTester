@@ -1,9 +1,9 @@
 import pytest
+from flexmock import flexmock
 from click.testing import CliRunner
 from typing import List
-from algorithm_tester.algorithms import Algorithm
-from algorithm_tester.tester_logic import test_instance_file
-from algorithm_tester.tester_dataclasses import Solution
+from algorithm_tester.tester_dataclasses import Algorithm, Parser, TesterContext
+from algorithm_tester.tester_logic import get_instance_file_results
 from algorithm_tester.helpers import FilePair, get_files
 from algorithm_tester.plugins import plugins
 
@@ -22,28 +22,38 @@ def test_algorithm(algorithm: Algorithm, exact: bool, relative_mistake: float):
     path = './data'
     dataFiles = get_files(f'{path}/NK')[0:1]
 
+    parser: Parser = plugins.get_parser(plugins.get_parser_names()[0])
+
+    context = flexmock(
+        time_retries=1,
+        check_time=False,
+        other_options=dict()
+    )
+
     for filepair in dataFiles:
         # Get all solutions of the current problem
         with open(filepair.solutionFile, "r") as solutionFile:
             solutions: List[str] = solutionFile.readlines()
 
         with open(filepair.dataFile, "r") as datafile:
-            it = test_instance_file(datafile=datafile, algorithm=algorithm.get_name(), 
-                relative_mistake=relative_mistake, time_retries=1, check_time=False)
+            parser.set_input_file(datafile)
+            it = get_instance_file_results(context=context, algorithm_name=algorithm.get_name(), parser=parser)
 
             # Compare solutions
             for index, solution in enumerate(it):
                 given_solution = solutions[index].split(" ")
-                found_solution = solution.output_str().split(" ")
+                found_solution = solution
+                max_value: int = found_solution.get("max_value")
 
-                assert int(found_solution[4]) >= 0
-                    
+                assert max_value is not None
+                assert found_solution["elapsed_configs"] >= 0
+
                 if exact:
                     # Check if found value matches exactly
-                    assert int(given_solution[2]) == int(found_solution[2])
+                    assert int(given_solution[2]) == max_value
                 else:
                     # Check if the found value is at most the best value
-                    assert int(given_solution[2]) >= int(found_solution[2])
+                    assert int(given_solution[2]) >= max_value
                 print
 
     print

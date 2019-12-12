@@ -37,7 +37,10 @@ def get_files_dict(path: str):
         for file in files:
             parts = file.split("_")
             value = f'{root}/{file}'
-            key = parts[1]
+            key: str = parts[1]
+
+            if key.isnumeric():
+                key = int(key)
 
             if key in data.keys():
                 data[key].append(value)

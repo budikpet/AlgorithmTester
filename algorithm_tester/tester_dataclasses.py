@@ -1,24 +1,8 @@
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from enum import Enum
 import re
 import numpy as np
-
-@dataclass
-class Thing:
-    position: int
-    weight: int
-    cost: int
-
-@dataclass
-class Task:
-    id: int
-    count: int
-    capacity: int
-    algorithm: str
-    # None if not used
-    relative_mistake: float
-    things: List[Thing] = field(default_factory=list)
 
 class AnalysisFile:
 
@@ -36,58 +20,88 @@ class AnalysisFile:
 
         self.full_path = full_path
 
-class Solution:
-    id: int
-    count: int
-    algorithm: str
-    max_value: int
-    relative_mistake: float = None
-    # Tuple of 1's and 0's
-    things: Tuple[int] = None
-
-    # Elapsed time in millis
-    elapsed_time: float = None
-    # Elapsed time in number of configurations
-    elapsed_configs: int = None
-
-    def __init__(self, task: Task, max_value: int, things, elapsed_configs: int = None, elapsed_time: float = None, relative_mistake: float = None):
-        self.things = things
-        self.max_value = max_value
-        self.elapsed_configs = elapsed_configs
-        self.elapsed_time = elapsed_time
-        self.relative_mistake = relative_mistake
-        self.id = task.id
-        self.count = task.count
-        self.algorithm = task.algorithm
-
-    def output_str(self) -> str:
-        output = f'{abs(self.id)} {self.count} {self.max_value} {self.algorithm}'
-
-        if self.elapsed_time is not None or self.elapsed_configs is not None:
-            if self.elapsed_time is not None:
-                output = f'{output} {self.elapsed_time}'
-            else:
-                output = f'{output} {self.elapsed_configs}'
-
-        if self.relative_mistake is not None:
-            output = f'{output} {self.relative_mistake}'
-
-        return f'{output} | {" ".join(map(str, self.things))}'
-
 @dataclass
-class ConfigCounter:
-    value: int
+class DynamicClickOption():
+    name: str
+    data_type: type
+    short_opt: str
+    long_opt: str = None
+    required: bool = False
+    doc_help: str = None
 
-@dataclass
-class RecursiveResult:
-    remaining_capacity: int
-    max_value: int
-    things: np.ndarray
+    def __key(self):
+        return (self.name)
 
-    def new_solution(self, thing: Thing = None):        
-        if thing is not None:
-            things = np.copy(self.things)
-            things[thing.position] = 1
-            return RecursiveResult(self.remaining_capacity - thing.weight, self.max_value + thing.cost, things)
-        else:
-            return RecursiveResult(self.remaining_capacity, self.max_value, np.copy(self.things))
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        if isinstance(other, DynamicClickOption):
+            return self.__key() == other.__key()
+        return NotImplemented
+
+class Algorithm(object):
+
+    def required_click_params(self) -> List[DynamicClickOption]:
+        pass
+
+    def get_columns(self) -> List[str]:
+        pass
+
+    def get_name(self) -> str:
+        pass
+    
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        pass
+
+class Parser(object):
+
+    def set_input_file(self, input_file):
+        self.input_file = input_file
+
+    def reload_input_file(self):
+        self.input_file.seek(0)
+
+    def get_name(self) -> str:
+        pass
+
+    def get_output_file_name(self, click_args: Dict[str, object]) -> str:
+        pass
+
+    def get_next_instance(self) -> Dict[str, object]:
+        pass
+
+    def write_result_to_file(self, output_file, data: Dict[str, object]):
+        pass
+
+class TesterContext():
+
+    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, other_options: Dict[str, object], input_dir, output_dir):
+        self.algorithm_names: List[str] = algorithms
+        self.parser_name: str = parser
+        self.communicator_names: List[str] = communicators
+        self.check_time: bool = check_time
+        self.time_retries: int = time_retries
+        self.max_num: int = max_num
+        self.other_options: Dict[str, object] = other_options
+        self.input_dir: str = input_dir
+        self.output_dir: str = output_dir
+
+        if self.other_options is None:
+            self.other_options = dict()
+
+    def get_options(self) -> Dict[str, object]:
+        options = {
+            "algorithm_names": self.algorithm_names,
+            "parser_name": self.parser_name,
+            "communicator_names": self.communicator_names,
+            "check_time": self.check_time,
+            "time_retries": self.time_retries,
+            "max_num": self.max_num,
+            "input_dir": self.input_dir,
+            "output_dir": self.output_dir
+        }
+
+        options.update(self.other_options)
+
+        return options

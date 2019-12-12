@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Dict
 import numpy as np
-from algorithm_tester.algorithms import Algorithm, TesterContext
-from algorithm_tester.tester_dataclasses import Task, Solution, Thing, ConfigCounter
+from algorithm_tester.tester_dataclasses import Algorithm, TesterContext
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
 
 class DynamicProgramming_Weight(Algorithm):
     """ 
@@ -17,7 +17,10 @@ class DynamicProgramming_Weight(Algorithm):
     def get_name(self) -> str:
         return "DPWeight"
 
-    def get_solution(self, task: Task, config_ctr: ConfigCounter):
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
+
+    def get_solution(self, task: Task, parsed_data: Dict[str, object], config_ctr: ConfigCounter):
         # Get the best possible value
         for i in range(1, task.count+1): 
             for w in range(1, task.capacity+1):
@@ -33,7 +36,8 @@ class DynamicProgramming_Weight(Algorithm):
         
         # Get things in the bag
         remaining_value: int = best_value
-        output_things = [0 for i in range(task.count)]
+        # output_things = [0 for i in range(task.count)]
+        output_things = np.zeros((task.count), dtype=int)
         
         for i in reversed(range(task.count)):
             row = self.dp_table[i]
@@ -46,18 +50,24 @@ class DynamicProgramming_Weight(Algorithm):
 
             if remaining_value == 0:
                 break
+        
+        parsed_data.update({
+            "max_value": best_value,
+            "elapsed_configs": config_ctr.value,
+            "things": output_things
+        })
 
-        return Solution(task=task, max_value=best_value, 
-            elapsed_configs=config_ctr.value, things=tuple(output_things))
+        return parsed_data
 
     def prepare_table(self, task: Task):
         self.dp_table = np.zeros((task.count + 1, task.capacity + 1), dtype=int)
 
-    def perform_algorithm(self, task: Task) -> Solution:
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        task: Task = Task(parsed_data=parsed_data)
         self.prepare_table(task)
 
         config_ctr = ConfigCounter(0)
-        return self.get_solution(task, config_ctr)
+        return self.get_solution(task, parsed_data, config_ctr)
 
 class DynamicProgramming(Algorithm):
     """ 
@@ -82,6 +92,9 @@ class DynamicProgramming(Algorithm):
 
     def get_name(self) -> str:
         return "DP"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def simplify_task(self, task: Task) -> bool:
         # Remove items with cost == 0 or weight > capacity
@@ -111,37 +124,41 @@ class DynamicProgramming(Algorithm):
 
         return True
 
-    def construct_solution(self, task: Task, found_sum: int, found_weight: int, config_ctr: int) -> Solution:
+    def construct_solution(self, task: Task, parsed_data: Dict[str, object], found_sum: int, found_weight: int, config_ctr: int) -> Dict[str, object]:
         """ Reconstructs vector of things using the filled table. """
 
-        things_positions = list()
+        output_things = np.zeros((task.count), dtype=int)
         curr_sum = found_sum
         curr_weight = found_weight
         for row_index in reversed(range(1, self.work_count + 1)):
             if self.dp_table[curr_sum][row_index] != self.dp_table[curr_sum][row_index - 1]:
                 # Thing at row_index is in the bag
                 curr_thing: Thing = self.work_things[row_index - 1]
-                things_positions.append(curr_thing.position)
+                output_things[curr_thing.position] = 1
                 curr_weight -= curr_thing.weight
                 curr_sum -= curr_thing.cost
 
             if curr_weight == 0:
                 break
 
-        things = [0 for _ in range(task.count)]
-        for pos in things_positions:
-            things[pos] = 1
+        parsed_data.update({
+            "max_value": found_sum,
+            "elapsed_configs": config_ctr,
+            "things": output_things
+        })
 
-        return Solution(task=task, max_value=found_sum, 
-            relative_mistake=task.relative_mistake, elapsed_configs=config_ctr, things=tuple(things))
+        return parsed_data
 
-    def perform_algorithm(self, task: Task) -> Solution:        
+    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        task: Task = Task(parsed_data=parsed_data) 
         self.work_count = task.count
         self.work_things = [Thing(thing.position, thing.weight, thing.cost) for thing in task.things]
         
         if not self.prepare_table(task):
             # No item can be added to the bag
-            return Solution(id=task.id, count=task.count, max_value=0, relative_mistake=task.relative_mistake, things=tuple(0 for _ in range(task.count)))
+            # FIXME: Return solution
+            # return Solution(id=task.id, count=task.count, max_value=0, relative_mistake=task.relative_mistake, things=tuple(0 for _ in range(task.count)))
+            return None
         
         best_sum = 0
         config_ctr: int = 0
@@ -158,5 +175,5 @@ class DynamicProgramming(Algorithm):
             if self.dp_table[curr_sum][i] <= task.capacity:
                 best_sum = curr_sum
 
-        return self.construct_solution(task=task, found_sum=best_sum, 
+        return self.construct_solution(task=task, parsed_data=parsed_data, found_sum=best_sum, 
             found_weight=self.dp_table[best_sum][self.work_count], config_ctr=config_ctr)
