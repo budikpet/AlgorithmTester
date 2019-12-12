@@ -18,7 +18,6 @@ from algorithm_tester.validators import validate_algorithms, validate_parser
 @click.option("-p", "--parser", type=str, callback=validate_parser, required=True, help="Name of the parser that is used to parse input files.")
 @click.option("-c", "--communicators", type=str, required=False, help="CSV string of names of available communication interfaces.")
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")
-@use_dynamic_options(plugins.get_dynamic_options())
 @click.argument("input-dir", required=True)
 @click.argument("output-dir", required=True)
 @docstring_parameters("Parametric docstring", "very nice!")

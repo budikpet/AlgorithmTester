@@ -6,18 +6,16 @@ from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, Recur
 class BruteForce(Algorithm):
     """ Uses Brute force  """
 
-    def required_click_params(self) -> List[DynamicClickOption]:
-        opt = DynamicClickOption(name="relative_mistake", data_type=str, short_opt="e", long_opt="relative-mistake", 
-            required=False, doc_help="A float number from interval (0; 100]. Represents highest possible mistake in percents.")
-        return [opt]
+    # def required_click_params(self) -> List[DynamicClickOption]:
+    #     opt = DynamicClickOption(name="relative_mistake", data_type=str, short_opt="e", long_opt="relative-mistake", 
+    #         required=False, doc_help="A float number from interval (0; 100]. Represents highest possible mistake in percents.")
+    #     return [opt]
 
     def get_name(self) -> str:
         return "Brute"
 
     def get_columns(self, show_time: bool = True) -> List[str]:
-        columns = ["relative_mistake"]
-        columns.extend(base_columns)
-        return columns
+        return base_columns
 
     def recursive_solve(self, config_ctr: ConfigCounter, task: Task, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
         config_ctr.value += 1

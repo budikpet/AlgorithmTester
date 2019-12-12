@@ -24,7 +24,7 @@ def create_columns_description_file(algorithm: str, check_time: bool, output_dir
     with open(f'{output_dir}/column_description_{algorithm}.dat', "w") as f:
         f.write(f'{" ".join(column_descriptions)}\n')
 
-def get_instance_file_results(context: TesterContext, datafile, algorithm_name: str, parser: Parser) -> Dict[str, object]:
+def get_instance_file_results(context: TesterContext, algorithm_name: str, parser: Parser) -> Dict[str, object]:
     parsed_data = parser.get_next_instance()
     algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
 
@@ -56,7 +56,7 @@ def run_algorithms_for_file(context: TesterContext, input_file):
         
         create_columns_description_file(algorithm_name, context.check_time, context.output_dir)
         
-        it = get_instance_file_results(context=context, datafile=input_file, algorithm_name=algorithm_name, parser=parser)
+        it = get_instance_file_results(context=context, algorithm_name=algorithm_name, parser=parser)
 
         click_options: Dict[str, object] = context.get_options()
         click_options["algorithm_name"] = algorithm_name

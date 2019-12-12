@@ -21,7 +21,7 @@
                 // "-e", "10",
                 "--check-time","True",
                 "-n", "1",
-                "--relative-mistake", "0.5",
+                // "--relative-mistake", "0.5",
                 "-p", "KnapsackParser",
                 "${workspaceFolder}/data/NK",
                 "${workspaceFolder}/analysis/tester_results/TEST"
