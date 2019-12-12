@@ -1,49 +1,14 @@
-from subprocess import Popen, PIPE, STDOUT
 import click
-from typing import Dict, List
-import os
-import time
+from typing import List
 from algorithm_tester.plugins import plugins
-from algorithm_tester.helpers import get_files_dict, create_path
-from algorithm_tester.tester_logic import get_instance_file_results
+from algorithm_tester.helpers import get_files_dict
+from algorithm_tester.tester_logic import run_algorithms_for_file
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms, validate_parser
 
 # TODO: Parser pro parsování vstupních i výstupních souborů
 # TODO: Parser bude mít metodu přijímající output-dict, podle kterého je vráceno jméno výstupního souboru.
 # TODO: Parser určuje, jaké hodnoty (sloupce) jsou do výstupního souboru ukládány. Algoritmus může dodat hodnoty, které chce, aby byli přidány.
-
-def create_columns_description_file(algorithm: str, check_time: bool, output_dir: str):
-    column_descriptions = plugins.get_algorithm(name=algorithm).get_additional_columns(check_time)
-
-    with open(f'{output_dir}/column_description_{algorithm}.dat', "w") as f:
-        f.write(f'{" ".join(column_descriptions)}\n')
-
-def write_solution(output_file, parsed_data: Dict[str, object]):
-    # output_file.write(f"{solution.output_str()}\n")
-    output: str = f'{parsed_data["id"]} {parsed_data["item_count"]} {parsed_data["max_value"]} {parsed_data["algorithm_name"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
-    output_file.write(f'{output}\n')
-
-def run_algorithms_for_file(parser: str, algorithms: List[str], check_time: bool, time_retries: int, other_options: Dict[str, object], input_file, output_dir):
-    create_path(output_dir)
-
-    for algorithm in algorithms:
-        input_file.seek(0)
-        create_columns_description_file(algorithm, check_time, output_dir)
-
-        suffix = f"_{algorithm}"
-
-        output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
-        
-        it = get_instance_file_results(datafile=input_file, check_time=check_time, 
-            algorithm=algorithm, time_retries=time_retries, other_options=other_options)
-
-        print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
-        with open(f'{output_dir}/{output_file_name}', "w") as output_file:
-            for solution in it:
-                # FIXME: Parse solution dict
-                write_solution(output_file, solution)
-                output_file.flush()
 
 @click.command()
 @click.option("-s", "--algorithms", callback=validate_algorithms, required=True, default=",".join(plugins.get_algorithm_names()), show_default=True, help="CSV string of names of available algorithms.")
