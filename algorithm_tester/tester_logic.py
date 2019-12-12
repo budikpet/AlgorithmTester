@@ -4,7 +4,7 @@ import click
 import time
 from typing import Dict, List
 from algorithm_tester.helpers import create_path
-from algorithm_tester.abstracts import TesterContext
+from algorithm_tester.tester_dataclasses import TesterContext
 from algorithm_tester.plugins import plugins
 
 # Enable timeit to return elapsed time and return value

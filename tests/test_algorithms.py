@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
 from typing import List
-from algorithm_tester.abstracts import Algorithm
+from algorithm_tester.tester_dataclasses import Algorithm
 from algorithm_tester.tester_logic import get_instance_file_results
 from algorithm_tester.helpers import FilePair, get_files
 from algorithm_tester.plugins import plugins

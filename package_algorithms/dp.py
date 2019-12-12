@@ -1,7 +1,7 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.abstracts import Algorithm, TesterContext
-from package_algorithms.tester_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
+from algorithm_tester.tester_dataclasses import Algorithm, TesterContext
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
 
 class DynamicProgramming_Weight(Algorithm):
     """ 

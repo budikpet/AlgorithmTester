@@ -1,8 +1,7 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.abstracts import Algorithm
-from algorithm_tester.tester_dataclasses import DynamicClickOption
-from package_algorithms.tester_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
+from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
 
 class BruteForce(Algorithm):
     """ Uses Brute force  """
