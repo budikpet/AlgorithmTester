@@ -45,14 +45,8 @@ class Algorithm(object):
     def required_click_params(self) -> List[DynamicClickOption]:
         pass
 
-    def get_additional_columns(self, show_time: bool = True) -> List[str]:
-        output = [
-            "maximum_sum",
-            "elapsed_configs",
-            "items_in_bag"
-        ]
-
-        return output
+    def get_columns(self) -> List[str]:
+        pass
 
     def get_name(self) -> str:
         pass
@@ -75,6 +69,9 @@ class Parser(object):
         pass
 
     def get_next_instance(self) -> Dict[str, object]:
+        pass
+
+    def write_result_to_file(self, output_file, data: Dict[str, object]):
         pass
 
 class TesterContext():

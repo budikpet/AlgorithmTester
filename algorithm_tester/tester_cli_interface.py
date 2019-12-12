@@ -14,7 +14,7 @@ from algorithm_tester.validators import validate_algorithms, validate_parser
 @click.command()
 @click.option("-s", "--algorithms", callback=validate_algorithms, required=True, default=",".join(plugins.get_algorithm_names()), show_default=True, help="CSV string of names of available algorithms.")
 @click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
-@click.option("--time-retries", type=int, default=5, help="How many times should we retry if elapsed time is checked.")
+@click.option("--time-retries", type=int, default=1, help="How many times should we retry if elapsed time is checked.")
 @click.option("-p", "--parser", type=str, callback=validate_parser, required=True, help="Name of the parser that is used to parse input files.")
 @click.option("-c", "--communicators", type=str, required=False, help="CSV string of names of available communication interfaces.")
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")

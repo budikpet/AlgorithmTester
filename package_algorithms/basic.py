@@ -1,7 +1,7 @@
 from typing import List, Dict
 import numpy as np
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
-from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
 
 class BruteForce(Algorithm):
     """ Uses Brute force  """
@@ -13,6 +13,11 @@ class BruteForce(Algorithm):
 
     def get_name(self) -> str:
         return "Brute"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        columns = ["relative_mistake"]
+        columns.extend(base_columns)
+        return columns
 
     def recursive_solve(self, config_ctr: ConfigCounter, task: Task, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
         config_ctr.value += 1
@@ -66,6 +71,9 @@ class Greedy(Algorithm):
 
     def get_name(self) -> str:
         return "Greedy"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison descending

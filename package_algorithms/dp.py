@@ -1,7 +1,7 @@
 from typing import List, Dict
 import numpy as np
 from algorithm_tester.tester_dataclasses import Algorithm, TesterContext
-from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
 
 class DynamicProgramming_Weight(Algorithm):
     """ 
@@ -16,6 +16,9 @@ class DynamicProgramming_Weight(Algorithm):
 
     def get_name(self) -> str:
         return "DPWeight"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def get_solution(self, task: Task, parsed_data: Dict[str, object], config_ctr: ConfigCounter):
         # Get the best possible value
@@ -89,6 +92,9 @@ class DynamicProgramming(Algorithm):
 
     def get_name(self) -> str:
         return "DP"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def simplify_task(self, task: Task) -> bool:
         # Remove items with cost == 0 or weight > capacity

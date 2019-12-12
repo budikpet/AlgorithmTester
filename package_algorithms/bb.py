@@ -1,13 +1,16 @@
 from typing import List, Dict
 import numpy as np
 from algorithm_tester.tester_dataclasses import Algorithm
-from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution
+from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
 
 class BranchBound(Algorithm):
     """ Uses BranchBound algorithm. """
 
     def get_name(self) -> str:
         return "BB"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def get_max_sum(self, task: Task) -> int:
         currSum = 0
@@ -70,6 +73,9 @@ class SortedBranchBound(Algorithm):
 
     def get_name(self) -> str:
         return "SBB"
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return base_columns
 
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         algorithm = BranchBound()

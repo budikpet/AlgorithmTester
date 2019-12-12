@@ -4,6 +4,16 @@ from enum import Enum
 import re
 import numpy as np
 
+base_columns: List[str] = [
+        "id",
+        "item_count",
+        "algorithm_name",
+        "max_value",
+        "elapsed_configs",
+        "elapsed_time",
+        "things"
+    ]
+
 @dataclass
 class Thing:
     position: int

@@ -19,10 +19,10 @@
                 // "-s", "Greedy", // "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                // "--check-time","True",
+                "--check-time","True",
                 "-n", "1",
                 "--relative-mistake", "0.5",
-                "-p", "KnapsackParser"
+                "-p", "KnapsackParser",
                 "${workspaceFolder}/data/NK",
                 "${workspaceFolder}/analysis/tester_results/TEST"
             ],
