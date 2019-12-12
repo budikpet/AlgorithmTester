@@ -21,7 +21,7 @@ class Algorithm(object):
             "id",
             "item_count",
             "maximum_sum",
-            "algorithm",
+            "algorithm_name",
             "|",
             "items_in_bag"
         ]

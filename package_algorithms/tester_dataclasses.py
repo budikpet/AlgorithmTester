@@ -14,9 +14,9 @@ class Task:
     
     def __init__(self, parsed_data: Dict[str, object]):
         self.id: int = parsed_data.get("id")
-        self.count: int = parsed_data.get("count")
+        self.count: int = parsed_data.get("item_count")
         self.capacity: int = parsed_data.get("capacity")
-        self.algorithm: str = parsed_data.get("algorithm")
+        self.algorithm: str = parsed_data.get("algorithm_name")
         # None if not used
         self.relative_mistake: float = parsed_data.get("relative_mistake")
         self.things: List[Thing] = [Thing(pos, weight, cost) for pos, weight, cost in parsed_data.get("things")]

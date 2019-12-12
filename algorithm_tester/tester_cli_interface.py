@@ -17,10 +17,10 @@ def create_columns_description_file(algorithm: str, check_time: bool, output_dir
 
 def write_solution(output_file, parsed_data: Dict[str, object]):
     # output_file.write(f"{solution.output_str()}\n")
-    output: str = f'{parsed_data["id"]} {parsed_data["count"]} {parsed_data["max_value"]} {parsed_data["algorithm"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
+    output: str = f'{parsed_data["id"]} {parsed_data["item_count"]} {parsed_data["max_value"]} {parsed_data["algorithm_name"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
     output_file.write(f'{output}\n')
 
-def run_algorithms_for_file(algorithms: List[str], check_time: bool, time_retries: int, input_file, output_dir):
+def run_algorithms_for_file(algorithms: List[str], check_time: bool, time_retries: int, other_options: Dict[str, object], input_file, output_dir):
     create_path(output_dir)
 
     for algorithm in algorithms:
@@ -32,7 +32,7 @@ def run_algorithms_for_file(algorithms: List[str], check_time: bool, time_retrie
         output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
         
         it = get_instance_file_results(datafile=input_file, check_time=check_time, 
-            algorithm=algorithm, time_retries=time_retries)
+            algorithm=algorithm, time_retries=time_retries, other_options=other_options)
 
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{output_dir}/{output_file_name}', "w") as output_file:
@@ -69,7 +69,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
                 break
 
         with open(files_dict[n_key], "r") as input_file:
-            run_algorithms_for_file(algorithms, check_time, time_retries, input_file, output_dir)
+            run_algorithms_for_file(algorithms, check_time, time_retries, kwargs, input_file, output_dir)
 
 def main(prog_name: str):
     run_tester(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg

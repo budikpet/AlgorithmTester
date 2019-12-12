@@ -21,6 +21,7 @@
                 // "-e", "10",
                 // "--check-time","True",
                 "-n", "1",
+                "--relative-mistake", "0.5",
                 "${workspaceFolder}/data/NK",
                 "${workspaceFolder}/analysis/tester_results/TEST"
             ],
