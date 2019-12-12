@@ -7,9 +7,9 @@ class KnapsackParser(Parser):
         return "KnapsackParser"
 
     def get_output_file_name(self, click_args: Dict[str, object]) -> str:
-        res: str = "tmp"
+        input_file_name: str = self.input_file.name.split("/")[-1]
 
-        return res
+        return input_file_name.replace(".dat", "_sol.dat")
 
     def get_next_instance(self) -> Dict[str, object]:
         instance: str = self.input_file.readline()

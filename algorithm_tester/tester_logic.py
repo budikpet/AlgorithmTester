@@ -29,15 +29,13 @@ def write_solution(output_file, parsed_data: Dict[str, object]):
     output: str = f'{parsed_data["id"]} {parsed_data["item_count"]} {parsed_data["max_value"]} {parsed_data["algorithm_name"]} {parsed_data["elapsed_configs"]} | {" ".join(map(str, parsed_data["things"]))}'
     output_file.write(f'{output}\n')
 
-def get_instance_file_results(context: TesterContext, datafile, algorithm_name: str, parser: Parser):
+def get_instance_file_results(context: TesterContext, datafile, algorithm_name: str, parser: Parser) -> Dict[str, object]:
     parsed_data = parser.get_next_instance()
     algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
 
     while parsed_data is not None:
         parsed_data["algorithm_name"] = algorithm_name
-
-        if context.other_options is not None:
-            parsed_data.update(context.other_options)
+        parsed_data.update(context.other_options)
 
         if context.check_time:
             # Use timeit to get time
@@ -59,14 +57,15 @@ def run_algorithms_for_file(context: TesterContext, input_file):
 
     for algorithm_name in context.algorithm_names:
         parser.reload_input_file()
+        
         create_columns_description_file(algorithm_name, context.check_time, context.output_dir)
-
-        suffix = f"_{algorithm_name}"
-
-        output_file_name = input_file.name.split("/")[-1].replace(".dat", f'{suffix}.dat')
         
         it = get_instance_file_results(context=context, datafile=input_file, algorithm_name=algorithm_name, parser=parser)
 
+        click_options: Dict[str, object] = context.get_options()
+        click_options["algorithm_name"] = algorithm_name
+
+        output_file_name: str = parser.get_output_file_name(click_options)
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
             for solution in it:

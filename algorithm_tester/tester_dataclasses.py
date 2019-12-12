@@ -89,3 +89,22 @@ class TesterContext():
         self.other_options: Dict[str, object] = other_options
         self.input_dir: str = input_dir
         self.output_dir: str = output_dir
+
+        if self.other_options is None:
+            self.other_options = dict()
+
+    def get_options(self) -> Dict[str, object]:
+        options = {
+            "algorithm_names": self.algorithm_names,
+            "parser_name": self.parser_name,
+            "communicator_names": self.communicator_names,
+            "check_time": self.check_time,
+            "time_retries": self.time_retries,
+            "max_num": self.max_num,
+            "input_dir": self.input_dir,
+            "output_dir": self.output_dir
+        }
+
+        options.update(self.other_options)
+
+        return options
