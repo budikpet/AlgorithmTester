@@ -30,3 +30,11 @@ class Algorithm(object):
     
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         pass
+
+class Parser(object):
+
+    def get_name(self) -> str:
+        pass
+
+    def get_output_file_name(solution_data: Dict[str, object]) -> str:
+        pass

@@ -11,3 +11,12 @@ def validate_algorithms(self, ctx, value: str):
         return values
     except:
         raise click.BadParameter(value)
+
+def validate_parser(self, ctx, value: str):
+    try:
+        if value not in plugins.get_parser_names():
+            raise click.BadParameter(value)
+
+        return value
+    except:
+        raise click.BadParameter(value)
