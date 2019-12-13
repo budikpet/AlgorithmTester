@@ -105,18 +105,48 @@ class Parser(object):
         self.input_file.seek(0)
 
     def get_name(self) -> str:
+        """
+        
+        Returns:
+            str: Name of this parser that is used to identify it.
+        """
         pass
 
     def get_output_file_name(self, click_args: Dict[str, object]) -> str:
+        """
+        Construct name of an output file using provided data.
+        
+        Args:
+            click_args (Dict[str, object]): Options that were given to the script.
+        
+        Returns:
+            str: Name of the output file.
+        """
         pass
 
     def get_next_instance(self) -> Dict[str, object]:
+        """
+        Parses next instance from an input file and returns it.
+        
+        Returns:
+            Dict[str, object]: Instance data (or None if no data remains).
+        """
         pass
 
     def write_result_to_file(self, output_file, data: Dict[str, object]):
+        """
+        Write result data to an output file.
+        
+        Args:
+            output_file: Opened output file.
+            data (Dict[str, object]): Result data from an algorithm and options that were given to the script.
+        """
         pass
 
 class TesterContext():
+    """
+    Contains all options and arguments given to the application.
+    """
 
     def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], input_dir, output_dir):
         self.algorithm_names: List[str] = algorithms
