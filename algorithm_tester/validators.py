@@ -5,6 +5,20 @@ from algorithm_tester.tester_dataclasses import DynamicClickOption
 from algorithm_tester.plugins import plugins
 
 def validate_algorithms(self, ctx, value: str) -> List[str]:
+    """
+    Validates CSV string of algorithm names.
+
+    Args:
+        ctx: Click context
+        value (str): CSV string of algorithm names.
+
+    Raises:
+        click.BadParameter: Found a value that is not an algorithm name.
+
+    Returns:
+        List[str]: List of names of Algorithms.
+    """
+
     try:
         values = [c.strip() for c in value.split(",")]
         for out_value in values:
@@ -16,6 +30,19 @@ def validate_algorithms(self, ctx, value: str) -> List[str]:
         raise click.BadParameter(value)
 
 def validate_parser(self, ctx, value: str) -> str:
+    """
+    Validate parser name.
+    
+    Args:
+        ctx: Click context
+        value (str): Name of a parser.
+    
+    Raises:
+        click.BadParameter: Provided name is not a parser name.
+    
+    Returns:
+        str: Parser name.
+    """
     try:
         if value not in plugins.get_parser_names():
             raise click.BadParameter(value)
@@ -25,6 +52,20 @@ def validate_parser(self, ctx, value: str) -> str:
         raise click.BadParameter(value)
 
 def validate_extra_options(self, ctx, value: List[str]) -> Dict[str, object]:
+    """
+    Validates that all options that were added extra are valid dynamic options that can be provided to algorithms.
+    
+    Args:
+        ctx: Click context
+        value (List[str]): A list of extra parameters with format [param_name1, param_value1, param_name2, param_value2, ...]
+    
+    Raises:
+        click.BadParameter: A parameter was provided that is not part of dynamic options.
+    
+    Returns:
+        Dict[str, object]: A dictionary with format "dynamic_option_name": value.
+    """
+
     try:
         output: Dict[str, object] = dict()
         dynamic_options: List[DynamicClickOption] = plugins.get_dynamic_options()

@@ -22,6 +22,19 @@ class AnalysisFile:
 
 @dataclass
 class DynamicClickOption():
+    """
+    Class that represents extra option that is required by an Algorithm subclass.
+
+    Args:
+        name (str): Name of the argument (dict key) for the option.
+        data_type (type): Click CLI type of the option value.
+        short_opt (str): Short option name (e. g. -f).
+        long_opt (str): Long option name (e. g. --force).
+        required (bool): True if the option must be provided.
+        doc_help (str): A string that should be part of the documentation.
+    
+    """
+
     name: str
     data_type: type
     short_opt: str
@@ -41,17 +54,46 @@ class DynamicClickOption():
         return NotImplemented
 
 class Algorithm(object):
+    """
+    Interface for algorithm plugins.
+    
+    """
 
     def required_click_params(self) -> List[DynamicClickOption]:
+        """
+        
+        Returns:
+            List[DynamicClickOption]: List of possible DynamicOptions for the algorithm.
+        """
         pass
 
     def get_columns(self) -> List[str]:
+        """
+        
+        
+        Returns:
+            List[str]: List of column names that should be part of the output file. These column names need to correspond to dictionary keys of perform_algorithm method.
+        """
         pass
 
     def get_name(self) -> str:
+        """
+        
+        Returns:
+            str: Name of this algorithm that is used to identify it.
+        """
         pass
     
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        """
+        Main method of the class. Receives instance data from a parser and creates results.
+        
+        Args:
+            parsed_data (Dict[str, object]): Instance data from a parser.
+        
+        Returns:
+            Dict[str, object]: Instance result data. Which values should be part of the output file is determined by the output of get_columns method.
+        """
         pass
 
 class Parser(object):
