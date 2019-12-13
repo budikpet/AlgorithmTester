@@ -6,10 +6,7 @@ from algorithm_tester.tester_dataclasses import TesterContext
 from algorithm_tester.tester_logic import run_algorithms_for_file
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms, validate_parser, validate_extra_options
-
-# TODO: Parser pro parsování vstupních i výstupních souborů
-# TODO: Parser bude mít metodu přijímající output-dict, podle kterého je vráceno jméno výstupního souboru.
-# TODO: Parser určuje, jaké hodnoty (sloupce) jsou do výstupního souboru ukládány. Algoritmus může dodat hodnoty, které chce, aby byli přidány.
+# TODO: Simplify loading of input files. The directory should only have instance files, not solution files.
 
 @click.command(name='my-cmd', context_settings=dict(
     ignore_unknown_options=True,

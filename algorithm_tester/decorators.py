@@ -10,6 +10,17 @@ def docstring_parameters(*args, **kwargs):
     return dec
 
 def use_dynamic_options(options: List[DynamicClickOption]):
+    """
+    Makes it possible to add dynamic options as valid Click CLI options.
+
+    These options are shown and used as thought they were created by @click.option directly.
+    
+    Args:
+        options (List[DynamicClickOption]): A list of dynamic options.
+    
+    Returns:
+        func: A function that adds dynamic options through @click.option.
+    """
     def decorator(f):
         for dynamic_option in reversed(options):
             dynamic_option: DynamicClickOption = dynamic_option

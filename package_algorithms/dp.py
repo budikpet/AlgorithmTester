@@ -156,9 +156,13 @@ class DynamicProgramming(Algorithm):
         
         if not self.prepare_table(task):
             # No item can be added to the bag
-            # FIXME: Return solution
-            # return Solution(id=task.id, count=task.count, max_value=0, relative_mistake=task.relative_mistake, things=tuple(0 for _ in range(task.count)))
-            return None
+            parsed_data.update({
+                "max_value": 0,
+                "elapsed_configs": 0,
+                "things": np.zeros((task.count), dtype=int)
+            })
+
+            return parsed_data
         
         best_sum = 0
         config_ctr: int = 0
