@@ -1,6 +1,8 @@
 AlgorithmTester
 ==================
 
+[![Build Status](https://travis-ci.com/budikpet/AlgorithmTester.svg?branch=master)](https://travis-ci.com/budikpet/AlgorithmTester)
+
 A click CLI script used for algorithm analysis for different algorithmical problems (e. g. Knapsack problem). It is used as a semestral work for MI-PYT and as an analysis script for MI-PAA.
 
 Main utilization
