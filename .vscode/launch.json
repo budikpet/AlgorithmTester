@@ -29,7 +29,7 @@
                 // "--relative-mistake", "0.5",
                 // "--relative", "0.lll",
                 "-p", "KnapsackParser",
-                "--input-dir", "${workspaceFolder}/data/NK/solutions",
+                "--input-dir", "${workspaceFolder}/data/NK",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",

@@ -58,43 +58,43 @@ def test_base_algorithms(algorithm: str, exact: bool, relative_mistake: float):
 
     print
 
-# def test_sa():
-#     path = './data'
-#     dataFiles = get_files(f'{path}/NK')
+def test_sa():
+    path = './data'
+    dataFiles = get_files(f'{path}/NK')[0:3]
 
-#     parser: Parser = plugins.get_parser(plugins.get_parser_names()[0])
+    parser: Parser = plugins.get_parser(plugins.get_parser_names()[0])
 
-#     context = flexmock(
-#         time_retries=1,
-#         check_time=False,
-#         extra_options={
-#             "init_temperature": 100.0,
-#             "min_temperature": 1.0,
-#             "cycles": 50,
-#             "cooling": 0.99
-#         }
-#     )
+    context = flexmock(
+        time_retries=1,
+        check_time=False,
+        extra_options={
+            "init_temperature": 100.0,
+            "min_temperature": 1.0,
+            "cycles": 50,
+            "cooling": 0.99
+        }
+    )
 
-#     for filepair in dataFiles:
-#         # Get all solutions of the current problem
-#         with open(filepair.solutionFile, "r") as solutionFile:
-#             solutions: List[str] = solutionFile.readlines()
+    for filepair in dataFiles:
+        # Get all solutions of the current problem
+        with open(filepair.solutionFile, "r") as solutionFile:
+            solutions: List[str] = solutionFile.readlines()
 
-#         with open(filepair.dataFile, "r") as datafile:
-#             parser.set_input_file(datafile)
-#             it = get_instance_file_results(context=context, algorithm_name="SA", parser=parser)
+        with open(filepair.dataFile, "r") as datafile:
+            parser.set_input_file(datafile)
+            it = get_instance_file_results(context=context, algorithm_name="SA", parser=parser)
 
-#             # Compare solutions
-#             for index, found_solution in enumerate(it):
-#                 given_solution = solutions[index].split(" ")
-#                 max_value: int = found_solution.get("max_value")
+            # Compare solutions
+            for index, found_solution in enumerate(it):
+                given_solution = solutions[index].split(" ")
+                max_value: int = found_solution.get("max_value")
 
-#                 assert max_value is not None
-#                 assert found_solution["elapsed_configs"] >= 0
+                assert max_value is not None
+                assert found_solution["elapsed_configs"] >= 0
 
                 
-#                 # Check if the found value is at most the best value
-#                 assert int(given_solution[2]) < max_value
-#                 print
+                # Check if the found value is at most the best value
+                assert int(given_solution[2]) >= max_value
+                print
 
-#     print
+    print

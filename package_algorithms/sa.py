@@ -75,12 +75,9 @@ class SimulatedAnnealing(Algorithm):
     def get_fitness(self, task: TaskSA, solution: np.ndarray):
         cost, weight = self.get_sums(task, solution)
 
-        # The higher remaining capacity the better. The higher cost the better.
+        # The higher cost the better. If weight > capacity then the fitness value is negative.
 
-        if weight <= task.capacity:
-            return cost
-        else:
-            return (task.capacity / (weight + 1)) * cost
+        return (task.capacity - weight + 1) * cost
 
     def get_solution(self, task: TaskSA) -> (np.ndarray, int):
         curr_temp: float = task.init_temp
@@ -126,7 +123,7 @@ class SimulatedAnnealing(Algorithm):
         max_cost, weight = self.get_sums(task, solution)
 
         parsed_data.update({
-            "max_value": max_cost,
+            "found_value": max_cost,
             "elapsed_configs": solution_cntr,
             "things": solution
         })
