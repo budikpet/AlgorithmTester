@@ -8,7 +8,7 @@ base_columns: List[str] = [
         "id",
         "item_count",
         "algorithm_name",
-        "max_value",
+        "found_value",
         "elapsed_configs",
         "elapsed_time",
         "things"

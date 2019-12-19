@@ -51,7 +51,7 @@ class BruteForce(Algorithm):
             max_value=0, things=things))
 
         parsed_data.update({
-            "max_value": result.max_value,
+            "found_value": result.max_value,
             "elapsed_configs": config_ctr.value,
             "things": result.things
         })
@@ -95,7 +95,7 @@ class Greedy(Algorithm):
                 break
 
         parsed_data.update({
-            "max_value": max_sum,
+            "found_value": max_sum,
             "elapsed_configs": config_ctr,
             "things": output_things
         })

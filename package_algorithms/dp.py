@@ -52,7 +52,7 @@ class DynamicProgramming_Weight(Algorithm):
                 break
         
         parsed_data.update({
-            "max_value": best_value,
+            "found_value": best_value,
             "elapsed_configs": config_ctr.value,
             "things": output_things
         })
@@ -142,7 +142,7 @@ class DynamicProgramming(Algorithm):
                 break
 
         parsed_data.update({
-            "max_value": found_sum,
+            "found_value": found_sum,
             "elapsed_configs": config_ctr,
             "things": output_things
         })
@@ -157,7 +157,7 @@ class DynamicProgramming(Algorithm):
         if not self.prepare_table(task):
             # No item can be added to the bag
             parsed_data.update({
-                "max_value": 0,
+                "found_value": 0,
                 "elapsed_configs": 0,
                 "things": np.zeros((task.count), dtype=int)
             })

@@ -61,7 +61,7 @@ class BranchBound(Algorithm):
             max_value=0, things=things))
 
         parsed_data.update({
-            "max_value": result.max_value,
+            "found_value": result.max_value,
             "elapsed_configs": config_ctr.value,
             "things": result.things
         })
@@ -92,7 +92,7 @@ class SortedBranchBound(Algorithm):
             max_value=0, things=things))
 
         parsed_data.update({
-            "max_value": result.max_value,
+            "found_value": result.max_value,
             "elapsed_configs": config_ctr.value,
             "things": result.things
         })

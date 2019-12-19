@@ -43,7 +43,7 @@ def test_base_algorithms(algorithm: str, exact: bool, relative_mistake: float):
             # Compare solutions
             for index, found_solution in enumerate(it):
                 given_solution = solutions[index].split(" ")
-                max_value: int = found_solution.get("max_value")
+                max_value: int = found_solution.get("found_value")
 
                 assert max_value is not None
                 assert found_solution["elapsed_configs"] >= 0
@@ -87,7 +87,7 @@ def test_sa():
             # Compare solutions
             for index, found_solution in enumerate(it):
                 given_solution = solutions[index].split(" ")
-                max_value: int = found_solution.get("max_value")
+                max_value: int = found_solution.get("found_value")
 
                 assert max_value is not None
                 assert found_solution["elapsed_configs"] >= 0
