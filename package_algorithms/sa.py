@@ -6,7 +6,6 @@ from math import exp
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
 from package_algorithms.alg_dataclasses import Thing, TaskKnapsackProblem
 
-@dataclass
 class TaskSA(TaskKnapsackProblem):
     
     def __init__(self, parsed_data: Dict[str, object]):
@@ -16,6 +15,13 @@ class TaskSA(TaskKnapsackProblem):
         self.min_temp: float = parsed_data.get("min_temperature")
         self.cycles: int = parsed_data.get("cycles")
 
+
+class SolutionSA():
+
+    def __init__(self, solution: np.ndarray, cost: int, weight: int):
+        self.solution = solution
+        self.cost = cost
+        self.weight = weight
 
 class SimulatedAnnealing(Algorithm):
     """ 
@@ -77,14 +83,33 @@ class SimulatedAnnealing(Algorithm):
 
         return cost
 
+    def initial_solution(self, task: TaskSA) -> SolutionSA:
+        solution: np.ndarray = np.zeros((task.count), dtype=int)
+        remaining_capacity = task.capacity
+
+        # Find solution
+        weight, cost = 0, 0
+        for index, thing in enumerate(task.things):
+            if thing.weight <= remaining_capacity:
+                remaining_capacity -= thing.weight
+                solution[index] = 1
+                weight += thing.weight
+                cost += thing.cost
+
+            if remaining_capacity <= 0:
+                break
+
+        return SolutionSA(solution, cost, weight)
+
+    def repair_solution(self, task: TaskSA, solution: np.ndarray):
+        print
+
     def get_solution(self, task: TaskSA) -> (np.ndarray, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
-        best_sol: np.ndarray = np.random.randint(low=0, high=2, size=task.count)
-        neighbour_sol: np.ndarray = best_sol.copy()
-        best_fitness: float = self.get_fitness(task, best_sol)
-        neighbour_fitness: float = best_fitness
+        best_sol: SolutionSA = self.initial_solution(task)
+        neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), cost=best_sol.cost, weight=best_sol.weight)
 
         random.seed(20191219)
 
@@ -95,6 +120,7 @@ class SimulatedAnnealing(Algorithm):
 
                 # Try neighbour solution
                 neighbour_sol[index] = (neighbour_sol[index] + 1) % 2
+                self.repair_solution(task, neighbour_sol)
                 neighbour_fitness: float = self.get_fitness(task, best_sol)
 
                 if neighbour_fitness > best_fitness:
@@ -119,7 +145,7 @@ class SimulatedAnnealing(Algorithm):
  
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         task: TaskSA = TaskSA(parsed_data=parsed_data)
-        task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
+        task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
         
         solution, solution_cntr = self.get_solution(task)
 
