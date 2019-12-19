@@ -1,7 +1,7 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.tester_dataclasses import Algorithm, TesterContext
-from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
+from algorithm_tester.tester_dataclasses import Algorithm, AlgTesterContext
+from package_algorithms.alg_dataclasses import ConfigCounter, TaskKnapsackProblem, Thing, RecursiveResult, Solution, base_columns
 
 class DynamicProgramming_Weight(Algorithm):
     """ 
@@ -20,7 +20,7 @@ class DynamicProgramming_Weight(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def get_solution(self, task: Task, parsed_data: Dict[str, object], config_ctr: ConfigCounter):
+    def get_solution(self, task: TaskKnapsackProblem, parsed_data: Dict[str, object], config_ctr: ConfigCounter):
         # Get the best possible value
         for i in range(1, task.count+1): 
             for w in range(1, task.capacity+1):
@@ -59,11 +59,11 @@ class DynamicProgramming_Weight(Algorithm):
 
         return parsed_data
 
-    def prepare_table(self, task: Task):
+    def prepare_table(self, task: TaskKnapsackProblem):
         self.dp_table = np.zeros((task.count + 1, task.capacity + 1), dtype=int)
 
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        task: Task = Task(parsed_data=parsed_data)
+        task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         self.prepare_table(task)
 
         config_ctr = ConfigCounter(0)
@@ -96,7 +96,7 @@ class DynamicProgramming(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def simplify_task(self, task: Task) -> bool:
+    def simplify_task(self, task: TaskKnapsackProblem) -> bool:
         # Remove items with cost == 0 or weight > capacity
         self.work_things = [thing for thing in self.work_things if thing.cost > 0 and thing.weight <= task.capacity]
         self.work_count = len(self.work_things)
@@ -110,7 +110,7 @@ class DynamicProgramming(Algorithm):
             max_weight_sum += thing.weight
         return max_cost_sum, max_weight_sum
 
-    def prepare_table(self, task: Task) -> bool:
+    def prepare_table(self, task: TaskKnapsackProblem) -> bool:
         """ Prepare the DP table & other important values """
 
         # The infinite value == (sum of all weights + 1)
@@ -124,7 +124,7 @@ class DynamicProgramming(Algorithm):
 
         return True
 
-    def construct_solution(self, task: Task, parsed_data: Dict[str, object], found_sum: int, found_weight: int, config_ctr: int) -> Dict[str, object]:
+    def construct_solution(self, task: TaskKnapsackProblem, parsed_data: Dict[str, object], found_sum: int, found_weight: int, config_ctr: int) -> Dict[str, object]:
         """ Reconstructs vector of things using the filled table. """
 
         output_things = np.zeros((task.count), dtype=int)
@@ -150,7 +150,7 @@ class DynamicProgramming(Algorithm):
         return parsed_data
 
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        task: Task = Task(parsed_data=parsed_data) 
+        task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data) 
         self.work_count = task.count
         self.work_things = [Thing(thing.position, thing.weight, thing.cost) for thing in task.things]
         

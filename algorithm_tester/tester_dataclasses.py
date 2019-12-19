@@ -143,7 +143,7 @@ class Parser(object):
         """
         pass
 
-class TesterContext():
+class AlgTesterContext():
     """
     Contains all options and arguments given to the application.
     """

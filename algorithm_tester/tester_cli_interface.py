@@ -2,7 +2,7 @@ import click
 from typing import List
 from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import get_files_dict, create_path
-from algorithm_tester.tester_dataclasses import TesterContext
+from algorithm_tester.tester_dataclasses import AlgTesterContext
 from algorithm_tester.tester_logic import run_algorithms_for_file
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms, validate_parser, validate_extra_options
@@ -25,7 +25,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
     
     files_dict = get_files_dict(input_dir)
 
-    context: TesterContext = TesterContext(
+    context: AlgTesterContext = AlgTesterContext(
         algorithms=algorithms, parser=parser, communicators=communicators,
         max_num=max_num, check_time=check_time, time_retries=time_retries,
         extra_options=extra_options,

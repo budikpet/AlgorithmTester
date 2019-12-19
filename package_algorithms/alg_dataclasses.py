@@ -20,7 +20,7 @@ class Thing:
     weight: int
     cost: int
 
-class Task:
+class TaskKnapsackProblem:
     
     def __init__(self, parsed_data: Dict[str, object]):
         self.id: int = parsed_data.get("id")
@@ -45,7 +45,7 @@ class Solution:
     # Elapsed time in number of configurations
     elapsed_configs: int = None
 
-    def __init__(self, task: Task, max_value: int, things, elapsed_configs: int = None, elapsed_time: float = None, relative_mistake: float = None):
+    def __init__(self, task: TaskKnapsackProblem, max_value: int, things, elapsed_configs: int = None, elapsed_time: float = None, relative_mistake: float = None):
         self.things = things
         self.max_value = max_value
         self.elapsed_configs = elapsed_configs

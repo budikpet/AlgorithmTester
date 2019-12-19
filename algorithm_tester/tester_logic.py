@@ -3,7 +3,7 @@ import timeit
 import click
 import time
 from typing import Dict, List
-from algorithm_tester.tester_dataclasses import TesterContext, Algorithm, Parser
+from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 
 # Enable timeit to return elapsed time and return value
@@ -31,12 +31,12 @@ def create_columns_description_file(algorithm: str, output_dir: str):
     with open(f'{output_dir}/column_description_{algorithm}.dat', "w") as f:
         f.write(f'{" ".join(column_descriptions)}\n')
 
-def get_instance_file_results(context: TesterContext, algorithm_name: str, parser: Parser) -> Dict[str, object]:
+def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, parser: Parser) -> Dict[str, object]:
     """
     Parsed instances are passed to the provided algorithm. Results are returned one by one.
     
     Args:
-        context (TesterContext): Input data.
+        context (AlgTesterContext): Input data.
         algorithm_name (str): Name of the algorithm used to compute results.
         parser (Parser): Used parser.
     
@@ -64,14 +64,14 @@ def get_instance_file_results(context: TesterContext, algorithm_name: str, parse
     
     print
 
-def run_algorithms_for_file(context: TesterContext, input_file):
+def run_algorithms_for_file(context: AlgTesterContext, input_file):
     """
     Generate output files for the specified input file.
 
     Parses input file using the provided parser, instance data are passed to all required algorithms, results are written to output files.
     
     Args:
-        context (TesterContext): Input data.
+        context (AlgTesterContext): Input data.
         input_file ([type]): Opened input file.
     """
     parser: Parser = plugins.get_parser(name=context.parser_name)
