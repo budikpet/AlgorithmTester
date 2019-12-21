@@ -4,7 +4,7 @@ import numpy as np
 import random
 from math import exp
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
-from package_algorithms.alg_dataclasses import Thing, TaskSA
+from package_algorithms.alg_dataclasses import Thing, TaskSA, SolutionSA
 
 
 class SimulatedAnnealingPenalty(Algorithm):
@@ -65,18 +65,35 @@ class SimulatedAnnealingPenalty(Algorithm):
 
         return cost, weight
 
-    def get_fitness(self, task: TaskSA, solution: np.ndarray):
-        cost, weight = self.get_sums(task, solution)
-
+    def get_fitness(self, task: TaskSA, solution: SolutionSA):
         # The higher cost the better. If weight > capacity then the fitness value is negative.
 
-        return (task.capacity - weight + 1) * cost
+        return (task.capacity - solution.sum_weight + 1) * solution.sum_cost
+
+    def initial_solution(self, task: TaskSA) -> SolutionSA:
+        solution: np.ndarray = np.zeros((task.count), dtype=int)
+        remaining_capacity = task.capacity
+
+        # Find solution
+        weight, cost = 0, 0
+        for index, thing in enumerate(task.things):
+            if thing.weight <= remaining_capacity:
+                remaining_capacity -= thing.weight
+                solution[index] = 1
+                weight += thing.weight
+                cost += thing.cost
+
+            if remaining_capacity <= 0:
+                break
+
+        return SolutionSA(solution, cost, weight)
+
 
     def get_solution(self, task: TaskSA) -> (np.ndarray, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
-        curr_sol: np.ndarray = np.random.randint(low=0, high=2, size=task.count)
+        curr_sol: SolutionSA = self.initial_solution(task)
         curr_fitness: float = self.get_fitness(task, curr_sol)
 
         random.seed(20191219)
@@ -110,6 +127,7 @@ class SimulatedAnnealingPenalty(Algorithm):
  
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         task: TaskSA = TaskSA(parsed_data=parsed_data)
+        task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
         
         solution, solution_cntr = self.get_solution(task)
 

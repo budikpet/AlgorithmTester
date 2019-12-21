@@ -81,9 +81,15 @@ class Solution:
 class SolutionSA():
 
     def __init__(self, solution: np.ndarray, sum_cost: int, sum_weight: int):
-        self.solution = solution
-        self.sum_cost = sum_cost
-        self.sum_weight = sum_weight
+        self.solution: np.ndarray = solution
+        self.sum_cost: int = sum_cost
+        self.sum_weight: int = sum_weight
+    
+    def __getitem__(self, key):
+        return self.solution[key]
+    
+    def __setitem__(self, key, value):
+        self.solution[key] = value
 
 @dataclass
 class ConfigCounter:
