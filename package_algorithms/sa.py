@@ -64,10 +64,8 @@ class SimulatedAnnealing(Algorithm):
 
         return cost, weight
 
-    def get_fitness(self, task: TaskSA, solution: np.ndarray):
-        cost, weight = self.get_sums(task, solution)
-
-        return cost
+    def get_fitness(self, task: TaskSA, solution: SolutionSA):
+        return solution.sum_cost
 
     def initial_solution(self, task: TaskSA) -> SolutionSA:
         solution: np.ndarray = np.zeros((task.count), dtype=int)
@@ -87,42 +85,68 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, cost, weight)
 
-    def repair_solution(self, task: TaskSA, solution: np.ndarray):
-        print
+    def repair_solution(self, task: TaskSA, solution: SolutionSA):
+        if solution.sum_weight <= task.capacity:
+            return
+        
+        for (index, value) in reversed(list(enumerate(solution.solution))):
+            if value == 1:
+                # Remove item with the lowest cost/weight
+                curr_thing: Thing = task.things[index]
+                solution[index] = 0
+                solution.sum_cost -= curr_thing.cost
+                solution.sum_weight -= curr_thing.weight
 
-    def get_solution(self, task: TaskSA) -> (np.ndarray, int):
+                if solution.sum_weight <= task.capacity:
+                    break
+
+    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA):
+        index: int = random.randint(0, task.count-1)
+        curr_thing: Thing = task.things[index]
+
+        new_value: int = (neighbour[index] + 1) % 2
+        neighbour[index] = new_value
+
+        if new_value == 1:
+            neighbour.sum_cost += curr_thing.cost
+            neighbour.sum_weight += curr_thing.weight
+            self.repair_solution(task, neighbour)
+        else:
+            neighbour.sum_cost -= curr_thing.cost
+            neighbour.sum_weight -= curr_thing.weight
+
+    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
         best_sol: SolutionSA = self.initial_solution(task)
+        best_fitness: float = self.get_fitness(task, best_sol)
         neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
 
-        random.seed(20191219)
+        # random.seed(20191219)
 
         while curr_temp > task.min_temp:
             for _ in range(task.cycles):
                 sol_cntr += 1
-                index: int = random.randint(0, task.count-1)
 
                 # Try neighbour solution
-                neighbour_sol[index] = (neighbour_sol[index] + 1) % 2
-                self.repair_solution(task, neighbour_sol)
-                neighbour_fitness: float = self.get_fitness(task, best_sol)
+                self.get_new_neighbour(task, neighbour_sol)
+                neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
 
                 if neighbour_fitness > best_fitness:
                     # Neighbour solution is better, accept it
                     best_fitness = neighbour_fitness
-                    best_sol = neighbour_sol.copy()
+                    best_sol.copy(neighbour_sol)
 
                 elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= random.random():
                     # Simulated Annealing condition. 
                     # Enables us to accept worse solution with a certain probability
                     best_fitness = neighbour_fitness
-                    best_sol = neighbour_sol.copy()
+                    best_sol.copy(neighbour_sol)
 
                 else:
                     # Change the solution back
-                    neighbour_sol = best_sol.copy()
+                    neighbour_sol.copy(neighbour_sol)
                 print
 
             curr_temp *= task.cooling_coefficient
@@ -135,12 +159,10 @@ class SimulatedAnnealing(Algorithm):
         
         solution, solution_cntr = self.get_solution(task)
 
-        max_cost, weight = self.get_sums(task, solution)
-
         parsed_data.update({
-            "found_value": max_cost,
+            "found_value": solution.sum_cost,
             "elapsed_configs": solution_cntr,
-            "things": solution
+            "things": solution.solution
         })
 
         return parsed_data

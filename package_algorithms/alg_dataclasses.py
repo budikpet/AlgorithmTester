@@ -91,6 +91,11 @@ class SolutionSA():
     def __setitem__(self, key, value):
         self.solution[key] = value
 
+    def copy(self, other):
+        self.solution = other.solution.copy()
+        self.sum_cost = other.sum_cost
+        self.sum_weight = other.sum_weight
+
 @dataclass
 class ConfigCounter:
     value: int

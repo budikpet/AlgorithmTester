@@ -88,8 +88,20 @@ class SimulatedAnnealingPenalty(Algorithm):
 
         return SolutionSA(solution, cost, weight)
 
+    def change_solution(self, task: TaskSA, solution: SolutionSA, index: int):
+        new_value: int = (solution[index] + 1) % 2
+        solution[index] = new_value
+        curr_thing: Thing = task.things[index]
 
-    def get_solution(self, task: TaskSA) -> (np.ndarray, int):
+        if new_value == 1:
+            solution.sum_cost += curr_thing.cost
+            solution.sum_weight += curr_thing.weight
+        else:
+            solution.sum_cost -= curr_thing.cost
+            solution.sum_weight -= curr_thing.weight
+
+
+    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
@@ -102,9 +114,10 @@ class SimulatedAnnealingPenalty(Algorithm):
             for _ in range(task.cycles):
                 sol_cntr += 1
                 index: int = random.randint(0, task.count-1)
+                curr_thing: Thing = task.things[index]
 
                 # Try neighbour solution
-                curr_sol[index] = (curr_sol[index] + 1) % 2
+                self.change_solution(task, curr_sol, index)
                 new_fitness: float = self.get_fitness(task, curr_sol)
 
                 if new_fitness > curr_fitness:
@@ -118,7 +131,7 @@ class SimulatedAnnealingPenalty(Algorithm):
 
                 else:
                     # Change the solution back
-                    curr_sol[index] = (curr_sol[index] + 1) % 2
+                    self.change_solution(task, curr_sol, index)
                 print
 
             curr_temp *= task.cooling_coefficient
@@ -131,12 +144,10 @@ class SimulatedAnnealingPenalty(Algorithm):
         
         solution, solution_cntr = self.get_solution(task)
 
-        max_cost, weight = self.get_sums(task, solution)
-
         parsed_data.update({
-            "found_value": max_cost,
+            "found_value": solution.sum_cost,
             "elapsed_configs": solution_cntr,
-            "things": solution
+            "things": solution.solution
         })
 
         return parsed_data

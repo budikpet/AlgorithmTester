@@ -20,7 +20,7 @@
                 // "--time-retries", "1000",
                 // "-e", "10",
                 "-s", "SA",
-                "--init-temperature", "100.0",
+                "--init-temperature", "1000.0",
                 "--cooling", "0.995",
                 "--min-temperature", "1.0",
                 "--cycles", "50",
