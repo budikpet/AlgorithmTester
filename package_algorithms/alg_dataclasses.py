@@ -31,6 +31,15 @@ class TaskKnapsackProblem:
         self.relative_mistake: float = parsed_data.get("relative_mistake")
         self.things: List[Thing] = [Thing(pos, weight, cost) for pos, weight, cost in parsed_data.get("things")]
 
+class TaskSA(TaskKnapsackProblem):
+    
+    def __init__(self, parsed_data: Dict[str, object]):
+        super().__init__(parsed_data)
+        self.init_temp: float = parsed_data.get("init_temperature")
+        self.cooling_coefficient: float = parsed_data.get("cooling")
+        self.min_temp: float = parsed_data.get("min_temperature")
+        self.cycles: int = parsed_data.get("cycles")
+
 class Solution:
     id: int
     count: int
@@ -68,6 +77,13 @@ class Solution:
             output = f'{output} {self.relative_mistake}'
 
         return f'{output} | {" ".join(map(str, self.things))}'
+
+class SolutionSA():
+
+    def __init__(self, solution: np.ndarray, sum_cost: int, sum_weight: int):
+        self.solution = solution
+        self.sum_cost = sum_cost
+        self.sum_weight = sum_weight
 
 @dataclass
 class ConfigCounter:

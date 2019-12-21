@@ -4,9 +4,10 @@ import numpy as np
 import random
 from math import exp
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
-from package_algorithms.alg_dataclasses import Thing, TaskSA, SolutionSA
+from package_algorithms.alg_dataclasses import Thing, TaskSA
 
-class SimulatedAnnealing(Algorithm):
+
+class SimulatedAnnealingPenalty(Algorithm):
     """ 
     
     Uses Simulated annealing algorithm. 
@@ -16,7 +17,7 @@ class SimulatedAnnealing(Algorithm):
     The higher the temperature the more likely the algorithm is to accept a worse solution.
 
     Dealing with impossible solutions:
-        This version uses a repair function to fix solutions whose weight is heigher than capacity.
+        This version uses penalty function to penalize solutions whose weight is heigher than capacity.
     
     """
 
@@ -33,7 +34,7 @@ class SimulatedAnnealing(Algorithm):
         return [init_temp, cooling, min_temp, cycles]
 
     def get_name(self) -> str:
-        return "SA"
+        return "SAPenalty"
 
     def get_columns(self, show_time: bool = True) -> List[str]:
         columns: List[str] = [
@@ -67,35 +68,16 @@ class SimulatedAnnealing(Algorithm):
     def get_fitness(self, task: TaskSA, solution: np.ndarray):
         cost, weight = self.get_sums(task, solution)
 
-        return cost
+        # The higher cost the better. If weight > capacity then the fitness value is negative.
 
-    def initial_solution(self, task: TaskSA) -> SolutionSA:
-        solution: np.ndarray = np.zeros((task.count), dtype=int)
-        remaining_capacity = task.capacity
-
-        # Find solution
-        weight, cost = 0, 0
-        for index, thing in enumerate(task.things):
-            if thing.weight <= remaining_capacity:
-                remaining_capacity -= thing.weight
-                solution[index] = 1
-                weight += thing.weight
-                cost += thing.cost
-
-            if remaining_capacity <= 0:
-                break
-
-        return SolutionSA(solution, cost, weight)
-
-    def repair_solution(self, task: TaskSA, solution: np.ndarray):
-        print
+        return (task.capacity - weight + 1) * cost
 
     def get_solution(self, task: TaskSA) -> (np.ndarray, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
-        best_sol: SolutionSA = self.initial_solution(task)
-        neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
+        curr_sol: np.ndarray = np.random.randint(low=0, high=2, size=task.count)
+        curr_fitness: float = self.get_fitness(task, curr_sol)
 
         random.seed(20191219)
 
@@ -105,33 +87,29 @@ class SimulatedAnnealing(Algorithm):
                 index: int = random.randint(0, task.count-1)
 
                 # Try neighbour solution
-                neighbour_sol[index] = (neighbour_sol[index] + 1) % 2
-                self.repair_solution(task, neighbour_sol)
-                neighbour_fitness: float = self.get_fitness(task, best_sol)
+                curr_sol[index] = (curr_sol[index] + 1) % 2
+                new_fitness: float = self.get_fitness(task, curr_sol)
 
-                if neighbour_fitness > best_fitness:
+                if new_fitness > curr_fitness:
                     # Neighbour solution is better, accept it
-                    best_fitness = neighbour_fitness
-                    best_sol = neighbour_sol.copy()
+                    curr_fitness = new_fitness
 
-                elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= random.random():
+                elif exp( (new_fitness - curr_fitness) / curr_temp) >= random.random():
                     # Simulated Annealing condition. 
                     # Enables us to accept worse solution with a certain probability
-                    best_fitness = neighbour_fitness
-                    best_sol = neighbour_sol.copy()
+                    curr_fitness = new_fitness
 
                 else:
                     # Change the solution back
-                    neighbour_sol = best_sol.copy()
+                    curr_sol[index] = (curr_sol[index] + 1) % 2
                 print
 
             curr_temp *= task.cooling_coefficient
 
-        return best_sol, sol_cntr
+        return curr_sol, sol_cntr
  
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         task: TaskSA = TaskSA(parsed_data=parsed_data)
-        task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
         
         solution, solution_cntr = self.get_solution(task)
 
