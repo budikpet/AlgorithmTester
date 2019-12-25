@@ -144,6 +144,13 @@ class SimulatedAnnealingPenalty(Algorithm):
         
         solution, solution_cntr = self.get_solution(task)
 
+        # Pass solution
+        out_things: np.ndarray = np.zeros((task.count), dtype=int)
+        for index, value in enumerate(solution.solution):
+            if value == 1:
+                thing: Thing = task.things[index]
+                out_things[thing.position] = 1
+
         parsed_data.update({
             "found_value": solution.sum_cost,
             "elapsed_configs": solution_cntr,
