@@ -1,5 +1,4 @@
 import os
-from algorithm_tester.tester_dataclasses import AnalysisFile
 
 class FilePair:
     def __init__(self, file1, file2):
@@ -11,23 +10,6 @@ class FilePair:
 def create_path(path):
     if not os.path.isdir(path):
         os.makedirs(path)
-
-def get_analysis_files(path: str):
-    """ 
-    Reads analysisOutput files in path.
-
-    Returns a list of AnalysisFile objects
-
-    """
-    data = list()
-    
-    # r=root, d=directories, f = files
-    for root, _, files in os.walk(path):
-        for file in files:
-            if "column" not in file:
-                full_path = f'{root}/{file}'
-                data.append(AnalysisFile(file, full_path))
-    return data
 
 def get_files_dict(path: str):
     data = dict()
