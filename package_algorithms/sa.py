@@ -123,7 +123,7 @@ class SimulatedAnnealing(Algorithm):
         best_fitness: float = self.get_fitness(task, best_sol)
         neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
 
-        # random.seed(20191219)
+        random.seed(20191219)
 
         while curr_temp > task.min_temp:
             for _ in range(task.cycles):
