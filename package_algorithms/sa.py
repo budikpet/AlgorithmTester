@@ -90,7 +90,6 @@ class SimulatedAnnealing(Algorithm):
             neighbour.sum_weight -= curr_weight
 
     def get_solution(self, task: TaskSA) -> (SolutionSA, int):
-        curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
         # Prepare things in numpy arrays only
@@ -104,39 +103,13 @@ class SimulatedAnnealing(Algorithm):
         # Prepare solutions
 
         best_sol: SolutionSA = self.initial_solution(task, costs, weights)
-        best_fitness: float = self.get_fitness(task, best_sol)
-        neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
 
         np.random.seed(20191219)
 
-        while curr_temp > task.min_temp:
-            rand_indexes: np.ndarray = np.random.randint(0, task.count-1, size=task.cycles, dtype=int)
-            rand_exp_predicates: np.ndarray = np.random.uniform(size=task.cycles)
-            for cycle in range(task.cycles):
-                sol_cntr += 1
-
-                # Try neighbour solution
-                csa.get_new_neighbour(neighbour_sol.solution, neighbour_sol.sum_cost, neighbour_sol.sum_weight, 
-                    index=rand_indexes[cycle], capacity=task.capacity, count=task.count, costs=costs, weights=weights)
-                neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
-
-                if neighbour_fitness > best_fitness:
-                    # Neighbour solution is better, accept it
-                    best_fitness = neighbour_fitness
-                    best_sol.copy(neighbour_sol)
-
-                elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= rand_exp_predicates[cycle]:
-                    # Simulated Annealing condition. 
-                    # Enables us to accept worse solution with a certain probability
-                    best_fitness = neighbour_fitness
-                    best_sol.copy(neighbour_sol)
-
-                else:
-                    # Change the solution back
-                    neighbour_sol.copy(best_sol)
-                print
-
-            curr_temp *= task.cooling_coefficient
+        best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(best_sol.solution, 
+            best_sol.sum_cost, best_sol.sum_weight, 
+            task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
+            costs, weights)
 
         return best_sol, sol_cntr
  
