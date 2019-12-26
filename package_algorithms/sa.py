@@ -3,6 +3,7 @@ from dataclasses import dataclass
 import numpy as np
 import random
 from math import exp
+import csa
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
 from package_algorithms.alg_dataclasses import Thing, TaskSA, SolutionSA
 
@@ -74,20 +75,6 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def repair_solution(self, task: TaskSA, solution: SolutionSA, costs: np.ndarray, weights: np.ndarray):
-        if solution.sum_weight <= task.capacity:
-            return
-        
-        for (index, value) in reversed(list(enumerate(solution.solution))):
-            if value == 1:
-                # Remove item with the lowest cost/weight
-                solution[index] = 0
-                solution.sum_cost -= costs[index]
-                solution.sum_weight -= weights[index]
-
-                if solution.sum_weight <= task.capacity:
-                    break
-
     def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, costs: np.ndarray, weights: np.ndarray):
         index: int = random.randint(0, task.count-1)
         curr_cost = costs[index]
@@ -99,7 +86,7 @@ class SimulatedAnnealing(Algorithm):
         if new_value == 1:
             neighbour.sum_cost += curr_cost
             neighbour.sum_weight += curr_weight
-            self.repair_solution(task, neighbour, costs, weights)
+            neighbour.sum_cost, neighbour.sum_weight = csa.repair_solution(neighbour.solution, neighbour.sum_cost, neighbour.sum_weight, task.capacity, task.count, costs, weights)
         else:
             neighbour.sum_cost -= curr_cost
             neighbour.sum_weight -= curr_weight
