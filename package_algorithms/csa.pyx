@@ -3,26 +3,26 @@ cimport cython
 
 ctypedef numpy.int64_t TYPE
 
-# cdef class SolutionSA():
-#     cdef numpy.int64_t[:] solution
-#     cdef int sum_cost
-#     cdef int sum_weight
+cdef class SolutionSA():
+    cdef long[:] solution
+    cdef int sum_cost
+    cdef int sum_weight
 
-#     def __cinit__(self, numpy.ndarray[TYPE, ndim=1] solution, int sum_cost, int sum_weight):
-#         self.solution: np.ndarray = solution
-#         self.sum_cost: int = sum_cost
-#         self.sum_weight: int = sum_weight
+    def __cinit__(self, numpy.ndarray[TYPE, ndim=1] solution, int sum_cost, int sum_weight):
+        self.solution = solution
+        self.sum_cost = sum_cost
+        self.sum_weight = sum_weight
     
-    # def __getitem__(self, key):
-    #     return self.solution[key]
+    def __getitem__(self, int key):
+        return self.solution[key]
     
-    # def __setitem__(self, key, value):
-    #     self.solution[key] = value
+    def __setitem__(self, int key, int value):
+        self.solution[key] = value
 
-    # def copy(self, other):
-    #     self.solution = other.solution.copy()
-    #     self.sum_cost = other.sum_cost
-    #     self.sum_weight = other.sum_weight
+    cdef copy(self, SolutionSA other):
+        self.solution = other.solution.copy()
+        self.sum_cost = other.sum_cost
+        self.sum_weight = other.sum_weight
 
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexes checking
@@ -50,22 +50,6 @@ cdef (int, int) repair_solution(long[:] solution, int cost_sum, int weight_sum, 
             if weight_sum <= capacity:
                 return cost_sum, weight_sum
 
-
-# def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, index: int, costs: np.ndarray, weights: np.ndarray):
-#         curr_cost = costs[index]
-#         curr_weight = weights[index]
-
-#         new_value: int = (neighbour[index] + 1) % 2
-#         neighbour[index] = new_value
-
-#         if new_value == 1:
-#             neighbour.sum_cost += curr_cost
-#             neighbour.sum_weight += curr_weight
-#             neighbour.sum_cost, neighbour.sum_weight = csa.repair_solution(neighbour.solution, neighbour.sum_cost, neighbour.sum_weight, task.capacity, task.count, costs, weights)
-#         else:
-#             neighbour.sum_cost -= curr_cost
-#             neighbour.sum_weight -= curr_weight
-
 @cython.boundscheck(False)  # Deactivate bounds checking
 @cython.wraparound(False)   # Deactivate negative indexes checking
 cpdef (int, int) get_new_neighbour(long[:] solution, int cost_sum, int weight_sum, int index, int capacity, int count, long[:] costs, long[:] weights):
@@ -83,3 +67,35 @@ cpdef (int, int) get_new_neighbour(long[:] solution, int cost_sum, int weight_su
         weight_sum -= weights[index]
 
     return cost_sum, weight_sum
+
+# while curr_temp > task.min_temp:
+#     rand_indexes: np.ndarray = np.random.randint(0, task.count-1, size=task.cycles, dtype=int)
+#     rand_exp_predicates: np.ndarray = np.random.uniform(size=task.cycles)
+#     for cycle in range(task.cycles):
+#         sol_cntr += 1
+
+#         # Try neighbour solution
+#         csa.get_new_neighbour(neighbour_sol.solution, neighbour_sol.sum_cost, neighbour_sol.sum_weight, 
+#             index=rand_indexes[cycle], capacity=task.capacity, count=task.count, costs=costs, weights=weights)
+#         neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
+
+#         if neighbour_fitness > best_fitness:
+#             # Neighbour solution is better, accept it
+#             best_fitness = neighbour_fitness
+#             best_sol.copy(neighbour_sol)
+
+#         elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= rand_exp_predicates[cycle]:
+#             # Simulated Annealing condition. 
+#             # Enables us to accept worse solution with a certain probability
+#             best_fitness = neighbour_fitness
+#             best_sol.copy(neighbour_sol)
+
+#         else:
+#             # Change the solution back
+#             neighbour_sol.copy(best_sol)
+#         print
+
+#     curr_temp *= task.cooling_coefficient
+
+# cpdef (long[:], int, int) get_solution(long[:] solution, int sum_cost, int sum_weight, float init_temperature, float min_temperature, float cooling_coef, int cycles, long[:] costs, long[:] weights):
+#     print
