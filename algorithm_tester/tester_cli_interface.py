@@ -1,4 +1,5 @@
 import click
+import time
 from typing import List
 from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import get_files_dict, create_path
@@ -44,6 +45,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
 
         with open(files_dict[n_key], "r") as input_file:
             run_algorithms_for_file(context, input_file)
+    print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')
 
 def main(prog_name: str):
     run_tester(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
