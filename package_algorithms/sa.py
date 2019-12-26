@@ -52,74 +52,73 @@ class SimulatedAnnealing(Algorithm):
 
         return columns
 
-    def get_sums(self, task: TaskSA, solution: np.ndarray):
-        cost, weight = 0, 0
-
-        # Get sums of weights and costs
-        for (index, value) in enumerate(solution):
-            if value == 1:
-                curr_thing: Thing = task.things[index]
-                cost += curr_thing.cost
-                weight += curr_thing.weight
-
-        return cost, weight
-
     def get_fitness(self, task: TaskSA, solution: SolutionSA):
         return solution.sum_cost
 
-    def initial_solution(self, task: TaskSA) -> SolutionSA:
+    def initial_solution(self, task: TaskSA, costs: np.ndarray, weights: np.ndarray) -> SolutionSA:
         solution: np.ndarray = np.zeros((task.count), dtype=int)
         remaining_capacity = task.capacity
 
         # Find solution
-        weight, cost = 0, 0
-        for index, thing in enumerate(task.things):
-            if thing.weight <= remaining_capacity:
-                remaining_capacity -= thing.weight
+        weight_sum, cost_sum = 0, 0
+        for index in range(task.count):
+            curr_weight = weights[index]
+            if curr_weight <= remaining_capacity:
+                remaining_capacity -= curr_weight
                 solution[index] = 1
-                weight += thing.weight
-                cost += thing.cost
+                weight_sum += curr_weight
+                cost_sum += costs[index]
 
             if remaining_capacity <= 0:
                 break
 
-        return SolutionSA(solution, sum_cost=cost, sum_weight=weight)
+        return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def repair_solution(self, task: TaskSA, solution: SolutionSA):
+    def repair_solution(self, task: TaskSA, solution: SolutionSA, costs: np.ndarray, weights: np.ndarray):
         if solution.sum_weight <= task.capacity:
             return
         
         for (index, value) in reversed(list(enumerate(solution.solution))):
             if value == 1:
                 # Remove item with the lowest cost/weight
-                curr_thing: Thing = task.things[index]
                 solution[index] = 0
-                solution.sum_cost -= curr_thing.cost
-                solution.sum_weight -= curr_thing.weight
+                solution.sum_cost -= costs[index]
+                solution.sum_weight -= weights[index]
 
                 if solution.sum_weight <= task.capacity:
                     break
 
-    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA):
+    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, costs: np.ndarray, weights: np.ndarray):
         index: int = random.randint(0, task.count-1)
-        curr_thing: Thing = task.things[index]
+        curr_cost = costs[index]
+        curr_weight = weights[index]
 
         new_value: int = (neighbour[index] + 1) % 2
         neighbour[index] = new_value
 
         if new_value == 1:
-            neighbour.sum_cost += curr_thing.cost
-            neighbour.sum_weight += curr_thing.weight
-            self.repair_solution(task, neighbour)
+            neighbour.sum_cost += curr_cost
+            neighbour.sum_weight += curr_weight
+            self.repair_solution(task, neighbour, costs, weights)
         else:
-            neighbour.sum_cost -= curr_thing.cost
-            neighbour.sum_weight -= curr_thing.weight
+            neighbour.sum_cost -= curr_cost
+            neighbour.sum_weight -= curr_weight
 
     def get_solution(self, task: TaskSA) -> (SolutionSA, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
-        best_sol: SolutionSA = self.initial_solution(task)
+        # Prepare things in numpy arrays only
+        costs: np.ndarray = np.zeros(task.count, dtype=int)
+        weights: np.ndarray = np.zeros(task.count, dtype=int)
+
+        for (index, thing) in enumerate(task.things):
+            costs[index] = thing.cost
+            weights[index] = thing.weight
+
+        # Prepare solutions
+
+        best_sol: SolutionSA = self.initial_solution(task, costs, weights)
         best_fitness: float = self.get_fitness(task, best_sol)
         neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
 
@@ -130,7 +129,7 @@ class SimulatedAnnealing(Algorithm):
                 sol_cntr += 1
 
                 # Try neighbour solution
-                self.get_new_neighbour(task, neighbour_sol)
+                self.get_new_neighbour(task, neighbour_sol, costs, weights)
                 neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
 
                 if neighbour_fitness > best_fitness:
