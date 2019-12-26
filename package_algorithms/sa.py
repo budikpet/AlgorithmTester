@@ -83,7 +83,7 @@ class SimulatedAnnealing(Algorithm):
             if remaining_capacity <= 0:
                 break
 
-        return SolutionSA(solution, cost, weight)
+        return SolutionSA(solution, sum_cost=cost, sum_weight=weight)
 
     def repair_solution(self, task: TaskSA, solution: SolutionSA):
         if solution.sum_weight <= task.capacity:
@@ -146,7 +146,7 @@ class SimulatedAnnealing(Algorithm):
 
                 else:
                     # Change the solution back
-                    neighbour_sol.copy(neighbour_sol)
+                    neighbour_sol.copy(best_sol)
                 print
 
             curr_temp *= task.cooling_coefficient
