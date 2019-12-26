@@ -14,6 +14,7 @@ dist: xenial
 # - eval $(ssh-agent -s)
 # - ssh-add github_deploy_key
 install:
+- pip install numpy cython
 - python setup.py install
 - python -m pip install .[dev]
 script:
