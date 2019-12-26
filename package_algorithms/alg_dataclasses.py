@@ -92,7 +92,7 @@ class SolutionSA():
         self.solution[key] = value
 
     def copy(self, other):
-        self.solution = other.solution.copy()
+        np.copyto(self.solution, other.solution)
         self.sum_cost = other.sum_cost
         self.sum_weight = other.sum_weight
 
