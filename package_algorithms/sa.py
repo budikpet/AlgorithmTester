@@ -116,7 +116,8 @@ class SimulatedAnnealing(Algorithm):
                 sol_cntr += 1
 
                 # Try neighbour solution
-                self.get_new_neighbour(task, neighbour_sol, index=rand_indexes[cycle], costs=costs, weights=weights)
+                csa.get_new_neighbour(neighbour_sol.solution, neighbour_sol.sum_cost, neighbour_sol.sum_weight, 
+                    index=rand_indexes[cycle], capacity=task.capacity, count=task.count, costs=costs, weights=weights)
                 neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
 
                 if neighbour_fitness > best_fitness:
