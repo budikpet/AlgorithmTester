@@ -49,3 +49,37 @@ cpdef (int, int) repair_solution(long[:] solution, int cost_sum, int weight_sum,
 
             if weight_sum <= capacity:
                 return cost_sum, weight_sum
+
+
+# def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, index: int, costs: np.ndarray, weights: np.ndarray):
+#         curr_cost = costs[index]
+#         curr_weight = weights[index]
+
+#         new_value: int = (neighbour[index] + 1) % 2
+#         neighbour[index] = new_value
+
+#         if new_value == 1:
+#             neighbour.sum_cost += curr_cost
+#             neighbour.sum_weight += curr_weight
+#             neighbour.sum_cost, neighbour.sum_weight = csa.repair_solution(neighbour.solution, neighbour.sum_cost, neighbour.sum_weight, task.capacity, task.count, costs, weights)
+#         else:
+#             neighbour.sum_cost -= curr_cost
+#             neighbour.sum_weight -= curr_weight
+
+@cython.boundscheck(False)  # Deactivate bounds checking
+@cython.wraparound(False)   # Deactivate negative indexes checking
+cpdef (int, int) get_new_neighbour(long[:] solution, int cost_sum, int weight_sum, int index, int capacity, int count, long[:] costs, long[:] weights):
+    cdef int new_value 
+
+    new_value = (solution[index] + 1) % 2
+    solution[index] = new_value
+
+    if new_value == 1:
+        cost_sum += costs[index]
+        weight_sum += weights[index]
+        cost_sum, weight_sum = repair_solution(solution, cost_sum, weight_sum, capacity, count, costs, weights)
+    else:
+        cost_sum -= costs[index]
+        weight_sum -= weights[index]
+
+    return cost_sum, weight_sum

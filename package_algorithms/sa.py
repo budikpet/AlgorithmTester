@@ -1,7 +1,6 @@
 from typing import List, Dict
 from dataclasses import dataclass
 import numpy as np
-import random
 from math import exp
 import csa
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
@@ -75,8 +74,7 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, costs: np.ndarray, weights: np.ndarray):
-        index: int = random.randint(0, task.count-1)
+    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, index: int, costs: np.ndarray, weights: np.ndarray):
         curr_cost = costs[index]
         curr_weight = weights[index]
 
@@ -109,14 +107,16 @@ class SimulatedAnnealing(Algorithm):
         best_fitness: float = self.get_fitness(task, best_sol)
         neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
 
-        random.seed(20191219)
+        np.random.seed(20191219)
 
         while curr_temp > task.min_temp:
-            for _ in range(task.cycles):
+            rand_indexes: np.ndarray = np.random.randint(0, task.count-1, size=task.cycles, dtype=int)
+            rand_exp_predicates: np.ndarray = np.random.uniform(size=task.cycles)
+            for cycle in range(task.cycles):
                 sol_cntr += 1
 
                 # Try neighbour solution
-                self.get_new_neighbour(task, neighbour_sol, costs, weights)
+                self.get_new_neighbour(task, neighbour_sol, index=rand_indexes[cycle], costs=costs, weights=weights)
                 neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
 
                 if neighbour_fitness > best_fitness:
@@ -124,7 +124,7 @@ class SimulatedAnnealing(Algorithm):
                     best_fitness = neighbour_fitness
                     best_sol.copy(neighbour_sol)
 
-                elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= random.random():
+                elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= rand_exp_predicates[cycle]:
                     # Simulated Annealing condition. 
                     # Enables us to accept worse solution with a certain probability
                     best_fitness = neighbour_fitness
