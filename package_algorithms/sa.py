@@ -86,7 +86,6 @@ class SimulatedAnnealing(Algorithm):
 
         best_sol: SolutionSA = self.initial_solution(task, costs, weights)
 
-        print(f"Curr id: {task.id}")
         best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(best_sol.solution, 
             best_sol.sum_cost, best_sol.sum_weight, 
             task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 

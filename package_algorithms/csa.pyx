@@ -24,7 +24,7 @@ cdef (int, int) repair_solution(long[:] solution, int cost_sum, int weight_sum, 
     if weight_sum <= capacity:
         return cost_sum, weight_sum
     
-    for index in range(count, -1, -1):
+    for index in range(count - 1, -1, -1):
         if solution[index] == 1:
             solution[index] = 0
             cost_sum -= costs[index]
@@ -68,7 +68,6 @@ cdef int random_int(int low = 0, int height = 2):
 @cython.cdivision(True)
 cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weight, float init_temp, float min_temp, float cooling_coef, int cycles, int capacity, long[:] costs, long[:] weights):
     cdef long[:] best_sol, neighbour_sol, rand_indexes
-    cdef double[:] rand_exp_predicates
     cdef int count, sol_cntr, best_cost, best_weight, neighbour_cost, neighbour_weight
     cdef float curr_temp
 
@@ -87,7 +86,7 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
             sol_cntr += 1
 
             # Try neighbour solution
-            get_new_neighbour(neighbour_sol, neighbour_cost, neighbour_weight,
+            neighbour_cost, neighbour_weight = get_new_neighbour(neighbour_sol, neighbour_cost, neighbour_weight,
                 index=random_int(0, count - 1), 
                 capacity=capacity, count=count, costs=costs, weights=weights)
 
