@@ -112,4 +112,5 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
 
         curr_temp *= cooling_coef
 
+    solution = best_sol.copy()
     return best_cost, best_weight, sol_cntr
