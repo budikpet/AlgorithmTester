@@ -8,7 +8,7 @@ base_columns: List[str] = [
         "id",
         "item_count",
         "algorithm_name",
-        "max_value",
+        "found_value",
         "elapsed_configs",
         "elapsed_time",
         "things"
@@ -20,7 +20,7 @@ class Thing:
     weight: int
     cost: int
 
-class Task:
+class TaskKnapsackProblem:
     
     def __init__(self, parsed_data: Dict[str, object]):
         self.id: int = parsed_data.get("id")
@@ -30,6 +30,15 @@ class Task:
         # None if not used
         self.relative_mistake: float = parsed_data.get("relative_mistake")
         self.things: List[Thing] = [Thing(pos, weight, cost) for pos, weight, cost in parsed_data.get("things")]
+
+class TaskSA(TaskKnapsackProblem):
+    
+    def __init__(self, parsed_data: Dict[str, object]):
+        super().__init__(parsed_data)
+        self.init_temp: float = parsed_data.get("init_temperature")
+        self.cooling_coefficient: float = parsed_data.get("cooling")
+        self.min_temp: float = parsed_data.get("min_temperature")
+        self.cycles: int = parsed_data.get("cycles")
 
 class Solution:
     id: int
@@ -45,7 +54,7 @@ class Solution:
     # Elapsed time in number of configurations
     elapsed_configs: int = None
 
-    def __init__(self, task: Task, max_value: int, things, elapsed_configs: int = None, elapsed_time: float = None, relative_mistake: float = None):
+    def __init__(self, task: TaskKnapsackProblem, max_value: int, things, elapsed_configs: int = None, elapsed_time: float = None, relative_mistake: float = None):
         self.things = things
         self.max_value = max_value
         self.elapsed_configs = elapsed_configs
@@ -68,6 +77,24 @@ class Solution:
             output = f'{output} {self.relative_mistake}'
 
         return f'{output} | {" ".join(map(str, self.things))}'
+
+class SolutionSA():
+
+    def __init__(self, solution: np.ndarray, sum_cost: int, sum_weight: int):
+        self.solution: np.ndarray = solution
+        self.sum_cost: int = sum_cost
+        self.sum_weight: int = sum_weight
+    
+    def __getitem__(self, key):
+        return self.solution[key]
+    
+    def __setitem__(self, key, value):
+        self.solution[key] = value
+
+    def copy(self, other):
+        np.copyto(self.solution, other.solution)
+        self.sum_cost = other.sum_cost
+        self.sum_weight = other.sum_weight
 
 @dataclass
 class ConfigCounter:

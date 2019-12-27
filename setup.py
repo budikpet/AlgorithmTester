@@ -1,4 +1,7 @@
 from setuptools import setup, find_packages
+from distutils.extension import Extension
+from Cython.Build import cythonize
+import numpy
 
 with open('README.rst') as f:
     long_description = ''.join(f.readlines())
@@ -9,8 +12,11 @@ setup(
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
+    ext_modules = cythonize(
+        [Extension('csa', ['package_algorithms/csa.pyx'], include_dirs=[numpy.get_include()])],
+        language_level=3),
     setup_requires=['pytest-runner'],
-    install_requires=['click>=6', 'numpy'],
+    install_requires=['click>=6', 'numpy', 'cython'],
     tests_require=['pytest==5.0.1', 'flexmock'],
     
     # All these 'dev' packages can then be installed by 'pip install .[dev]'

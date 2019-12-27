@@ -1,7 +1,7 @@
 from typing import List, Dict
 import numpy as np
 from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
-from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
+from package_algorithms.alg_dataclasses import ConfigCounter, TaskKnapsackProblem, Thing, RecursiveResult, Solution, base_columns
 
 class BruteForce(Algorithm):
     """ Uses Brute force  """
@@ -17,7 +17,7 @@ class BruteForce(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def recursive_solve(self, config_ctr: ConfigCounter, task: Task, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
+    def recursive_solve(self, config_ctr: ConfigCounter, task: TaskKnapsackProblem, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
         config_ctr.value += 1
         curr_thing = task.things[thing_at_index]
         if thing_at_index >= task.count - 1:
@@ -42,7 +42,7 @@ class BruteForce(Algorithm):
     
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison
-        task: Task = Task(parsed_data=parsed_data)
+        task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         config_ctr = ConfigCounter(0)
@@ -51,7 +51,7 @@ class BruteForce(Algorithm):
             max_value=0, things=things))
 
         parsed_data.update({
-            "max_value": result.max_value,
+            "found_value": result.max_value,
             "elapsed_configs": config_ctr.value,
             "things": result.things
         })
@@ -75,7 +75,7 @@ class Greedy(Algorithm):
 
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison descending
-        task: Task = Task(parsed_data=parsed_data)
+        task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         output_things = np.zeros((task.count), dtype=int)
@@ -95,7 +95,7 @@ class Greedy(Algorithm):
                 break
 
         parsed_data.update({
-            "max_value": max_sum,
+            "found_value": max_sum,
             "elapsed_configs": config_ctr,
             "things": output_things
         })

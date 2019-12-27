@@ -1,3 +1,9 @@
+# other
+.DS_Store
+#analysis/tester_results
+analysis/excel
+*.c
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -102,11 +108,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-
-# other
-.DS_Store
-#analysis/tester_results
-analysis/excel
 
 ######## C ########
 

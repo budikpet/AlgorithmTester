@@ -37,10 +37,10 @@ class KnapsackParser(Parser):
     def write_result_to_file(self, output_file, data: Dict[str, object]):
         columns: List[str] = data["algorithm"].get_columns()
 
-        if data["check_time"] == False and "elapsed_time" in columns:
-            columns.remove("elapsed_time")
-        elif data["check_time"] == True and "elapsed_time" in columns and "elapsed_configs" in columns:
-            columns.remove("elapsed_configs")
+        # if data["check_time"] == False and "elapsed_time" in columns:
+        #     columns.remove("elapsed_time")
+        # elif data["check_time"] == True and "elapsed_time" in columns and "elapsed_configs" in columns:
+        #     columns.remove("elapsed_configs")
 
 
         if data.get("things") is not None:

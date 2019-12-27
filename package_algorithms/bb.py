@@ -1,7 +1,7 @@
 from typing import List, Dict
 import numpy as np
 from algorithm_tester.tester_dataclasses import Algorithm
-from package_algorithms.alg_dataclasses import ConfigCounter, Task, Thing, RecursiveResult, Solution, base_columns
+from package_algorithms.alg_dataclasses import ConfigCounter, TaskKnapsackProblem, Thing, RecursiveResult, Solution, base_columns
 
 class BranchBound(Algorithm):
     """ Uses BranchBound algorithm. """
@@ -12,7 +12,7 @@ class BranchBound(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def get_max_sum(self, task: Task) -> int:
+    def get_max_sum(self, task: TaskKnapsackProblem) -> int:
         currSum = 0
         for thing in reversed(task.things):
             currSum += thing.cost
@@ -20,7 +20,7 @@ class BranchBound(Algorithm):
         return currSum
     
     # maximum_sum: A sum of all objects that are after the current object
-    def recursive_solve(self, config_ctr: ConfigCounter, task: Task, maximum_sum: int, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
+    def recursive_solve(self, config_ctr: ConfigCounter, task: TaskKnapsackProblem, maximum_sum: int, thing_at_index: int, curr_state: RecursiveResult) -> RecursiveResult:
         config_ctr.value += 1
         curr_thing = task.things[thing_at_index]
         if thing_at_index >= task.count - 1:
@@ -53,7 +53,7 @@ class BranchBound(Algorithm):
     
     def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
-        task: Task = Task(parsed_data=parsed_data)
+        task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         maximum_sum = self.get_max_sum(task)
         config_ctr = ConfigCounter(0)
         things = np.zeros((task.count), dtype=int)
@@ -61,7 +61,7 @@ class BranchBound(Algorithm):
             max_value=0, things=things))
 
         parsed_data.update({
-            "max_value": result.max_value,
+            "found_value": result.max_value,
             "elapsed_configs": config_ctr.value,
             "things": result.things
         })
@@ -81,7 +81,7 @@ class SortedBranchBound(Algorithm):
         algorithm = BranchBound()
 
         # Sort things by cost/weight comparison
-        task: Task = Task(parsed_data=parsed_data)
+        task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
 
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
@@ -92,7 +92,7 @@ class SortedBranchBound(Algorithm):
             max_value=0, things=things))
 
         parsed_data.update({
-            "max_value": result.max_value,
+            "found_value": result.max_value,
             "elapsed_configs": config_ctr.value,
             "things": result.things
         })

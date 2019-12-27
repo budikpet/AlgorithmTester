@@ -77,15 +77,20 @@ def validate_extra_options(self, ctx, value: List[str]) -> Dict[str, object]:
 
         for pair in values:
             # Find a dynamic option that has the same short or long name
-            predicate = lambda option: option.short_opt == pair[0] or option.long_opt == pair[0]
-            found_option = list(itertools
-                .takewhile(predicate, dynamic_options))
+            predicate = lambda option: option.short_opt == f'-{pair[0]}' or option.long_opt == f'--{pair[0]}'
+
+            found_option: DynamicClickOption = None
+            for option in dynamic_options:
+                if predicate(option):
+                    found_option = option
+                    break
             
-            if len(found_option) <= 0:
+            if found_option is None:
                 # This option does not exist
+                print(f'Option does not exist: {found_option}')
                 raise click.BadParameter()
             
-            found_option: DynamicClickOption = found_option[0]
+            # found_option: DynamicClickOption = found_option[0]
             
             # Try using an appropriate data type
             if issubclass(found_option.data_type, int):
