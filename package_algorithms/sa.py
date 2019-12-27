@@ -52,9 +52,6 @@ class SimulatedAnnealing(Algorithm):
 
         return columns
 
-    def get_fitness(self, task: TaskSA, solution: SolutionSA):
-        return solution.sum_cost
-
     def initial_solution(self, task: TaskSA, costs: np.ndarray, weights: np.ndarray) -> SolutionSA:
         solution: np.ndarray = np.zeros((task.count), dtype=int)
         remaining_capacity = task.capacity
@@ -74,21 +71,6 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, index: int, costs: np.ndarray, weights: np.ndarray):
-        curr_cost = costs[index]
-        curr_weight = weights[index]
-
-        new_value: int = (neighbour[index] + 1) % 2
-        neighbour[index] = new_value
-
-        if new_value == 1:
-            neighbour.sum_cost += curr_cost
-            neighbour.sum_weight += curr_weight
-            neighbour.sum_cost, neighbour.sum_weight = csa.repair_solution(neighbour.solution, neighbour.sum_cost, neighbour.sum_weight, task.capacity, task.count, costs, weights)
-        else:
-            neighbour.sum_cost -= curr_cost
-            neighbour.sum_weight -= curr_weight
-
     def get_solution(self, task: TaskSA) -> (SolutionSA, int):
         sol_cntr: int = 0
 
@@ -104,8 +86,7 @@ class SimulatedAnnealing(Algorithm):
 
         best_sol: SolutionSA = self.initial_solution(task, costs, weights)
 
-        np.random.seed(20191219)
-
+        print(f"Curr id: {task.id}")
         best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(best_sol.solution, 
             best_sol.sum_cost, best_sol.sum_weight, 
             task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
