@@ -19,7 +19,7 @@
                 // "-s", "Greedy", // "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "-s", "SA",
+                "-s", "SA_OLD",
                 "--init-temperature", "1000.0",
                 "--cooling", "0.995",
                 "--min-temperature", "1.0",

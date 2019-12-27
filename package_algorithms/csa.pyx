@@ -3,6 +3,7 @@ cimport numpy as np
 cimport cython
 from libc.math cimport exp
 from libc.stdlib cimport rand, srand, RAND_MAX
+from cpython.exc cimport PyErr_CheckSignals
 
 ctypedef np.int64_t TYPE
 
@@ -96,7 +97,7 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
                 best_cost = neighbour_cost
                 best_weight = neighbour_weight
 
-            elif exp( (neighbour_cost - best_cost) / curr_temp) >= random_float():
+            elif exp( (neighbour_cost - best_cost) / curr_temp) > random_float():
                 # Simulated Annealing condition. 
                 # Enables us to accept worse solution with a certain probability
                 best_sol = neighbour_sol.copy()
@@ -109,6 +110,8 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
                 neighbour_cost = best_cost
                 neighbour_weight = best_weight
             print
+
+        PyErr_CheckSignals()
 
         curr_temp *= cooling_coef
 
