@@ -1,3 +1,4 @@
+import time
 cimport numpy as np
 cimport cython
 from libc.math cimport exp
@@ -79,7 +80,7 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
     best_sol = solution.copy()
     neighbour_sol = solution.copy()
 
-    srand(20191219)
+    srand((int) (time.time()))
     
     while curr_temp > min_temp:
         for cycle in range(cycles):

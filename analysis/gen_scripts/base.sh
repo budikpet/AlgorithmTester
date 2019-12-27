@@ -7,7 +7,7 @@
 # -c	korelace s hmotností žádná/menší/silná [uni|corr|strong]
 # -k	granularita (pouze pokud je -w light|heavy)
 
-path="../../data"
+path="../../data/DataAnalysis"
 name="Base"
 
 mkdir -p "$path"/"$name"

@@ -22,7 +22,7 @@ setup(
     # All these 'dev' packages can then be installed by 'pip install .[dev]'
     extras_require={
         'dev':  ["sphinx"],
-        'analysis': ['notebook', 'pandas', 'openpyxl'],
+        'analysis': ['notebook', 'pandas', 'openpyxl', 'matplotlib'],
         'tests': ['pytest==5.0.1', 'flexmock']
     },
     python_requires='>=3.7',
