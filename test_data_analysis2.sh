@@ -1,9 +1,9 @@
-path="analysis/tester_results/NK"
-in_path="data"
+path="analysis/tester_results/DataAnalysis"
+in_path="data/DataAnalysis"
 
 ALG="DPWeight"
 
-IN_NAME="NK"
+IN_NAME="Balance"
 OUT_DIR=$path"/"$IN_NAME
 run_tester -s $ALG --check-time True -p KnapsackParser --input-dir $in_path"/"$IN_NAME --output-dir $OUT_DIR --init-temperature 2500 --min-temperature 1 --cooling 0.99 --cycles 50
 
