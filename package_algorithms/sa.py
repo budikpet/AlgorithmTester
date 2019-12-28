@@ -82,13 +82,13 @@ class SimulatedAnnealing(Algorithm):
 
         for (index, thing) in enumerate(task.things):
             costs[index] = thing.cost
-            weights[index] = thing.weight
+            weights[index] = thing.weight            
 
         # Prepare solutions
 
         best_sol: SolutionSA = self.initial_solution(task, costs, weights)
 
-        best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(task.output_file_name,
+        best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(task.evo_filename,
             best_sol.solution, best_sol.sum_cost, best_sol.sum_weight, 
             task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
             costs, weights)

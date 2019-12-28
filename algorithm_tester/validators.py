@@ -94,7 +94,7 @@ def validate_extra_options(self, ctx, value: List[str]) -> Dict[str, object]:
             
             # Try using an appropriate data type
             if issubclass(found_option.data_type, bool):
-                output[found_option.name] = bool(pair[1])
+                output[found_option.name] = pair[1] == 'True'
             elif issubclass(found_option.data_type, int):
                 output[found_option.name] = int(pair[1])
             elif issubclass(found_option.data_type, float):

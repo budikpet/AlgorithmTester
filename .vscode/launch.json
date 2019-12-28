@@ -29,7 +29,7 @@
                 // "--relative-mistake", "0.5",
                 // "--relative", "0.lll",
                 "-p", "KnapsackParser",
-                "--create-evo-file", "True",
+                "--create-evo-file", "False",
                 "--input-dir", "${workspaceFolder}/data/ParamAnalysis",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
