@@ -1,7 +1,7 @@
 path="analysis/tester_results/DataAnalysis"
 in_path="data/DataAnalysis"
 
-ALG="SA"
+ALG="SA_OLD"
 
 IN_NAME="Balance"
 OUT_DIR=$path"/"$IN_NAME
