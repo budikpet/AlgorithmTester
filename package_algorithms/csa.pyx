@@ -4,6 +4,7 @@ cimport cython
 from libc.math cimport exp
 from libc.stdlib cimport rand, srand, RAND_MAX
 from cpython.exc cimport PyErr_CheckSignals
+import random
 
 ctypedef np.int64_t TYPE
 
@@ -67,9 +68,9 @@ cdef int random_int(int low = 0, int height = 2):
 @cython.wraparound(False)   # Deactivate negative indexes checking
 @cython.initializedcheck(False)
 @cython.cdivision(True)
-cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weight, float init_temp, float min_temp, float cooling_coef, int cycles, int capacity, long[:] costs, long[:] weights):
+cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weight, float init_temp, float min_temp, float cooling_coef, int cycles, int capacity, long[:] costs, long[:] weights) except *:
     cdef long[:] best_sol, neighbour_sol, rand_indexes
-    cdef int count, sol_cntr, best_cost, best_weight, neighbour_cost, neighbour_weight
+    cdef int count, sol_cntr, best_cost, best_weight, neighbour_cost, neighbour_weight, new_index
     cdef float curr_temp
 
     best_cost, best_weight, neighbour_cost, neighbour_weight = sum_cost, sum_weight, sum_cost, sum_weight
@@ -80,15 +81,18 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
     best_sol = solution.copy()
     neighbour_sol = solution.copy()
 
-    srand((int) (time.time()))
+    #srand((int) (time.time()))
+    #srand(20191219)
+    random.seed(20191219)
     
     while curr_temp > min_temp:
         for cycle in range(cycles):
             sol_cntr += 1
+            new_index = int((count - 1)*random.random())    # Faster random value between 0 and (count - 1)
 
             # Try neighbour solution
             neighbour_cost, neighbour_weight = get_new_neighbour(neighbour_sol, neighbour_cost, neighbour_weight,
-                index=random_int(0, count - 1), 
+                index=new_index, 
                 capacity=capacity, count=count, costs=costs, weights=weights)
 
             if neighbour_cost > best_cost:
@@ -97,7 +101,7 @@ cpdef (int, int, int) get_solution(long[:] solution, int sum_cost, int sum_weigh
                 best_cost = neighbour_cost
                 best_weight = neighbour_weight
 
-            elif exp( (neighbour_cost - best_cost) / curr_temp) > random_float():
+            elif exp( (neighbour_cost - best_cost) / curr_temp) > random.random():
                 # Simulated Annealing condition. 
                 # Enables us to accept worse solution with a certain probability
                 best_sol = neighbour_sol.copy()
