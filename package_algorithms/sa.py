@@ -29,8 +29,10 @@ class SimulatedAnnealing(Algorithm):
             required=True, doc_help="A float number from interval (0; +inf). Represents the minimum temperature of SA. The algorithm ends when this or lower temperature is achieved.")
         cycles = DynamicClickOption(name="cycles", data_type=int, short_opt="", long_opt="--cycles", 
             required=True, doc_help="An int number from interval (0; +inf). Represents the number of internal cycles of SA that are done before cooling occurs.")
+        evo_file = DynamicClickOption(name="create_evo_file", data_type=bool, short_opt="", long_opt="--create-evo-file", 
+            required=False, doc_help="If true, creates a file which contains evolution of results. Stored in output dir.")
         
-        return [init_temp, cooling, min_temp, cycles]
+        return [init_temp, cooling, min_temp, cycles, evo_file]
 
     def get_name(self) -> str:
         return "SA"
@@ -86,8 +88,8 @@ class SimulatedAnnealing(Algorithm):
 
         best_sol: SolutionSA = self.initial_solution(task, costs, weights)
 
-        best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(best_sol.solution, 
-            best_sol.sum_cost, best_sol.sum_weight, 
+        best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(task.output_file_name,
+            best_sol.solution, best_sol.sum_cost, best_sol.sum_weight, 
             task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
             costs, weights)
 

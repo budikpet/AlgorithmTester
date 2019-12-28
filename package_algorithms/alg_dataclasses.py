@@ -39,6 +39,8 @@ class TaskSA(TaskKnapsackProblem):
         self.cooling_coefficient: float = parsed_data.get("cooling")
         self.min_temp: float = parsed_data.get("min_temperature")
         self.cycles: int = parsed_data.get("cycles")
+        self.output_file_name: str = parsed_data.get("output_file_name")
+        self.create_evo_file = parsed_data.get("create_evo_file") is not None            
 
 class Solution:
     id: int
