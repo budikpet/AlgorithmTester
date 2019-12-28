@@ -41,7 +41,7 @@ OUT_DIR=$path"/ParamAnalysis/Cycles"
 
 step=25
 start=100
-end=300
+end=250
 
 for i in `seq $start $step $end`; do 
     echo $i
