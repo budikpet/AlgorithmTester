@@ -68,7 +68,7 @@ cdef int random_int(int low = 0, int height = 2):
 @cython.wraparound(False)   # Deactivate negative indexes checking
 @cython.initializedcheck(False)
 @cython.cdivision(True)
-cpdef (int, int, int) get_solution(str evo_filename, long[:] solution, int sum_cost, int sum_weight, float init_temp, float min_temp, float cooling_coef, int cycles, int capacity, long[:] costs, long[:] weights) except *:
+cpdef (int, int, int) get_solution(str evo_filepath, long[:] solution, int sum_cost, int sum_weight, float init_temp, float min_temp, float cooling_coef, int cycles, int capacity, long[:] costs, long[:] weights) except *:
     cdef long[:] best_sol, neighbour_sol, rand_indexes
     cdef int count, sol_cntr, best_cost, best_weight, neighbour_cost, neighbour_weight, new_index
     cdef float curr_temp

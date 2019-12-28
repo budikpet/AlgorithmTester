@@ -571,9 +571,9 @@ struct __pyx_opt_args_3csa_random_int {
 <pre class="cython line score-0">&#xA0;<span class="">068</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">wraparound</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>   <span class="c"># Deactivate negative indexes checking</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">069</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">initializedcheck</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">070</span>: <span class="nd">@cython</span><span class="o">.</span><span class="n">cdivision</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span></pre>
-<pre class="cython line score-156" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">071</span>: <span class="k">cpdef</span> (<span class="nf">int</span><span class="p">,</span> <span class="nf">int</span><span class="p">,</span> <span class="kt">int</span>) <span class="nf">get_solution</span><span class="p">(</span><span class="nb">str</span> <span class="n">evo_filename</span><span class="p">,</span> <span class="nb">long</span><span class="p">[:]</span> <span class="n">solution</span><span class="p">,</span> <span class="nb">int</span> <span class="n">sum_cost</span><span class="p">,</span> <span class="nb">int</span> <span class="n">sum_weight</span><span class="p">,</span> <span class="nb">float</span> <span class="n">init_temp</span><span class="p">,</span> <span class="nb">float</span> <span class="n">min_temp</span><span class="p">,</span> <span class="nb">float</span> <span class="n">cooling_coef</span><span class="p">,</span> <span class="nb">int</span> <span class="n">cycles</span><span class="p">,</span> <span class="nb">int</span> <span class="n">capacity</span><span class="p">,</span> <span class="nb">long</span><span class="p">[:]</span> <span class="n">costs</span><span class="p">,</span> <span class="nb">long</span><span class="p">[:]</span> <span class="n">weights</span><span class="p">)</span> <span class="k">except</span> <span class="o">*</span><span class="p">:</span></pre>
+<pre class="cython line score-156" onclick="(function(s){s.display=s.display==='block'?'none':'block'})(this.nextElementSibling.style)">+<span class="">071</span>: <span class="k">cpdef</span> (<span class="nf">int</span><span class="p">,</span> <span class="nf">int</span><span class="p">,</span> <span class="kt">int</span>) <span class="nf">get_solution</span><span class="p">(</span><span class="nb">str</span> <span class="n">evo_filepath</span><span class="p">,</span> <span class="nb">long</span><span class="p">[:]</span> <span class="n">solution</span><span class="p">,</span> <span class="nb">int</span> <span class="n">sum_cost</span><span class="p">,</span> <span class="nb">int</span> <span class="n">sum_weight</span><span class="p">,</span> <span class="nb">float</span> <span class="n">init_temp</span><span class="p">,</span> <span class="nb">float</span> <span class="n">min_temp</span><span class="p">,</span> <span class="nb">float</span> <span class="n">cooling_coef</span><span class="p">,</span> <span class="nb">int</span> <span class="n">cycles</span><span class="p">,</span> <span class="nb">int</span> <span class="n">capacity</span><span class="p">,</span> <span class="nb">long</span><span class="p">[:]</span> <span class="n">costs</span><span class="p">,</span> <span class="nb">long</span><span class="p">[:]</span> <span class="n">weights</span><span class="p">)</span> <span class="k">except</span> <span class="o">*</span><span class="p">:</span></pre>
 <pre class='cython code score-156 '>static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static __pyx_ctuple_int__and_int__and_int __pyx_f_3csa_get_solution(CYTHON_UNUSED PyObject *__pyx_v_evo_filename, __Pyx_memviewslice __pyx_v_solution, int __pyx_v_sum_cost, int __pyx_v_sum_weight, float __pyx_v_init_temp, float __pyx_v_min_temp, float __pyx_v_cooling_coef, int __pyx_v_cycles, int __pyx_v_capacity, __Pyx_memviewslice __pyx_v_costs, __Pyx_memviewslice __pyx_v_weights, CYTHON_UNUSED int __pyx_skip_dispatch) {
+static __pyx_ctuple_int__and_int__and_int __pyx_f_3csa_get_solution(CYTHON_UNUSED PyObject *__pyx_v_evo_filepath, __Pyx_memviewslice __pyx_v_solution, int __pyx_v_sum_cost, int __pyx_v_sum_weight, float __pyx_v_init_temp, float __pyx_v_min_temp, float __pyx_v_cooling_coef, int __pyx_v_cycles, int __pyx_v_capacity, __Pyx_memviewslice __pyx_v_costs, __Pyx_memviewslice __pyx_v_weights, CYTHON_UNUSED int __pyx_skip_dispatch) {
   __Pyx_memviewslice __pyx_v_best_sol = { 0, 0, { 0 }, { 0 }, { 0 } };
   __Pyx_memviewslice __pyx_v_neighbour_sol = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_count;
@@ -610,7 +610,7 @@ static __pyx_ctuple_int__and_int__and_int __pyx_f_3csa_get_solution(CYTHON_UNUSE
 /* Python wrapper */
 static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  PyObject *__pyx_v_evo_filename = 0;
+  PyObject *__pyx_v_evo_filepath = 0;
   __Pyx_memviewslice __pyx_v_solution = { 0, 0, { 0 }, { 0 }, { 0 } };
   int __pyx_v_sum_cost;
   int __pyx_v_sum_weight;
@@ -625,7 +625,7 @@ static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__p
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("get_solution (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&amp;__pyx_n_s_evo_filename,&amp;__pyx_n_s_solution,&amp;__pyx_n_s_sum_cost,&amp;__pyx_n_s_sum_weight,&amp;__pyx_n_s_init_temp,&amp;__pyx_n_s_min_temp,&amp;__pyx_n_s_cooling_coef,&amp;__pyx_n_s_cycles,&amp;__pyx_n_s_capacity,&amp;__pyx_n_s_costs,&amp;__pyx_n_s_weights,0};
+    static PyObject **__pyx_pyargnames[] = {&amp;__pyx_n_s_evo_filepath,&amp;__pyx_n_s_solution,&amp;__pyx_n_s_sum_cost,&amp;__pyx_n_s_sum_weight,&amp;__pyx_n_s_init_temp,&amp;__pyx_n_s_min_temp,&amp;__pyx_n_s_cooling_coef,&amp;__pyx_n_s_cycles,&amp;__pyx_n_s_capacity,&amp;__pyx_n_s_costs,&amp;__pyx_n_s_weights,0};
     PyObject* values[11] = {0,0,0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -659,7 +659,7 @@ static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__p
       kw_args = <span class='py_c_api'>PyDict_Size</span>(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_evo_filename)) != 0)) kw_args--;
+        if (likely((values[0] = <span class='pyx_c_api'>__Pyx_PyDict_GetItemStr</span>(__pyx_kwds, __pyx_n_s_evo_filepath)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         CYTHON_FALLTHROUGH;
         case  1:
@@ -740,7 +740,7 @@ static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__p
       values[9] = <span class='py_macro_api'>PyTuple_GET_ITEM</span>(__pyx_args, 9);
       values[10] = <span class='py_macro_api'>PyTuple_GET_ITEM</span>(__pyx_args, 10);
     }
-    __pyx_v_evo_filename = ((PyObject*)values[0]);
+    __pyx_v_evo_filepath = ((PyObject*)values[0]);
     __pyx_v_solution = <span class='pyx_c_api'>__Pyx_PyObject_to_MemoryviewSlice_ds_long</span>(values[1], PyBUF_WRITABLE);<span class='error_goto'> if (unlikely(!__pyx_v_solution.memview)) __PYX_ERR(0, 71, __pyx_L3_error)</span>
     __pyx_v_sum_cost = <span class='pyx_c_api'>__Pyx_PyInt_As_int</span>(values[2]); if (unlikely((__pyx_v_sum_cost == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 71, __pyx_L3_error)</span>
     __pyx_v_sum_weight = <span class='pyx_c_api'>__Pyx_PyInt_As_int</span>(values[3]); if (unlikely((__pyx_v_sum_weight == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) <span class='error_goto'>__PYX_ERR(0, 71, __pyx_L3_error)</span>
@@ -760,8 +760,8 @@ static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__p
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_evo_filename), (&amp;PyUnicode_Type), 1, "evo_filename", 1))) <span class='error_goto'>__PYX_ERR(0, 71, __pyx_L1_error)</span>
-  __pyx_r = __pyx_pf_3csa_get_solution(__pyx_self, __pyx_v_evo_filename, __pyx_v_solution, __pyx_v_sum_cost, __pyx_v_sum_weight, __pyx_v_init_temp, __pyx_v_min_temp, __pyx_v_cooling_coef, __pyx_v_cycles, __pyx_v_capacity, __pyx_v_costs, __pyx_v_weights);
+  if (unlikely(!<span class='pyx_c_api'>__Pyx_ArgTypeTest</span>(((PyObject *)__pyx_v_evo_filepath), (&amp;PyUnicode_Type), 1, "evo_filepath", 1))) <span class='error_goto'>__PYX_ERR(0, 71, __pyx_L1_error)</span>
+  __pyx_r = __pyx_pf_3csa_get_solution(__pyx_self, __pyx_v_evo_filepath, __pyx_v_solution, __pyx_v_sum_cost, __pyx_v_sum_weight, __pyx_v_init_temp, __pyx_v_min_temp, __pyx_v_cooling_coef, __pyx_v_cycles, __pyx_v_capacity, __pyx_v_costs, __pyx_v_weights);
 
   /* function exit code */
   goto __pyx_L0;
@@ -772,12 +772,12 @@ static PyObject *__pyx_pw_3csa_1get_solution(PyObject *__pyx_self, PyObject *__p
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_3csa_get_solution(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_evo_filename, __Pyx_memviewslice __pyx_v_solution, int __pyx_v_sum_cost, int __pyx_v_sum_weight, float __pyx_v_init_temp, float __pyx_v_min_temp, float __pyx_v_cooling_coef, int __pyx_v_cycles, int __pyx_v_capacity, __Pyx_memviewslice __pyx_v_costs, __Pyx_memviewslice __pyx_v_weights) {
+static PyObject *__pyx_pf_3csa_get_solution(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_evo_filepath, __Pyx_memviewslice __pyx_v_solution, int __pyx_v_sum_cost, int __pyx_v_sum_weight, float __pyx_v_init_temp, float __pyx_v_min_temp, float __pyx_v_cooling_coef, int __pyx_v_cycles, int __pyx_v_capacity, __Pyx_memviewslice __pyx_v_costs, __Pyx_memviewslice __pyx_v_weights) {
   PyObject *__pyx_r = NULL;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("get_solution", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __pyx_f_3csa_get_solution(__pyx_v_evo_filename, __pyx_v_solution, __pyx_v_sum_cost, __pyx_v_sum_weight, __pyx_v_init_temp, __pyx_v_min_temp, __pyx_v_cooling_coef, __pyx_v_cycles, __pyx_v_capacity, __pyx_v_costs, __pyx_v_weights, 0);<span class='error_goto'> if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 71, __pyx_L1_error)</span>
+  __pyx_t_1 = __pyx_f_3csa_get_solution(__pyx_v_evo_filepath, __pyx_v_solution, __pyx_v_sum_cost, __pyx_v_sum_weight, __pyx_v_init_temp, __pyx_v_min_temp, __pyx_v_cooling_coef, __pyx_v_cycles, __pyx_v_capacity, __pyx_v_costs, __pyx_v_weights, 0);<span class='error_goto'> if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 71, __pyx_L1_error)</span>
   __pyx_t_2 = <span class='pyx_c_api'>__pyx_convert__to_py___pyx_ctuple_int__and_int__and_int</span>(__pyx_t_1);<span class='error_goto'> if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 71, __pyx_L1_error)</span>
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
   __pyx_r = __pyx_t_2;

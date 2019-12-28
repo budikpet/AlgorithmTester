@@ -40,11 +40,12 @@ class TaskSA(TaskKnapsackProblem):
         self.min_temp: float = parsed_data.get("min_temperature")
         self.cycles: int = parsed_data.get("cycles")
         self.output_file_name: str = parsed_data.get("output_file_name")
+        self.output_dir: str = parsed_data.get("output_dir")
         
-        self.evo_filename = ""
+        self.evo_filepath = ""
         if parsed_data.get("create_evo_file") is not None:
             if parsed_data.get("create_evo_file") == True:
-                self.evo_filename = self.output_file_name.replace(".dat", ".evo")
+                self.evo_filepath = f'{self.output_dir}/{self.output_file_name.replace(".dat", ".evo")}'
 
 class Solution:
     id: int

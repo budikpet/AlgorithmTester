@@ -55,6 +55,7 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
     while parsed_data is not None:
         parsed_data["algorithm_name"] = algorithm_name
         parsed_data["output_file_name"] = output_file_name
+        parsed_data["output_dir"] = context.output_dir
         parsed_data.update(context.extra_options)
 
         if context.check_time:
