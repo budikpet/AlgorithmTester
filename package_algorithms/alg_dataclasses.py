@@ -42,7 +42,7 @@ class TaskSA(TaskKnapsackProblem):
         self.output_file_name: str = parsed_data.get("output_file_name")
         self.output_dir: str = parsed_data.get("output_dir")
         
-        self.evo_filepath = ""
+        self.evo_filepath = None
         if parsed_data.get("create_evo_file") is not None:
             if parsed_data.get("create_evo_file") == True:
                 self.evo_filepath = f'{self.output_dir}/{self.output_file_name.replace(".dat", ".evo")}'
