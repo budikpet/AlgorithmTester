@@ -45,9 +45,17 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
     """
     parsed_data = parser.get_next_instance()
     algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
+    
+    click_options: Dict[str, object] = context.get_options()
+    click_options["algorithm_name"] = algorithm_name
+    click_options["algorithm"] = algorithm
+    
+    output_file_name: str = parser.get_output_file_name(click_options)
 
     while parsed_data is not None:
         parsed_data["algorithm_name"] = algorithm_name
+        parsed_data["output_file_name"] = output_file_name
+        parsed_data["output_dir"] = context.output_dir
         parsed_data.update(context.extra_options)
 
         if context.check_time:

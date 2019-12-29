@@ -29,8 +29,10 @@ class SimulatedAnnealing(Algorithm):
             required=True, doc_help="A float number from interval (0; +inf). Represents the minimum temperature of SA. The algorithm ends when this or lower temperature is achieved.")
         cycles = DynamicClickOption(name="cycles", data_type=int, short_opt="", long_opt="--cycles", 
             required=True, doc_help="An int number from interval (0; +inf). Represents the number of internal cycles of SA that are done before cooling occurs.")
+        evo_file = DynamicClickOption(name="create_evo_file", data_type=bool, short_opt="", long_opt="--create-evo-file", 
+            required=False, doc_help="If true, creates a file which contains evolution of results. Stored in output dir.")
         
-        return [init_temp, cooling, min_temp, cycles]
+        return [init_temp, cooling, min_temp, cycles, evo_file]
 
     def get_name(self) -> str:
         return "SA"
@@ -52,9 +54,6 @@ class SimulatedAnnealing(Algorithm):
 
         return columns
 
-    def get_fitness(self, task: TaskSA, solution: SolutionSA):
-        return solution.sum_cost
-
     def initial_solution(self, task: TaskSA, costs: np.ndarray, weights: np.ndarray) -> SolutionSA:
         solution: np.ndarray = np.zeros((task.count), dtype=int)
         remaining_capacity = task.capacity
@@ -74,21 +73,6 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA, index: int, costs: np.ndarray, weights: np.ndarray):
-        curr_cost = costs[index]
-        curr_weight = weights[index]
-
-        new_value: int = (neighbour[index] + 1) % 2
-        neighbour[index] = new_value
-
-        if new_value == 1:
-            neighbour.sum_cost += curr_cost
-            neighbour.sum_weight += curr_weight
-            neighbour.sum_cost, neighbour.sum_weight = csa.repair_solution(neighbour.solution, neighbour.sum_cost, neighbour.sum_weight, task.capacity, task.count, costs, weights)
-        else:
-            neighbour.sum_cost -= curr_cost
-            neighbour.sum_weight -= curr_weight
-
     def get_solution(self, task: TaskSA) -> (SolutionSA, int):
         sol_cntr: int = 0
 
@@ -98,18 +82,25 @@ class SimulatedAnnealing(Algorithm):
 
         for (index, thing) in enumerate(task.things):
             costs[index] = thing.cost
-            weights[index] = thing.weight
+            weights[index] = thing.weight            
 
         # Prepare solutions
 
         best_sol: SolutionSA = self.initial_solution(task, costs, weights)
 
-        np.random.seed(20191219)
-
-        best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(best_sol.solution, 
-            best_sol.sum_cost, best_sol.sum_weight, 
-            task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
-            costs, weights)
+        if task.evo_filepath is not None:
+            with open(f'{task.output_dir}/column_description.evo', "w") as out:
+                out.write(f"current_temperature best_cost best_weight")
+            
+            best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution_with_evo(task.evo_filepath,
+                best_sol.solution, best_sol.sum_cost, best_sol.sum_weight, 
+                task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
+                costs, weights)
+        else:
+            best_sol.sum_cost, best_sol.sum_weight, sol_cntr = csa.get_solution(best_sol.solution, 
+                best_sol.sum_cost, best_sol.sum_weight, 
+                task.init_temp, task.min_temp, task.cooling_coefficient, task.cycles, task.capacity, 
+                costs, weights)
 
         return best_sol, sol_cntr
  

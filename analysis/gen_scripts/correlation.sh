@@ -7,7 +7,7 @@
 # -c	korelace s hmotností žádná/menší/silná [uni|corr|strong] (Cost distribution)
 # -k	granularita (pouze pokud je -w light|heavy)
 
-path="../../data"
+path="../../data/DataAnalysis"
 name="Correlation"
 
 mkdir -p "$path"/"$name"

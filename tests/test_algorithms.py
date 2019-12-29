@@ -64,15 +64,19 @@ def test_sa():
 
     parser: Parser = plugins.get_parser(plugins.get_parser_names()[0])
 
-    context = flexmock(
-        time_retries=1,
-        check_time=False,
-        extra_options={
+    extra_options = {
             "init_temperature": 100.0,
             "min_temperature": 1.0,
             "cycles": 50,
             "cooling": 0.99
         }
+    
+    context = flexmock(
+        time_retries=1,
+        output_dir="",
+        check_time=False,
+        extra_options=extra_options,
+        get_options=lambda: extra_options
     )
 
     for filepair in dataFiles:
