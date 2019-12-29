@@ -1,1 +1,1 @@
-run_tester -s SA --check-time True -p KnapsackParser --input-dir data/EvoFile --output-dir analysis/tester_results/EvoFile --init-temperature 2500 --min-temperature 1 --cooling 0.950 --cycles 50 --create-evo-file True
+run_tester -s SA --check-time True -p KnapsackParser --input-dir data/EvoFile --output-dir analysis/tester_results/EvoFile --init-temperature 2500 --min-temperature 1 --cooling 0.995 --cycles 100 --create-evo-file True
