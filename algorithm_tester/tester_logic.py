@@ -3,6 +3,7 @@ import timeit
 import click
 import time
 from typing import Dict, List, IO
+from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 
@@ -103,3 +104,27 @@ def run_algorithms_for_file(context: AlgTesterContext, input_file: IO):
             for solution in it:
                 parser.write_result_to_file(output_file, {**click_options, **solution} )
                 output_file.flush()
+
+def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
+    files_dict = get_files_dict(input_dir)
+
+    context: AlgTesterContext = AlgTesterContext(
+        algorithms=algorithms, parser=parser, communicators=communicators,
+        max_num=max_num, check_time=check_time, time_retries=time_retries,
+        extra_options=extra_options,
+        input_dir=input_dir, output_dir=output_dir
+        )
+
+    for key, path in files_dict.items():
+        files_dict[key] = [path for path in files_dict[key] if "_inst" in path][0]
+
+    create_path(output_dir)
+
+    for index, n_key in enumerate(sorted(files_dict)):
+        if max_num is not None:
+            if index >= max_num:
+                break
+
+        with open(files_dict[n_key], "r") as input_file:
+            run_algorithms_for_file(context, input_file)
+    print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')

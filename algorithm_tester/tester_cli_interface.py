@@ -2,9 +2,7 @@ import click
 import time
 from typing import List
 from algorithm_tester.plugins import plugins
-from algorithm_tester.helpers import get_files_dict, create_path
-from algorithm_tester.tester_dataclasses import AlgTesterContext
-from algorithm_tester.tester_logic import run_algorithms_for_file
+from algorithm_tester.tester_logic import run_tester
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms, validate_parser, validate_extra_options
 # TODO: Simplify loading of input files. The directory should only have instance files, not solution files.
@@ -23,29 +21,7 @@ from algorithm_tester.validators import validate_algorithms, validate_parser, va
 @click.option("--output-dir", type=str, required=True, help="Path to directory where output files are to be stored.")
 @click.argument('extra-options', callback=validate_extra_options, nargs=-1, type=click.UNPROCESSED)
 def run_tester_cli_interface(algorithms: List[str], check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
-    
-    files_dict = get_files_dict(input_dir)
-
-    context: AlgTesterContext = AlgTesterContext(
-        algorithms=algorithms, parser=parser, communicators=communicators,
-        max_num=max_num, check_time=check_time, time_retries=time_retries,
-        extra_options=extra_options,
-        input_dir=input_dir, output_dir=output_dir
-        )
-
-    for key, path in files_dict.items():
-        files_dict[key] = [path for path in files_dict[key] if "_inst" in path][0]
-
-    create_path(output_dir)
-
-    for index, n_key in enumerate(sorted(files_dict)):
-        if max_num is not None:
-            if index >= max_num:
-                break
-
-        with open(files_dict[n_key], "r") as input_file:
-            run_algorithms_for_file(context, input_file)
-    print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')
+    run_tester(algorithms, check_time, time_retries, parser, communicators, max_num, input_dir, output_dir, extra_options)
 
 def main(prog_name: str):
     run_tester_cli_interface(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
