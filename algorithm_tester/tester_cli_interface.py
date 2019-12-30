@@ -22,7 +22,7 @@ from algorithm_tester.validators import validate_algorithms, validate_parser, va
 @click.option("--input-dir", type=str, required=True, help="Path to directory with input files.")
 @click.option("--output-dir", type=str, required=True, help="Path to directory where output files are to be stored.")
 @click.argument('extra-options', callback=validate_extra_options, nargs=-1, type=click.UNPROCESSED)
-def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
+def run_tester_cli_interface(algorithms: List[str], check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
     
     files_dict = get_files_dict(input_dir)
 
@@ -48,4 +48,4 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
     print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')
 
 def main(prog_name: str):
-    run_tester(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
+    run_tester_cli_interface(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
