@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import numpy as np
 from math import exp
 import csa
-from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
+from algorithm_tester.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
 from package_algorithms.alg_dataclasses import Thing, TaskSA, SolutionSA
 
 class SimulatedAnnealing(Algorithm):
@@ -104,8 +104,8 @@ class SimulatedAnnealing(Algorithm):
 
         return best_sol, sol_cntr
  
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        task: TaskSA = TaskSA(parsed_data=parsed_data)
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        task: TaskSA = TaskSA(context, parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
         
         solution, solution_cntr = self.get_solution(task)

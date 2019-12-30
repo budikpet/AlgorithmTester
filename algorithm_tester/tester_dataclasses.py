@@ -4,6 +4,41 @@ from enum import Enum
 import re
 import numpy as np
 
+class AlgTesterContext():
+    """
+    Contains all options and arguments given to the application.
+    """
+
+    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], input_dir, output_dir):
+        self.algorithm_names: List[str] = algorithms
+        self.parser_name: str = parser
+        self.communicator_names: List[str] = communicators
+        self.check_time: bool = check_time
+        self.time_retries: int = time_retries
+        self.max_num: int = max_num
+        self.extra_options: Dict[str, object] = extra_options
+        self.input_dir: str = input_dir
+        self.output_dir: str = output_dir
+
+        if self.extra_options is None:
+            self.extra_options = dict()
+
+    def get_options(self) -> Dict[str, object]:
+        options = {
+            "algorithm_names": self.algorithm_names,
+            "parser_name": self.parser_name,
+            "communicator_names": self.communicator_names,
+            "check_time": self.check_time,
+            "time_retries": self.time_retries,
+            "max_num": self.max_num,
+            "input_dir": self.input_dir,
+            "output_dir": self.output_dir
+        }
+
+        options.update(self.extra_options)
+
+        return options
+
 @dataclass
 class DynamicClickOption():
     """
@@ -68,7 +103,7 @@ class Algorithm(object):
         """
         pass
     
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         """
         Main method of the class. Receives instance data from a parser and creates results.
         
@@ -96,7 +131,7 @@ class Parser(object):
         """
         pass
 
-    def get_output_file_name(self, click_args: Dict[str, object]) -> str:
+    def get_output_file_name(self, context: AlgTesterContext, click_args: Dict[str, object]) -> str:
         """
         Construct name of an output file using provided data.
         
@@ -126,38 +161,3 @@ class Parser(object):
             data (Dict[str, object]): Result data from an algorithm and options that were given to the script.
         """
         pass
-
-class AlgTesterContext():
-    """
-    Contains all options and arguments given to the application.
-    """
-
-    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], input_dir, output_dir):
-        self.algorithm_names: List[str] = algorithms
-        self.parser_name: str = parser
-        self.communicator_names: List[str] = communicators
-        self.check_time: bool = check_time
-        self.time_retries: int = time_retries
-        self.max_num: int = max_num
-        self.extra_options: Dict[str, object] = extra_options
-        self.input_dir: str = input_dir
-        self.output_dir: str = output_dir
-
-        if self.extra_options is None:
-            self.extra_options = dict()
-
-    def get_options(self) -> Dict[str, object]:
-        options = {
-            "algorithm_names": self.algorithm_names,
-            "parser_name": self.parser_name,
-            "communicator_names": self.communicator_names,
-            "check_time": self.check_time,
-            "time_retries": self.time_retries,
-            "max_num": self.max_num,
-            "input_dir": self.input_dir,
-            "output_dir": self.output_dir
-        }
-
-        options.update(self.extra_options)
-
-        return options

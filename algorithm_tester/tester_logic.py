@@ -50,22 +50,21 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
     click_options["algorithm_name"] = algorithm_name
     click_options["algorithm"] = algorithm
     
-    output_file_name: str = parser.get_output_file_name(click_options)
+    output_file_name: str = parser.get_output_file_name(context, click_options)
 
     while parsed_data is not None:
-        parsed_data["algorithm_name"] = algorithm_name
         parsed_data["output_file_name"] = output_file_name
-        parsed_data["output_dir"] = context.output_dir
         parsed_data.update(context.extra_options)
 
         if context.check_time:
             # Use timeit to get time
-            t = timeit.Timer(lambda: algorithm.perform_algorithm(parsed_data))
+            t = timeit.Timer(lambda: algorithm.perform_algorithm(context, parsed_data))
             elapsed_time, solution = t.timeit(number=context.time_retries)
             solution["elapsed_time"] = round((elapsed_time*1000)/context.time_retries, 10)   # Store in millis
         else:
-            solution = algorithm.perform_algorithm(parsed_data)
+            solution = algorithm.perform_algorithm(context, parsed_data)
 
+        solution["algorithm_name"] = algorithm_name
         yield solution
 
         parsed_data = parser.get_next_instance()
@@ -97,7 +96,7 @@ def run_algorithms_for_file(context: AlgTesterContext, input_file):
         click_options["algorithm_name"] = algorithm_name
         click_options["algorithm"] = algorithm
 
-        output_file_name: str = parser.get_output_file_name(click_options)
+        output_file_name: str = parser.get_output_file_name(context, click_options)
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
             for solution in it:

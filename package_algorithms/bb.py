@@ -1,6 +1,6 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.tester_dataclasses import Algorithm
+from algorithm_tester.tester_dataclasses import Algorithm, AlgTesterContext
 from package_algorithms.alg_dataclasses import ConfigCounter, TaskKnapsackProblem, Thing, RecursiveResult, Solution, base_columns
 
 class BranchBound(Algorithm):
@@ -51,7 +51,7 @@ class BranchBound(Algorithm):
         # Current thing too heavy. The subtree has high enough value, need to check if items fit
         return self.recursive_solve(config_ctr, task, maximum_sum - curr_thing.cost, thing_at_index + 1, curr_state.new_solution())
     
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Create a descending list of maximum sums that is going to be used for value-based decisions in BranchBound alg.
         task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         maximum_sum = self.get_max_sum(task)
@@ -77,7 +77,7 @@ class SortedBranchBound(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         algorithm = BranchBound()
 
         # Sort things by cost/weight comparison

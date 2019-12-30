@@ -1,5 +1,5 @@
 from typing import Dict, List
-from algorithm_tester.tester_dataclasses import Parser
+from algorithm_tester.tester_dataclasses import Parser, AlgTesterContext
 
 class KnapsackParser(Parser):
     """
@@ -9,7 +9,7 @@ class KnapsackParser(Parser):
     def get_name(self) -> str:
         return "KnapsackParser"
 
-    def get_output_file_name(self, click_args: Dict[str, object]) -> str:
+    def get_output_file_name(self, context: AlgTesterContext, click_args: Dict[str, object]) -> str:
         input_file_name: str = self.input_file.name.split("/")[-1]
 
         return input_file_name.replace(".dat", f'_{click_args["algorithm_name"]}_sol.dat')

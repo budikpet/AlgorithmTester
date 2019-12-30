@@ -1,6 +1,6 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
+from algorithm_tester.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
 from package_algorithms.alg_dataclasses import ConfigCounter, TaskKnapsackProblem, Thing, RecursiveResult, Solution, base_columns
 
 class BruteForce(Algorithm):
@@ -40,7 +40,7 @@ class BruteForce(Algorithm):
         
         return self.recursive_solve(config_ctr, task, thing_at_index + 1, curr_state.new_solution())
     
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison
         task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
@@ -73,7 +73,7 @@ class Greedy(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         # Sort things by cost/weight comparison descending
         task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/thing.weight, reverse=True)
