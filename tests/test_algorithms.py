@@ -37,7 +37,6 @@ def test_base_algorithms(algorithm: str, exact: bool, relative_mistake: float):
             solutions: List[str] = solutionFile.readlines()
 
         with open(filepair.dataFile, "r") as datafile:
-            parser.set_input_file(datafile)
             it = get_instance_file_results(context=context, algorithm_name=algorithm.get_name(), parser=parser)
 
             # Compare solutions
@@ -85,7 +84,6 @@ def test_sa():
             solutions: List[str] = solutionFile.readlines()
 
         with open(filepair.dataFile, "r") as datafile:
-            parser.set_input_file(datafile)
             it = get_instance_file_results(context=context, algorithm_name="SA", parser=parser)
 
             # Compare solutions

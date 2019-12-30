@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, IO
 from enum import Enum
 import re
 import numpy as np
@@ -117,12 +117,6 @@ class Algorithm(object):
 
 class Parser(object):
 
-    def set_input_file(self, input_file):
-        self.input_file = input_file
-
-    def reload_input_file(self):
-        self.input_file.seek(0)
-
     def get_name(self) -> str:
         """
         
@@ -131,7 +125,7 @@ class Parser(object):
         """
         pass
 
-    def get_output_file_name(self, context: AlgTesterContext, click_args: Dict[str, object]) -> str:
+    def get_output_file_name(self, context: AlgTesterContext, input_file: IO, click_args: Dict[str, object]) -> str:
         """
         Construct name of an output file using provided data.
         
@@ -143,7 +137,7 @@ class Parser(object):
         """
         pass
 
-    def get_next_instance(self) -> Dict[str, object]:
+    def get_next_instance(self, input_file: IO) -> Dict[str, object]:
         """
         Parses next instance from an input file and returns it.
         

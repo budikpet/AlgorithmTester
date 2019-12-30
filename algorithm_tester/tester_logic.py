@@ -2,7 +2,7 @@ import os
 import timeit
 import click
 import time
-from typing import Dict, List
+from typing import Dict, List, IO
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 
@@ -31,7 +31,7 @@ def create_columns_description_file(algorithm: str, output_dir: str):
     with open(f'{output_dir}/column_description_{algorithm}.dat', "w") as f:
         f.write(f'{" ".join(column_descriptions)}\n')
 
-def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, parser: Parser) -> Dict[str, object]:
+def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, parser: Parser, input_file: IO) -> Dict[str, object]:
     """
     Parsed instances are passed to the provided algorithm. Results are returned one by one.
     
@@ -43,14 +43,14 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
     Yields:
         Dict[str, object]: Result data of one instance from the input file.
     """
-    parsed_data = parser.get_next_instance()
+    parsed_data = parser.get_next_instance(input_file)
     algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
     
     click_options: Dict[str, object] = context.get_options()
     click_options["algorithm_name"] = algorithm_name
     click_options["algorithm"] = algorithm
     
-    output_file_name: str = parser.get_output_file_name(context, click_options)
+    output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
 
     while parsed_data is not None:
         parsed_data["output_file_name"] = output_file_name
@@ -67,11 +67,11 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
         solution["algorithm_name"] = algorithm_name
         yield solution
 
-        parsed_data = parser.get_next_instance()
+        parsed_data = parser.get_next_instance(input_file)
     
     print
 
-def run_algorithms_for_file(context: AlgTesterContext, input_file):
+def run_algorithms_for_file(context: AlgTesterContext, input_file: IO):
     """
     Generate output files for the specified input file.
 
@@ -82,21 +82,22 @@ def run_algorithms_for_file(context: AlgTesterContext, input_file):
         input_file ([type]): Opened input file.
     """
     parser: Parser = plugins.get_parser(name=context.parser_name)
-    parser.set_input_file(input_file)
 
     for algorithm_name in context.algorithm_names:
         algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
-        parser.reload_input_file()
+
+        # Move reader to the start of the file
+        input_file.seek(0)
         
         create_columns_description_file(algorithm_name, context.output_dir)
         
-        it = get_instance_file_results(context=context, algorithm_name=algorithm_name, parser=parser)
+        it = get_instance_file_results(context=context, algorithm_name=algorithm_name, parser=parser, input_file=input_file)
 
         click_options: Dict[str, object] = context.get_options()
         click_options["algorithm_name"] = algorithm_name
         click_options["algorithm"] = algorithm
 
-        output_file_name: str = parser.get_output_file_name(context, click_options)
+        output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
         print(f'Running output for: {output_file_name}. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
             for solution in it:
