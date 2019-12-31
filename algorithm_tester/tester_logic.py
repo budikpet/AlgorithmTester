@@ -120,7 +120,11 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
 
     create_path(output_dir)
 
-    runner = ConcurrentInstancesRunner()
+    runner = ConcurrentFilesRunner()
 
+    start = time.perf_counter()
     runner.start(context, files_dict)
+    finish = time.perf_counter()
+    print(f'Finished task in {round(finish - start, 2)} second(s)')
+
     print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')
