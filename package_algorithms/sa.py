@@ -73,16 +73,22 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
-        sol_cntr: int = 0
-
+    def get_numpy_costs_weights(self, task: TaskSA) -> (np.ndarray, np.ndarray):
         # Prepare things in numpy arrays only
         costs: np.ndarray = np.zeros(task.count, dtype=int)
         weights: np.ndarray = np.zeros(task.count, dtype=int)
 
         for (index, thing) in enumerate(task.things):
             costs[index] = thing.cost
-            weights[index] = thing.weight            
+            weights[index] = thing.weight  
+        
+        return costs, weights
+
+    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
+        sol_cntr: int = 0
+
+        # Prepare things in numpy arrays only
+        costs, weights = self.get_numpy_costs_weights(task)      
 
         # Prepare solutions
 
