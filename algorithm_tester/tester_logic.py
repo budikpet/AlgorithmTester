@@ -5,6 +5,7 @@ from typing import Dict, List, IO
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
+from algorithm_tester.concurrency_runners import BaseRunner
 
 # Enable timeit to return elapsed time and return value
 new_template = """
@@ -119,11 +120,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
 
     create_path(output_dir)
 
-    for index, n_key in enumerate(sorted(files_dict)):
-        if max_num is not None:
-            if index >= max_num:
-                break
+    runner: BaseRunner = BaseRunner()
 
-        with open(files_dict[n_key], "r") as input_file:
-            run_algorithms_for_file(context, input_file)
+    runner.start(context, files_dict)
     print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')

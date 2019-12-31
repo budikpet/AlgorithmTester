@@ -26,7 +26,21 @@ def get_click_options(context: AlgTesterContext, algorithm: Algorithm) -> Dict[s
 
     return click_options
 
-def get_solution_for_instance(context: AlgTesterContext, parsed_instance_data: Dict[str, object]) -> Dict[str, object]:
+def create_columns_description_file(context: AlgTesterContext, algorithm: Algorithm):
+    """
+    Create an output file with names of columns for a specific algorithm.
+    
+    Args:
+        algorithm (str): Name of the algorithm whose columns are persisted.
+        output_dir (str): Output directory.
+    """
+    column_descriptions = algorithm.get_columns()
+
+    with open(f'{context.output_dir}/column_description_{algorithm.get_name()}.dat', "w") as f:
+        f.write(f'{" ".join(column_descriptions)}\n')
+
+
+def get_solution_for_instance(context: AlgTesterContext, algorithm: Algorithm, parsed_instance_data: Dict[str, object]) -> Dict[str, object]:
     if context.check_time:
         # Use timeit to get time
         t = timeit.Timer(lambda: algorithm.perform_algorithm(context, parsed_instance_data))
@@ -37,7 +51,7 @@ def get_solution_for_instance(context: AlgTesterContext, parsed_instance_data: D
 
     return solution
 
-def get_instances(context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm):
+def get_parsed_instances_data(context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm):
     parsed_instance_data = parser.get_next_instance(input_file)
     
     click_options: Dict[str, object] = get_click_options(context, algorithm)
@@ -46,37 +60,41 @@ def get_instances(context: AlgTesterContext, input_file: IO, parser: Parser, alg
 
     while parsed_instance_data is not None:
         parsed_instance_data["output_file_name"] = output_file_name
-        parsed_instance_data["algorithm_name"] = algorithm_name
+        parsed_instance_data["algorithm_name"] = algorithm.get_name()
+        parsed_instance_data["algorithm"] = algorithm
         parsed_instance_data.update(context.extra_options)
 
         yield parsed_instance_data
 
         parsed_instance_data = parser.get_next_instance(input_file)
 
-def run_tester_for_file(context: AlgTesterContext, input_file_name: str):
+def run_tester_for_file(context: AlgTesterContext, input_file_path: str):
     parser: Parser = plugins.get_parser(context.parser_name)
     
-    with open(input_file_name, "r") as input_file:
+    print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
+    with open(input_file_path, "r") as input_file:
         for algorithm_name in context.algorithm_names:
             algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
             
             click_options = get_click_options(context, algorithm)
-            output_file_name: str = parser.get_output_file_name(context, input_file, click_args)
+            output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
 
-            with open(output_file_name) as output_file:
+            create_columns_description_file(context, algorithm)
+            with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
 
-                for instance in get_instances(context, input_file, parser, algorithm):
-                    solution = get_solution_for_instance(context, parsed_instance_data)
+                for parsed_instance_data in get_parsed_instances_data(context, input_file, parser, algorithm):
+                    solution = get_solution_for_instance(context, algorithm, parsed_instance_data)
 
                     parser.write_result_to_file(output_file, solution)
 
-class SimpleRunner:
+class BaseRunner:
 
     def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
         for index, n_key in enumerate(sorted(files_dict)):
             if context.max_num is not None and index >= context.max_num:
                 break
 
-            run_tester_for_file(context, input_file)
+            input_file_path: str = files_dict.get(n_key)
+            run_tester_for_file(context, input_file_path)
 
             
