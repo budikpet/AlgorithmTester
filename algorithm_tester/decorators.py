@@ -1,6 +1,6 @@
 import click
 from typing import Dict, List
-from algorithm_tester.tester_dataclasses import DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import DynamicClickOption
 
 def docstring_parameters(*args, **kwargs):
     """ A decorator that enables parameterized docstring. """

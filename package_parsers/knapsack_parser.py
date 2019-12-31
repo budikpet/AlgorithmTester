@@ -1,5 +1,5 @@
 from typing import Dict, List, IO
-from algorithm_tester.tester_dataclasses import Parser, AlgTesterContext
+from algorithm_tester_common.tester_dataclasses import Parser, AlgTesterContext
 
 class KnapsackParser(Parser):
     """

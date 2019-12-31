@@ -1,7 +1,7 @@
 import click
 import itertools
 from typing import Dict, List, Tuple
-from algorithm_tester.tester_dataclasses import DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import DynamicClickOption
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runners, Runner
 

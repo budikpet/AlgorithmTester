@@ -5,7 +5,7 @@ import multiprocessing
 import concurrent.futures
 from enum import Enum
 from typing import IO, Dict, List
-from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 
 

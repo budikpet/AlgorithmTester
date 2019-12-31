@@ -3,7 +3,7 @@ import timeit
 import time
 from typing import Dict, List, IO
 from algorithm_tester.helpers import get_files_dict, create_path
-from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runner, Runners
 

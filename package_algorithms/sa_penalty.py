@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import numpy as np
 import random
 from math import exp
-from algorithm_tester.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
 from package_algorithms.alg_dataclasses import Thing, TaskSA, SolutionSA
 
 

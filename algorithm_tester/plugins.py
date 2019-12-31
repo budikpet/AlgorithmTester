@@ -1,7 +1,7 @@
 import pkg_resources
 import sys, inspect
 from typing import Dict, List, Set
-from algorithm_tester.tester_dataclasses import Algorithm, Parser, DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, DynamicClickOption
 
 """
 This module should be used to automatically retrieve plugins (Algorithm, Parser and Communicators classes) from setup.py entrypoints.

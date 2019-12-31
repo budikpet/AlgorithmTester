@@ -3,7 +3,7 @@ from typing import List, Tuple, Dict
 from enum import Enum
 import re
 import numpy as np
-from algorithm_tester.tester_dataclasses import AlgTesterContext
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext
 
 base_columns: List[str] = [
         "id",
