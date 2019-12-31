@@ -1,6 +1,5 @@
 import os
 import timeit
-import click
 import time
 from typing import Dict, List, IO
 from algorithm_tester.helpers import get_files_dict, create_path
@@ -55,6 +54,7 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
 
     while parsed_data is not None:
         parsed_data["output_file_name"] = output_file_name
+        parsed_data["algorithm_name"] = algorithm_name
         parsed_data.update(context.extra_options)
 
         if context.check_time:
@@ -65,7 +65,6 @@ def get_instance_file_results(context: AlgTesterContext, algorithm_name: str, pa
         else:
             solution = algorithm.perform_algorithm(context, parsed_data)
 
-        solution["algorithm_name"] = algorithm_name
         yield solution
 
         parsed_data = parser.get_next_instance(input_file)

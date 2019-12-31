@@ -5,7 +5,6 @@ from algorithm_tester.plugins import plugins
 from algorithm_tester.tester_logic import run_tester
 from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
 from algorithm_tester.validators import validate_algorithms, validate_parser, validate_extra_options
-# TODO: Simplify loading of input files. The directory should only have instance files, not solution files.
 
 @click.command(name='my-cmd', context_settings=dict(
     ignore_unknown_options=True,
