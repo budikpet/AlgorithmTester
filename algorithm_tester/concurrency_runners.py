@@ -108,3 +108,39 @@ class ConcurrentFilesRunner:
 
                 input_file_path: str = files_dict.get(n_key)
                 executor.submit(run_tester_for_file, context, input_file_path)
+
+class ConcurrentInstancesRunner:
+
+    def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, executor: concurrent.futures.ProcessPoolExecutor):
+        click_options = get_click_options(context, algorithm)
+        output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
+
+        create_columns_description_file(context, algorithm)
+        with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
+            it = get_parsed_instances_data(context, input_file, parser, algorithm)
+            futures = [executor.submit(get_solution_for_instance, context, algorithm, instance) for instance in it]
+
+            # Get results
+            for future in concurrent.futures.as_completed(futures):
+                solution: Dict[str, object] = future.result()
+                parser.write_result_to_file(output_file, solution)
+
+    def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
+        parser: Parser = plugins.get_parser(context.parser_name)
+        
+        print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
+        with open(input_file_path, "r") as input_file:
+            for algorithm_name in context.algorithm_names:
+                algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
+                
+                self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, executor)
+
+    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+
+            for index, n_key in enumerate(sorted(files_dict)):
+                if context.max_num is not None and index >= context.max_num:
+                    break
+
+                input_file_path: str = files_dict.get(n_key)
+                self.run_tester_for_file(context, input_file_path, executor)

@@ -19,6 +19,7 @@ class AlgTesterContext():
         self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
         self.output_dir: str = output_dir
+        self.batch_size: int = 10
 
         if self.extra_options is None:
             self.extra_options = dict()
