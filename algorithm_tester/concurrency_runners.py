@@ -21,6 +21,17 @@ def inner(_it, _timer{init}):
 timeit.template = new_template
 
 def get_click_options(context: AlgTesterContext, algorithm: Algorithm) -> Dict[str, object]:
+    """
+    Create a dictionary of options and arguments given to the Click CLI. 
+    Used by Parser to generate name of the output file.
+    
+    Arguments:
+        context {AlgTesterContext} -- [description]
+        algorithm {Algorithm} -- [description]
+    
+    Returns:
+        Dict[str, object] -- [description]
+    """
     click_options: Dict[str, object] = context.get_options()
     click_options["algorithm_name"] = algorithm.get_name()
     click_options["algorithm"] = algorithm
@@ -42,10 +53,13 @@ def create_columns_description_file(context: AlgTesterContext, algorithm: Algori
 
 class Runner(object):
 
-    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
         pass
 
 class BaseRunner(Runner):
+    """
+    Processes files and their instances sequentially. No concurrency is used.
+    """
 
     def get_solution_for_instance(self, context: AlgTesterContext, algorithm: Algorithm, parsed_instance_data: Dict[str, object]) -> Dict[str, object]:
         if context.check_time:
@@ -58,7 +72,19 @@ class BaseRunner(Runner):
 
         return solution
 
-    def get_parsed_instances_data(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm):
+    def get_parsed_instances_data(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm) -> Dict[str, object]:
+        """
+        Parses instances from the input file.
+        
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            input_file {IO} -- The opened input file.
+            parser {Parser} -- [description]
+            algorithm {Algorithm} -- [description]
+        
+        Yields:
+            Dict[str, object] -- One parsed instance from the input file.
+        """
         parsed_instance_data = parser.get_next_instance(input_file)
         
         click_options: Dict[str, object] = get_click_options(context, algorithm)
@@ -76,6 +102,13 @@ class BaseRunner(Runner):
             parsed_instance_data = parser.get_next_instance(input_file)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str):
+        """
+        Compute results for the given input file.
+        
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            input_file_path {str} -- Path to the input file to compute results for.
+        """
         parser: Parser = plugins.get_parser(context.parser_name)
         
         print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
@@ -94,7 +127,15 @@ class BaseRunner(Runner):
 
                         parser.write_result_to_file(output_file, solution)
 
-    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+        """
+        Parses instances from given input files, solve them using required algorithms and write results to the output file.
+        
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            files_dict {Dict[str, str]} -- All files with instances that are to be computed. 
+            Keys were created to make it possible to process files in a sorted order.
+        """
         for index, n_key in enumerate(sorted(files_dict)):
             if context.max_num is not None and index >= context.max_num:
                 break
@@ -103,10 +144,21 @@ class BaseRunner(Runner):
             self.run_tester_for_file(context, input_file_path)
 
 class ConcurrentFilesRunner(Runner):
+    """
+    Processes multiple files concurrently. Instances in each file is processed sequentially.
+    
+    """
     _base_runner: BaseRunner = BaseRunner()
 
-    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+        """
+        Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            files_dict {Dict[str, str]} -- All files with instances that are to be computed. 
+            Keys were created to make it possible to process files in a sorted order.
+        """
         with concurrent.futures.ProcessPoolExecutor() as executor:
             for index, n_key in enumerate(sorted(files_dict)):
                 if context.max_num is not None and index >= context.max_num:
@@ -116,6 +168,10 @@ class ConcurrentFilesRunner(Runner):
                 executor.submit(self._base_runner.run_tester_for_file, context, input_file_path)
 
 class ConcurrentInstancesRunner(Runner):
+    """
+    Processes multiple instances of 1 file concurrently.
+    
+    """
     _base_runner: BaseRunner = BaseRunner()
 
     def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, executor: concurrent.futures.ProcessPoolExecutor):
@@ -142,7 +198,15 @@ class ConcurrentInstancesRunner(Runner):
                 
                 self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, executor)
 
-    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+        """
+        Parses instances from given input files, solve them using required algorithms and write results to the output file.
+        
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            files_dict {Dict[str, str]} -- All files with instances that are to be computed. 
+            Keys were created to make it possible to process files in a sorted order.
+        """
         with concurrent.futures.ProcessPoolExecutor() as executor:
 
             for index, n_key in enumerate(sorted(files_dict)):
@@ -153,6 +217,12 @@ class ConcurrentInstancesRunner(Runner):
                 self.run_tester_for_file(context, input_file_path, executor)
 
 class Runners(Enum):
+    """
+    Contains references to all Concurrency runners available.
+    
+    Arguments:
+        Enum {Runner} -- A concurrency runner.
+    """
     BASE = BaseRunner()
     FILES = ConcurrentFilesRunner()
     INSTANCES = ConcurrentInstancesRunner()
