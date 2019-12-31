@@ -3,7 +3,7 @@ import timeit
 import time
 import multiprocessing
 import concurrent.futures
-from typing import IO, Dict
+from typing import IO, Dict, List
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 
@@ -97,4 +97,14 @@ class BaseRunner:
             input_file_path: str = files_dict.get(n_key)
             run_tester_for_file(context, input_file_path)
 
-            
+class ConcurrentFilesRunner:
+
+    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+        
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            for index, n_key in enumerate(sorted(files_dict)):
+                if context.max_num is not None and index >= context.max_num:
+                    break
+
+                input_file_path: str = files_dict.get(n_key)
+                executor.submit(run_tester_for_file, context, input_file_path)

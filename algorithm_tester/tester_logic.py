@@ -5,7 +5,7 @@ from typing import Dict, List, IO
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
-from algorithm_tester.concurrency_runners import BaseRunner
+from algorithm_tester.concurrency_runners import BaseRunner, ConcurrentFilesRunner
 
 # Enable timeit to return elapsed time and return value
 new_template = """
@@ -120,7 +120,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
 
     create_path(output_dir)
 
-    runner: BaseRunner = BaseRunner()
+    runner = ConcurrentFilesRunner()
 
     runner.start(context, files_dict)
     print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')
