@@ -40,11 +40,15 @@ def test_initial_solution(base_context):
     print
 
 def test_perform_algorithm(base_context):
+    fixture_path: str = "tests/test_algorithms/fixtures"
     parser: KnapsackParser = KnapsackParser()
     sa: SimulatedAnnealing = SimulatedAnnealing()
 
-    with open("tests/test_algorithms/fixtures/instance_files/NK_4_inst.dat") as input_file:
+    with open(f"{fixture_path}/instance_files/NK_4_inst.dat") as input_file:
         instance = parser.get_next_instance(input_file)
+
+    with open(f"{fixture_path}/instance_files/NK_4_sol.dat", "r") as solutionFile:
+        given_solution = solutionFile.readline().split(" ")
 
     base_context.extra_options = {
         "init_temperature": 1000.0, "min_temperature": 1.0, "cooling": 0.99, "cycles": 20
@@ -58,5 +62,6 @@ def test_perform_algorithm(base_context):
     assert solution.get("things") is not None
     assert 1 in solution.get("things")
     assert solution.get("found_value") is not None
+    assert solution.get("found_value") <= int(given_solution[2])
 
     print
