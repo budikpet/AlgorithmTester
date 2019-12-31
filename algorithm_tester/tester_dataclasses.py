@@ -9,10 +9,11 @@ class AlgTesterContext():
     Contains all options and arguments given to the application.
     """
 
-    def __init__(self, algorithms: List[str], parser: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], input_dir, output_dir):
+    def __init__(self, algorithms: List[str], parser: str, concurrency_runner: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], input_dir, output_dir):
         self.algorithm_names: List[str] = algorithms
         self.parser_name: str = parser
         self.communicator_names: List[str] = communicators
+        self.concurrency_runner_name: str = concurrency_runner
         self.check_time: bool = check_time
         self.time_retries: int = time_retries
         self.max_num: int = max_num

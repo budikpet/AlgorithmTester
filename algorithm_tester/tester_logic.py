@@ -5,7 +5,7 @@ from typing import Dict, List, IO
 from algorithm_tester.helpers import get_files_dict, create_path
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
-from algorithm_tester.concurrency_runners import BaseRunner, ConcurrentFilesRunner, ConcurrentInstancesRunner
+from algorithm_tester.concurrency_runners import Runner, Runners
 
 # Enable timeit to return elapsed time and return value
 new_template = """
@@ -105,11 +105,11 @@ def run_algorithms_for_file(context: AlgTesterContext, input_file: IO):
                 parser.write_result_to_file(output_file, {**click_options, **solution} )
                 output_file.flush()
 
-def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
+def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
     files_dict = get_files_dict(input_dir)
 
     context: AlgTesterContext = AlgTesterContext(
-        algorithms=algorithms, parser=parser, communicators=communicators,
+        algorithms=algorithms, parser=parser, communicators=communicators, concurrency_runner=concurrency_runner,
         max_num=max_num, check_time=check_time, time_retries=time_retries,
         extra_options=extra_options,
         input_dir=input_dir, output_dir=output_dir
@@ -120,7 +120,7 @@ def run_tester(algorithms: List[str], check_time: bool, time_retries: int, parse
 
     create_path(output_dir)
 
-    runner = ConcurrentFilesRunner()
+    runner = Runners[concurrency_runner].value
 
     start = time.perf_counter()
     runner.start(context, files_dict)

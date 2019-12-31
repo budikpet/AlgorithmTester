@@ -3,6 +3,7 @@ import timeit
 import time
 import multiprocessing
 import concurrent.futures
+from enum import Enum
 from typing import IO, Dict, List
 from algorithm_tester.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
@@ -39,7 +40,12 @@ def create_columns_description_file(context: AlgTesterContext, algorithm: Algori
     with open(f'{context.output_dir}/column_description_{algorithm.get_name()}.dat', "w") as f:
         f.write(f'{" ".join(column_descriptions)}\n')
 
-class BaseRunner:
+class Runner(object):
+
+    def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+        pass
+
+class BaseRunner(Runner):
 
     def get_solution_for_instance(self, context: AlgTesterContext, algorithm: Algorithm, parsed_instance_data: Dict[str, object]) -> Dict[str, object]:
         if context.check_time:
@@ -96,7 +102,7 @@ class BaseRunner:
             input_file_path: str = files_dict.get(n_key)
             self.run_tester_for_file(context, input_file_path)
 
-class ConcurrentFilesRunner:
+class ConcurrentFilesRunner(Runner):
     _base_runner: BaseRunner = BaseRunner()
 
     def start(self, context: AlgTesterContext, files_dict: Dict[str, str]):
@@ -109,7 +115,7 @@ class ConcurrentFilesRunner:
                 input_file_path: str = files_dict.get(n_key)
                 executor.submit(self._base_runner.run_tester_for_file, context, input_file_path)
 
-class ConcurrentInstancesRunner:
+class ConcurrentInstancesRunner(Runner):
     _base_runner: BaseRunner = BaseRunner()
 
     def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, executor: concurrent.futures.ProcessPoolExecutor):
@@ -145,3 +151,8 @@ class ConcurrentInstancesRunner:
 
                 input_file_path: str = files_dict.get(n_key)
                 self.run_tester_for_file(context, input_file_path, executor)
+
+class Runners(Enum):
+    BASE = BaseRunner()
+    FILES = ConcurrentFilesRunner()
+    INSTANCES = ConcurrentInstancesRunner()
