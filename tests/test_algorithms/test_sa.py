@@ -1,7 +1,7 @@
 import pytest
 from flexmock import flexmock
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext
-from package_algorithms.sa import SimulatedAnnealing, TaskSA, SolutionSA
+from package_algorithms.knapsack.sa import SimulatedAnnealing, TaskSA, SolutionSA
 from package_parsers.knapsack_parser import KnapsackParser
 
 @pytest.fixture
