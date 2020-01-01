@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
     ext_modules = cythonize(
-        [Extension('csa', ['package_algorithms/csa.pyx'], include_dirs=[numpy.get_include()])],
+        [Extension('csa', ['package_algorithms/knapsack/csa.pyx'], include_dirs=[numpy.get_include()])],
         language_level=3),
     setup_requires=['pytest-runner'],
     install_requires=['click>=6', 'numpy', 'cython'],
