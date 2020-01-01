@@ -2,7 +2,7 @@ import os
 import timeit
 import time
 from typing import Dict, List, IO
-from algorithm_tester.helpers import get_files_dict, create_path
+from algorithm_tester.helpers import get_input_files, create_path
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runner, Runners
@@ -23,7 +23,6 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         output_dir {[type]} -- [description]
         extra_options {[type]} -- [description]
     """
-    files_dict = get_files_dict(input_dir)
 
     context: AlgTesterContext = AlgTesterContext(
         algorithms=algorithms, parser=parser, communicators=communicators, concurrency_runner=concurrency_runner,
@@ -32,15 +31,14 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         input_dir=input_dir, output_dir=output_dir
         )
 
-    for key, path in files_dict.items():
-        files_dict[key] = [path for path in files_dict[key] if "_inst" in path][0]
+    input_files: List[str] = get_input_files(input_dir)
 
     create_path(output_dir)
 
     runner = Runners[concurrency_runner].value
 
     start = time.perf_counter()
-    runner.compute_results(context, files_dict)
+    runner.compute_results(context, input_files)
     finish = time.perf_counter()
     print(f'Finished task in {round(finish - start, 2)} second(s)')
 

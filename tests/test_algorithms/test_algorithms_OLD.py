@@ -4,7 +4,7 @@
 # from typing import List
 # from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, AlgTesterContext
 # from algorithm_tester.tester_logic import get_instance_file_results
-# from algorithm_tester.helpers import FilePair, get_files
+# from algorithm_tester.helpers import FilePair, get_input_files
 # from algorithm_tester.plugins import plugins
 
 # @pytest.mark.parametrize(
@@ -20,7 +20,7 @@
 # )
 # def test_base_algorithms(algorithm: str, exact: bool, relative_mistake: float):
 #     path = './data'
-#     dataFiles = get_files(f'{path}/NK/instances')[0:2]
+#     dataFiles = get_input_files(f'{path}/NK/instances')[0:2]
 #     algorithm: Algorithm = plugins.get_algorithm(algorithm)
 
 #     parser: Parser = plugins.get_parser(plugins.get_parser_names()[0])
@@ -59,7 +59,7 @@
 
 # def test_sa():
 #     path = './data'
-#     dataFiles = get_files(f'{path}/NK')[0:3]
+#     dataFiles = get_input_files(f'{path}/NK')[0:3]
 
 #     parser: Parser = plugins.get_parser(plugins.get_parser_names()[0])
 
