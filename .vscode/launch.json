@@ -31,7 +31,7 @@
                 // "--relative", "0.lll",
                 "-p", "KnapsackParser",
                 // "--create-evo-file", "True",
-                "--input-dir", "${workspaceFolder}/data/ParamAnalysis",
+                "--input-dir", "${workspaceFolder}/data/wuf_A/wuf20-88-A",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
