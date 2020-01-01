@@ -3,6 +3,7 @@ from typing import List, Tuple, Dict
 from enum import Enum
 import re
 import numpy as np
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext
 
 base_columns: List[str] = [
         "id",
@@ -33,18 +34,18 @@ class TaskKnapsackProblem:
 
 class TaskSA(TaskKnapsackProblem):
     
-    def __init__(self, parsed_data: Dict[str, object]):
+    def __init__(self, context: AlgTesterContext, parsed_data: Dict[str, object]):
         super().__init__(parsed_data)
-        self.init_temp: float = parsed_data.get("init_temperature")
-        self.cooling_coefficient: float = parsed_data.get("cooling")
-        self.min_temp: float = parsed_data.get("min_temperature")
-        self.cycles: int = parsed_data.get("cycles")
+        self.init_temp: float = context.extra_options.get("init_temperature")
+        self.cooling_coefficient: float = context.extra_options.get("cooling")
+        self.min_temp: float = context.extra_options.get("min_temperature")
+        self.cycles: int = context.extra_options.get("cycles")
         self.output_file_name: str = parsed_data.get("output_file_name")
-        self.output_dir: str = parsed_data.get("output_dir")
+        self.output_dir: str = context.output_dir
         
         self.evo_filepath = None
-        if parsed_data.get("create_evo_file") is not None:
-            if parsed_data.get("create_evo_file") == True:
+        if context.extra_options.get("create_evo_file") is not None:
+            if context.extra_options.get("create_evo_file") == True:
                 self.evo_filepath = f'{self.output_dir}/{self.output_file_name.replace(".dat", ".evo")}'
 
 class Solution:

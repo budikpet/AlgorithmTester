@@ -1,8 +1,20 @@
 import click
 import itertools
 from typing import Dict, List, Tuple
-from algorithm_tester.tester_dataclasses import DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import DynamicClickOption
 from algorithm_tester.plugins import plugins
+from algorithm_tester.concurrency_runners import Runners, Runner
+
+def validate_concurrency_runner(self, ctx, value: str) -> str:
+    try:
+        current_runner = [runner for runner in Runners if runner.name.casefold() == value.casefold()]
+
+        if len(current_runner) <= 0:
+            raise click.BadParameter(value)
+
+        return current_runner[0].name
+    except:
+        raise click.BadParameter(value)
 
 def validate_algorithms(self, ctx, value: str) -> List[str]:
     """

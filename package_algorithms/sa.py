@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import numpy as np
 from math import exp
 import csa
-from algorithm_tester.tester_dataclasses import Algorithm, DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
 from package_algorithms.alg_dataclasses import Thing, TaskSA, SolutionSA
 
 class SimulatedAnnealing(Algorithm):
@@ -73,16 +73,22 @@ class SimulatedAnnealing(Algorithm):
 
         return SolutionSA(solution, sum_cost=cost_sum, sum_weight=weight_sum)
 
-    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
-        sol_cntr: int = 0
-
+    def get_numpy_costs_weights(self, task: TaskSA) -> (np.ndarray, np.ndarray):
         # Prepare things in numpy arrays only
         costs: np.ndarray = np.zeros(task.count, dtype=int)
         weights: np.ndarray = np.zeros(task.count, dtype=int)
 
         for (index, thing) in enumerate(task.things):
             costs[index] = thing.cost
-            weights[index] = thing.weight            
+            weights[index] = thing.weight  
+        
+        return costs, weights
+
+    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
+        sol_cntr: int = 0
+
+        # Prepare things in numpy arrays only
+        costs, weights = self.get_numpy_costs_weights(task)      
 
         # Prepare solutions
 
@@ -104,8 +110,8 @@ class SimulatedAnnealing(Algorithm):
 
         return best_sol, sol_cntr
  
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        task: TaskSA = TaskSA(parsed_data=parsed_data)
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        task: TaskSA = TaskSA(context, parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
         
         solution, solution_cntr = self.get_solution(task)

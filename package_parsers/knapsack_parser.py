@@ -1,5 +1,5 @@
-from typing import Dict, List
-from algorithm_tester.tester_dataclasses import Parser
+from typing import Dict, List, IO
+from algorithm_tester_common.tester_dataclasses import Parser, AlgTesterContext
 
 class KnapsackParser(Parser):
     """
@@ -9,13 +9,13 @@ class KnapsackParser(Parser):
     def get_name(self) -> str:
         return "KnapsackParser"
 
-    def get_output_file_name(self, click_args: Dict[str, object]) -> str:
-        input_file_name: str = self.input_file.name.split("/")[-1]
+    def get_output_file_name(self, context: AlgTesterContext, input_file: IO, click_args: Dict[str, object]) -> str:
+        input_file_name: str = input_file.name.split("/")[-1]
 
         return input_file_name.replace(".dat", f'_{click_args["algorithm_name"]}_sol.dat')
 
-    def get_next_instance(self) -> Dict[str, object]:
-        instance: str = self.input_file.readline()
+    def get_next_instance(self, input_file: IO) -> Dict[str, object]:
+        instance: str = input_file.readline()
 
         if instance is None or instance == "":
             return None
@@ -34,7 +34,7 @@ class KnapsackParser(Parser):
 
         return parsed_data
 
-    def write_result_to_file(self, output_file, data: Dict[str, object]):
+    def write_result_to_file(self, output_file: IO, data: Dict[str, object]):
         columns: List[str] = data["algorithm"].get_columns()
 
         # if data["check_time"] == False and "elapsed_time" in columns:

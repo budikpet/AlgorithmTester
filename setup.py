@@ -8,7 +8,7 @@ with open('README.rst') as f:
 
 setup(
     name='algorithm_tester',
-    version='0.4',
+    version='0.5',
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
@@ -34,7 +34,7 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'run_tester = algorithm_tester:run_tester',
+            'run_tester = algorithm_tester:run_tester_cli_interface',
         ],
         'algorithm_tester.plugins': [
             'algorithms = package_algorithms',

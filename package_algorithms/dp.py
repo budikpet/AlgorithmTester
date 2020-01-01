@@ -1,6 +1,6 @@
 from typing import List, Dict
 import numpy as np
-from algorithm_tester.tester_dataclasses import Algorithm, AlgTesterContext
+from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext
 from package_algorithms.alg_dataclasses import ConfigCounter, TaskKnapsackProblem, Thing, RecursiveResult, Solution, base_columns
 
 class DynamicProgramming_Weight(Algorithm):
@@ -62,7 +62,7 @@ class DynamicProgramming_Weight(Algorithm):
     def prepare_table(self, task: TaskKnapsackProblem):
         self.dp_table = np.zeros((task.count + 1, task.capacity + 1), dtype=int)
 
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data)
         self.prepare_table(task)
 
@@ -149,7 +149,7 @@ class DynamicProgramming(Algorithm):
 
         return parsed_data
 
-    def perform_algorithm(self, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         task: TaskKnapsackProblem = TaskKnapsackProblem(parsed_data=parsed_data) 
         self.work_count = task.count
         self.work_things = [Thing(thing.position, thing.weight, thing.cost) for thing in task.things]
