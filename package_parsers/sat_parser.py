@@ -75,5 +75,7 @@ class SATParser(Parser):
         output_data = [data.get(column) for column in columns]
         
         output: str = f'{" ".join(map(str, output_data))}'
+        output = output.replace("[", "").replace("]", "").replace("\n", "")
+        output = re.sub('\s+', ' ', output).strip()
         output_file.write(f'{output}\n')
         output_file.flush()
