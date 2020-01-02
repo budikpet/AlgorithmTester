@@ -4,9 +4,12 @@ import numpy as np
 import random
 from math import exp
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
-from package_algorithms.knapsack.alg_dataclasses import Thing, TaskSA, SolutionSA
+from package_algorithms.sat.alg_dataclasses import TaskSAT
 
-class SimulatedAnnealing_OLD(Algorithm):
+class SolutionSA:
+    print
+
+class SimulatedAnnealing_SAT(Algorithm):
     """ 
     Version of SA algorithm that is not optimized using Cython.
     
@@ -33,74 +36,34 @@ class SimulatedAnnealing_OLD(Algorithm):
         return [init_temp, cooling, min_temp, cycles]
 
     def get_name(self) -> str:
-        return "SA_OLD"
+        return "SA_SAT"
 
     def get_columns(self, show_time: bool = True) -> List[str]:
         columns: List[str] = [
-            "id",
-            "item_count",
-            "algorithm_name",
-            "init_temperature",
-            "cooling",
-            "min_temperature",
-            "cycles",
+            "output_filename",
             "found_value",
+            "vars_output",      # numbers [1..number_of_vars], negative if result is negated
             "elapsed_configs",
-            "elapsed_time",
-            "things"
+            "elapsed_time"
         ]
 
         return columns
 
-    def get_sums(self, task: TaskSA, solution: np.ndarray):
-        cost, weight = 0, 0
-
-        # Get sums of weights and costs
-        for (index, value) in enumerate(solution):
-            if value == 1:
-                curr_thing: Thing = task.things[index]
-                cost += curr_thing.cost
-                weight += curr_thing.weight
-
-        return cost, weight
-
-    def get_fitness(self, task: TaskSA, solution: SolutionSA):
+    def get_fitness(self, task: TaskSAT, solution: SolutionSA):
+        # TODO: If res = 0, then use (solution.sum_value - task.sum_of_all_values)
+        # TODO: If res = 1, then use (solution.sum_value)
         return solution.sum_cost
 
-    def initial_solution(self, task: TaskSA) -> SolutionSA:
+    def initial_solution(self, task: TaskSAT) -> SolutionSA:
         solution: np.ndarray = np.zeros((task.count), dtype=int)
-        remaining_capacity = task.capacity
+        sum_value = 0
 
         # Find solution
-        weight, cost = 0, 0
-        # for index, thing in enumerate(task.things):
-        #     if thing.weight <= remaining_capacity:
-        #         remaining_capacity -= thing.weight
-        #         solution[index] = 1
-        #         weight += thing.weight
-        #         cost += thing.cost
+        # TODO Use random solution
 
-        #     if remaining_capacity <= 0:
-        #         break
+        return SolutionSA(solution, sum_value)
 
-        return SolutionSA(solution, cost, weight)
-
-    def repair_solution(self, task: TaskSA, solution: SolutionSA):
-        if solution.sum_weight <= task.capacity:
-            return
-        
-        for (index, value) in reversed(list(enumerate(solution.solution))):
-            if value == 1:
-                # Remove item with the lowest cost/weight
-                curr_thing: Thing = task.things[index]
-                solution[index] = 0
-                solution.sum_cost -= curr_thing.cost
-                solution.sum_weight -= curr_thing.weight
-
-                if solution.sum_weight <= task.capacity:
-                    break
-
-    def get_new_neighbour(self, task: TaskSA, neighbour: SolutionSA):
+    def get_new_neighbour(self, task: TaskSAT, neighbour: SolutionSA):
         index: int = random.randint(0, task.count-1)
         curr_thing: Thing = task.things[index]
 
@@ -115,7 +78,7 @@ class SimulatedAnnealing_OLD(Algorithm):
             neighbour.sum_cost -= curr_thing.cost
             neighbour.sum_weight -= curr_thing.weight
 
-    def get_solution(self, task: TaskSA) -> (SolutionSA, int):
+    def get_solution(self, task: TaskSAT) -> (SolutionSA, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
@@ -154,7 +117,7 @@ class SimulatedAnnealing_OLD(Algorithm):
         return best_sol, sol_cntr
  
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        task: TaskSA = TaskSA(context, parsed_data=parsed_data)
+        task: TaskSAT = TaskSAT(context, parsed_data=parsed_data)
         task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
         
         solution, solution_cntr = self.get_solution(task)

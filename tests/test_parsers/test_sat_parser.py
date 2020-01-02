@@ -17,7 +17,7 @@ def test_get_next_instance():
     
     max_var: int = 0
     for clause in instance["clauses"]:
-        curr_max_var = max([abs(num) for num in clause])
+        curr_max_var = max(clause.max(), abs(clause.min()))
         if max_var < curr_max_var:
             max_var = curr_max_var
 
