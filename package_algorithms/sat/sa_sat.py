@@ -102,7 +102,11 @@ class SimulatedAnnealing_SAT(Algorithm):
 
         best_sol: SolutionSA = self.initial_solution(task)
         best_fitness: float = self.get_fitness(task, best_sol)
-        neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_value, best_sol.is_valid)
+        
+        curr_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_value, best_sol.is_valid)
+        curr_fitness: float = self.get_fitness(task, curr_sol)
+        
+        neighbour_sol: SolutionSA = SolutionSA(curr_sol.solution.copy(), curr_sol.sum_value, curr_sol.is_valid)
 
         while curr_temp > task.min_temp:
             for _ in range(task.cycles):
@@ -112,23 +116,27 @@ class SimulatedAnnealing_SAT(Algorithm):
                 self.get_new_neighbour(task, neighbour_sol)
                 neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
 
-                if neighbour_fitness > best_fitness:
+                if neighbour_fitness > curr_fitness:
                     # Neighbour solution is better, accept it
-                    best_fitness = neighbour_fitness
-                    best_sol.copy(neighbour_sol)
+                    curr_fitness = neighbour_fitness
+                    curr_sol.copy(neighbour_sol)
 
-                elif exp( abs(neighbour_fitness - best_fitness) / curr_temp) > random.random():
+                    if curr_fitness > best_fitness:
+                        best_fitness = curr_fitness
+                        best_sol.copy(curr_sol)
+
+                elif exp( abs(neighbour_fitness - curr_fitness) / curr_temp) > random.random():
                     # Simulated Annealing condition. 
                     # Enables us to accept worse solution with a certain probability
-                    best_fitness = neighbour_fitness
-                    best_sol.copy(neighbour_sol)
+                    curr_fitness = neighbour_fitness
+                    curr_sol.copy(neighbour_sol)
 
                 else:
                     # Change the solution back
                     neighbour_sol.copy(neighbour_sol)
                 print
 
-            curr_temp *= task.cooling_coefficient
+            curr_temp *= task.cooling
 
         return best_sol, sol_cntr
  
@@ -138,16 +146,17 @@ class SimulatedAnnealing_SAT(Algorithm):
         solution, solution_cntr = self.get_solution(task)
 
         # Pass solution
-        out_things: np.ndarray = np.zeros((task.count), dtype=int)
+        out_vars: np.ndarray = np.zeros(task.num_of_vars + 1, dtype=int)
         for index, value in enumerate(solution.solution):
             if value == 1:
-                thing: Thing = task.things[index]
-                out_things[thing.position] = 1
+                out_vars[index] = index
+            else:
+                out_vars[index] = -index
 
         parsed_data.update({
-            "found_value": solution.sum_cost,
-            "elapsed_configs": solution_cntr,
-            "things": out_things
+            "found_value": solution.sum_value,
+            "vars_output": out_vars,
+            "elapsed_configs": solution_cntr
         })
 
         return parsed_data

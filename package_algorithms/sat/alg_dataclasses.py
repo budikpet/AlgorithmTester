@@ -29,5 +29,5 @@ class SolutionSA():
 
     def copy(self, other):
         np.copyto(self.solution, other.solution)
-        self.sum_cost = other.sum_cost
-        self.sum_weight = other.sum_weight
+        self.sum_value = other.sum_value
+        self.is_valid = other.is_valid

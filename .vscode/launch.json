@@ -25,7 +25,7 @@
                 "--cooling", "0.99",
                 "--min-temperature", "1.0",
                 "--cycles", "50",
-                "--check-time","False",
+                "--check-time","True",
                 // "-n", "1",
                 // "--relative-mistake", "0.5",
                 // "--relative", "0.lll",

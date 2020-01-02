@@ -26,6 +26,9 @@ class SATParser(Parser):
         
         line = input_file.readline()
         while line is not None:
+            if line == '':
+                return None
+            
             line = re.sub('\s+', ' ', line).strip()
             if re.search("^ *c SAT instance", line) is not None:
                 # Output file line
@@ -73,3 +76,4 @@ class SATParser(Parser):
         
         output: str = f'{" ".join(map(str, output_data))}'
         output_file.write(f'{output}\n')
+        output_file.flush()
