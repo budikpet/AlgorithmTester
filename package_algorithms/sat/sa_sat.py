@@ -4,10 +4,7 @@ import numpy as np
 import random
 from math import exp
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
-from package_algorithms.sat.alg_dataclasses import TaskSAT
-
-class SolutionSA:
-    print
+from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
 
 class SimulatedAnnealing_SAT(Algorithm):
     """ 
@@ -50,43 +47,62 @@ class SimulatedAnnealing_SAT(Algorithm):
         return columns
 
     def get_fitness(self, task: TaskSAT, solution: SolutionSA):
-        # TODO: If res = 0, then use (solution.sum_value - task.sum_of_all_values)
-        # TODO: If res = 1, then use (solution.sum_value)
-        return solution.sum_cost
+        if solution.is_valid:
+            return solution.sum_value
+        else:
+            return solution.sum_value - task.all_weights_sum
+
+    def is_solution_valid(self, task: TaskSAT, solution: np.ndarray) -> bool:
+        for clause in task.clauses:
+            res: bool = False
+
+            for value in clause:
+                if value != 0:
+                    sol_value: int = solution[abs(value) - 1]
+                    if (sol_value == 0 and value < 0) or (sol_value == 1 and value > 0):
+                        # This clause == 1, continue to other clauses
+                        res = True
+                        continue
+
+            if res == False:
+                # One clause is False, then result is false
+                return False
+        return True
 
     def initial_solution(self, task: TaskSAT) -> SolutionSA:
-        solution: np.ndarray = np.zeros((task.count), dtype=int)
+        solution: np.ndarray = np.random.random_integers(0, 1, size=task.num_of_vars)
         sum_value = 0
 
-        # Find solution
-        # TODO Use random solution
+        for index, value in enumerate(solution):
+            if value == 1:
+                sum_value += task.weights[index]
 
-        return SolutionSA(solution, sum_value)
+        return SolutionSA(solution, sum_value, self.is_solution_valid(task, solution))
 
     def get_new_neighbour(self, task: TaskSAT, neighbour: SolutionSA):
-        index: int = random.randint(0, task.count-1)
-        curr_thing: Thing = task.things[index]
+        index: int = random.randint(0, task.num_of_vars-1)
+        curr_value: int = task.weights[index]
 
-        new_value: int = (neighbour[index] + 1) % 2
-        neighbour[index] = new_value
+        new_value: int = (neighbour.solution[index] + 1) % 2
+        neighbour.solution[index] = new_value
 
         if new_value == 1:
-            neighbour.sum_cost += curr_thing.cost
-            neighbour.sum_weight += curr_thing.weight
-            self.repair_solution(task, neighbour)
+            neighbour.sum_value += curr_value
         else:
-            neighbour.sum_cost -= curr_thing.cost
-            neighbour.sum_weight -= curr_thing.weight
+            neighbour.sum_value -= curr_value
+
+        neighbour.is_valid = self.is_solution_valid(task, neighbour.solution)
 
     def get_solution(self, task: TaskSAT) -> (SolutionSA, int):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
+        np.random.seed(20191219)
+        random.seed(20191219)
+
         best_sol: SolutionSA = self.initial_solution(task)
         best_fitness: float = self.get_fitness(task, best_sol)
-        neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_cost, best_sol.sum_weight)
-
-        random.seed(20191219)
+        neighbour_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_value, best_sol.is_valid)
 
         while curr_temp > task.min_temp:
             for _ in range(task.cycles):
@@ -101,7 +117,7 @@ class SimulatedAnnealing_SAT(Algorithm):
                     best_fitness = neighbour_fitness
                     best_sol.copy(neighbour_sol)
 
-                elif exp( (neighbour_fitness - best_fitness) / curr_temp) >= random.random():
+                elif exp( abs(neighbour_fitness - best_fitness) / curr_temp) > random.random():
                     # Simulated Annealing condition. 
                     # Enables us to accept worse solution with a certain probability
                     best_fitness = neighbour_fitness
@@ -117,8 +133,7 @@ class SimulatedAnnealing_SAT(Algorithm):
         return best_sol, sol_cntr
  
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        task: TaskSAT = TaskSAT(context, parsed_data=parsed_data)
-        task.things = sorted(task.things, key=lambda thing: thing.cost/(thing.weight + 1), reverse=True)
+        task: TaskSAT = TaskSAT(context=context, parsed_data=parsed_data)
         
         solution, solution_cntr = self.get_solution(task)
 

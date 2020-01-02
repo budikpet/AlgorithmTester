@@ -19,7 +19,7 @@
                 // "-s", "Greedy", // "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "-s", "SA",
+                "-s", "SA_SAT",
                 "-r", "base",
                 "--init-temperature", "2500.0",
                 "--cooling", "0.99",
@@ -29,7 +29,7 @@
                 // "-n", "1",
                 // "--relative-mistake", "0.5",
                 // "--relative", "0.lll",
-                "-p", "KnapsackParser",
+                "-p", "SATParser",
                 // "--create-evo-file", "True",
                 "--input-dir", "${workspaceFolder}/data/wuf-A/wuf20-88-A",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
