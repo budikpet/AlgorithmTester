@@ -31,7 +31,7 @@
                 // "--relative", "0.lll",
                 "-p", "SATParser",
                 // "--create-evo-file", "True",
-                "--input-dir", "${workspaceFolder}/data/wuf-A/wuf20-88-A",
+                "--input-dir", "${workspaceFolder}/data/wuf-M/wuf20-78-M",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
