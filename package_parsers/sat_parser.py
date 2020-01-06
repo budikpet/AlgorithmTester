@@ -17,12 +17,11 @@ class SATParser(Parser):
         return input_file_name.replace(".mwcnf", f'_{click_args["algorithm_name"]}_sol.mwcnf')
 
     def get_next_instance(self, input_file: IO) -> Dict[str, object]:
+        tmp_clauses: List[List[int]] = list()
         clauses: np.ndarray
         weights: np.ndarray
         num_of_vars, num_of_clauses = 0, 0
         output_filename: str
-
-        last_clause: int = 0
         
         line = input_file.readline()
         while line is not None:
@@ -39,7 +38,6 @@ class SATParser(Parser):
                 # Information line
                 split = line.split(" ")
                 num_of_vars, num_of_clauses = int(split[2]), int(split[3])
-                clauses = np.zeros(shape=(num_of_clauses, num_of_vars), dtype=int)
                 weights = np.zeros(shape=num_of_vars, dtype=int)
             elif re.search("^ *w", line) is not None:
                 # Weights line
@@ -52,12 +50,19 @@ class SATParser(Parser):
             elif re.search("^ *-*[0-9]+", line) is not None:
                 # Clause line
                 split = line.split(" ")[:-1]
+                clause: List[int] = list()
                 for value in split:
                     value = int(value)
-                    clauses[last_clause][abs(value) - 1] = value
-                last_clause += 1
+                    clause.append(value)
+                tmp_clauses.append(clause)
 
-            line = input_file.readline()        
+            line = input_file.readline()    
+
+        # move tmp_clauses data into clauses numpy array
+        max_clause_length = max([len(clause) for clause in tmp_clauses])
+        clauses = np.zeros(shape=(num_of_clauses, max_clause_length), dtype=int)
+        for i,clause in enumerate(tmp_clauses):
+            clauses[i][0:len(clause)] = clause
 
         parsed_data = {
             "num_of_vars": num_of_vars,
