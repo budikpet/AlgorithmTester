@@ -70,6 +70,11 @@ class SimulatedAnnealing_SAT(Algorithm):
         return True
 
     def initial_solution(self, task: TaskSAT) -> SolutionSA:
+        # TODO: Možná vytvořit tak, aby byl validní - 
+        # - seřadit si klauzule od té s nejvíce nulami (má nejméně zadaný proměnných)
+        # - do pole výsledků si vkládat 1 a 0 podle toho, co daná klauzule vyžaduje
+        # - bude potřeba si pamatovat, že např. proměnná 1 byla předtím v klauzuli s proměnnou 2, 3... při ukládání do výsledků
+        # - na konci budou projité všechny klauzule
         solution: np.ndarray = np.random.random_integers(0, 1, size=task.num_of_vars)
         sum_value = 0
 
