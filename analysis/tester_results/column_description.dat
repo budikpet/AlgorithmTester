@@ -1,1 +1,1 @@
-output_filename found_value vars_output elapsed_configs elapsed_time
+output_filename found_value vars_output num_of_vars num_of_clauses algorithm_name init_temperature min_temperature cooling cycles elapsed_configs elapsed_time

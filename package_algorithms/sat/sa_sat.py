@@ -4,7 +4,7 @@ import numpy as np
 import random
 from math import exp
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
-from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
+from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA, base_columns
 import csa_sat
 
 class SimulatedAnnealing_SAT(Algorithm):
@@ -34,18 +34,10 @@ class SimulatedAnnealing_SAT(Algorithm):
         return [init_temp, cooling, min_temp, cycles]
 
     def get_name(self) -> str:
-        return "SA_SAT"
+        return "SA_SAT_V1"
 
     def get_columns(self, show_time: bool = True) -> List[str]:
-        columns: List[str] = [
-            "output_filename",
-            "found_value",
-            "vars_output",      # numbers [1..number_of_vars], negative if result is negated
-            "elapsed_configs",
-            "elapsed_time"
-        ]
-
-        return columns
+        return base_columns
 
     def duplicate_solution(self, sol: SolutionSA):
         duplicate: SolutionSA = SolutionSA(sol.solution.copy(), sol.sum_weight)

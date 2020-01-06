@@ -5,6 +5,21 @@ import re
 import numpy as np
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext
 
+base_columns: List[str] = [
+    "output_filename",
+    "found_value",
+    "vars_output",      # numbers [1..number_of_vars], negative if result is negated
+    "num_of_vars",
+    "num_of_clauses",
+    "algorithm_name",
+    "init_temperature",
+    "min_temperature",
+    "cooling",
+    "cycles",
+    "elapsed_configs",
+    "elapsed_time"
+]
+
 class TaskSAT:
     
     def __init__(self, context: AlgTesterContext, parsed_data: Dict[str, object]):
