@@ -9,15 +9,21 @@ cpdef (int, bint) check_validity(long[:] invalid_literals_per_var, long[:, :] cl
     cdef int num_of_satisfied_clauses = 0
     cdef bint is_satisfied = False
     cdef bint is_valid = False
-    cdef long[:] clause
-    cdef int value, index
+    cdef int value, index, sol_value
+
+    # Go through the clauses memoryview using indexes
+    cdef size_t i, j, I, J
+    I = clauses.shape[0]
+    J = clauses.shape[1]
 
     invalid_literals_per_var[:] = 0
 
-    for clause in clauses:
+    # Check all variables of all clauses
+    for i in range(I):
         is_satisfied = False
 
-        for value in clause:
+        for j in range(J):
+            value = clauses[i, j]
             if value != 0:
                 index = abs(value) - 1
                 sol_value: int = solution[index]
@@ -25,6 +31,7 @@ cpdef (int, bint) check_validity(long[:] invalid_literals_per_var, long[:, :] cl
                     # Clause satisfied
                     is_satisfied = True
                 else: 
+                    # Clause not satisfied
                     invalid_literals_per_var[index] += 1
         
         if is_satisfied:
