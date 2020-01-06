@@ -4,6 +4,7 @@ import flexmock
 from package_algorithms.sat.sa_sat import SimulatedAnnealing_SAT
 from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
 from tests.test_algorithms.fixtures import base_context
+import csa_sat
 
 @pytest.fixture
 def base_task():
@@ -23,6 +24,10 @@ def base_task():
 
     return base_task
 
+def check_validity(task, sol: SolutionSA):
+    sol.num_of_satisfied_clauses, sol.is_valid = csa_sat.check_validity(sol.invalid_literals_per_var, 
+        task.clauses, sol.solution, task.num_of_clauses)
+
 def test_is_solution_valid(base_context, base_task):
     alg = SimulatedAnnealing_SAT()
     zero_array = np.zeros(4, dtype=int)
@@ -32,10 +37,10 @@ def test_is_solution_valid(base_context, base_task):
     sol3 = SolutionSA(np.array([1, 1, 1, 0], dtype=int), 0)
     sol4 = SolutionSA(np.array([0, 0, 1, 1], dtype=int), 0)
 
-    alg.check_validity(base_task, sol1)
-    alg.check_validity(base_task, sol2)
-    alg.check_validity(base_task, sol3)
-    alg.check_validity(base_task, sol4)
+    check_validity(base_task, sol1)
+    check_validity(base_task, sol2)
+    check_validity(base_task, sol3)
+    check_validity(base_task, sol4)
 
     assert sol1.is_valid
     assert sol1.num_of_satisfied_clauses == base_task.num_of_clauses
@@ -64,7 +69,8 @@ def test_duplicate_solution(base_task):
     alg = SimulatedAnnealing_SAT()
     
     sol = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
-    alg.check_validity(base_task, sol)
+    sol.num_of_satisfied_clauses, sol.is_valid = csa_sat.check_validity(sol.invalid_literals_per_var, 
+        base_task.clauses, sol.solution, base_task.num_of_clauses)
 
     duplicate = alg.duplicate_solution(sol)
 
