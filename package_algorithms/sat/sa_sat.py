@@ -46,43 +46,44 @@ class SimulatedAnnealing_SAT(Algorithm):
 
         return columns
 
-    def get_fitness(self, task: TaskSAT, solution: SolutionSA):
-        if solution.is_valid:
-            return solution.sum_value
-        else:
-            return solution.sum_value - task.all_weights_sum
+    def duplicate_solution(self, sol: SolutionSA):
+        duplicate: SolutionSA = SolutionSA(sol.solution.copy(), sol.sum_weight)
+        np.copyto(duplicate.invalid_literals_per_var, sol.invalid_literals_per_var)
+        duplicate.is_valid = sol.is_valid
+        duplicate.num_of_satisfied_clauses = sol.num_of_satisfied_clauses
 
-    def is_solution_valid(self, task: TaskSAT, solution: np.ndarray) -> bool:
+        return sol
+
+    def check_validity(self, task: TaskSAT, sol: SolutionSA):
+        sol.invalid_literals_per_var[:] = 0
+        sol.num_of_satisfied_clauses = 0
+        sol.is_valid = False
+
         for clause in task.clauses:
-            res: bool = False
+            is_satisfied: bool = False
 
             for value in clause:
                 if value != 0:
-                    sol_value: int = solution[abs(value) - 1]
+                    index = abs(value) - 1
+                    sol_value: int = sol.solution[index]
                     if (sol_value == 0 and value < 0) or (sol_value == 1 and value > 0):
-                        # This clause == 1, continue to other clauses
-                        res = True
-                        continue
-
-            if res == False:
-                # One clause is False, then result is false
-                return False
-        return True
+                        # Clause satisfied
+                        is_satisfied = True
+                    else: 
+                        sol.invalid_literals_per_var[index] += 1
+            
+            if is_satisfied:
+                # Last clause was satisfied
+                sol.num_of_satisfied_clauses += 1
+        
+        sol.is_valid = task.num_of_clauses == sol.num_of_satisfied_clauses
 
     def initial_solution(self, task: TaskSAT) -> SolutionSA:
-        # TODO: Možná vytvořit tak, aby byl validní - 
-        # - seřadit si klauzule od té s nejvíce nulami (má nejméně zadaný proměnných)
-        # - do pole výsledků si vkládat 1 a 0 podle toho, co daná klauzule vyžaduje
-        # - bude potřeba si pamatovat, že např. proměnná 1 byla předtím v klauzuli s proměnnou 2, 3... při ukládání do výsledků
-        # - na konci budou projité všechny klauzule
-        solution: np.ndarray = np.random.random_integers(0, 1, size=task.num_of_vars)
-        sum_value = 0
+        solution: SolutionSA = SolutionSA(np.zeros(task.num_of_vars, dtype=int), 0)
 
-        for index, value in enumerate(solution):
-            if value == 1:
-                sum_value += task.weights[index]
+        self.check_validity(task, solution)
 
-        return SolutionSA(solution, sum_value, self.is_solution_valid(task, solution))
+        return solution
 
     def get_new_neighbour(self, task: TaskSAT, neighbour: SolutionSA):
         index: int = random.randint(0, task.num_of_vars-1)
@@ -92,11 +93,38 @@ class SimulatedAnnealing_SAT(Algorithm):
         neighbour.solution[index] = new_value
 
         if new_value == 1:
-            neighbour.sum_value += curr_value
+            neighbour.sum_weight += curr_value
         else:
-            neighbour.sum_value -= curr_value
+            neighbour.sum_weight -= curr_value
 
-        neighbour.is_valid = self.is_solution_valid(task, neighbour.solution)
+        self.check_validity(task, neighbour)
+
+    def is_new_sol_better(self, new_sol: SolutionSA, curr_sol: SolutionSA) -> bool:
+        """
+        Compare new and current solution.
+        
+        Arguments:
+            new_sol {SolutionSA} -- New neighbour solution.
+            curr_sol {SolutionSA} -- Currently used solution.
+        
+        Returns:
+            bool -- True if neighbour solution is better.
+        """
+
+        if new_sol.is_valid and curr_sol.is_valid:
+            # Both valid, compare weights
+            return new_sol.sum_weight > curr_sol.sum_weight
+
+        if not new_sol.is_valid and curr_sol.is_valid:
+            # Both invalid, compare number of satisfied clauses
+            return new_sol.num_of_satisfied_clauses > curr_sol.num_of_satisfied_clauses
+
+        if new_sol.is_valid and not curr_sol.is_valid:
+            # Only neighbour is valid -> it is better
+            return True
+
+        # Only current solution is valid -> it is better
+        return False
 
     def get_solution(self, task: TaskSAT) -> (SolutionSA, int):
         curr_temp: float = task.init_temp
@@ -106,12 +134,8 @@ class SimulatedAnnealing_SAT(Algorithm):
         random.seed(20191219)
 
         best_sol: SolutionSA = self.initial_solution(task)
-        best_fitness: float = self.get_fitness(task, best_sol)
-        
-        curr_sol: SolutionSA = SolutionSA(best_sol.solution.copy(), best_sol.sum_value, best_sol.is_valid)
-        curr_fitness: float = self.get_fitness(task, curr_sol)
-        
-        neighbour_sol: SolutionSA = SolutionSA(curr_sol.solution.copy(), curr_sol.sum_value, curr_sol.is_valid)
+        curr_sol: SolutionSA = self.duplicate_solution(best_sol)
+        neighbour_sol: SolutionSA = self.duplicate_solution(best_sol)
 
         while curr_temp > task.min_temp:
             for _ in range(task.cycles):
@@ -119,21 +143,18 @@ class SimulatedAnnealing_SAT(Algorithm):
 
                 # Try neighbour solution
                 self.get_new_neighbour(task, neighbour_sol)
-                neighbour_fitness: float = self.get_fitness(task, neighbour_sol)
 
-                if neighbour_fitness > curr_fitness:
+                if self.is_new_sol_better(neighbour_sol, curr_sol):
                     # Neighbour solution is better, accept it
-                    curr_fitness = neighbour_fitness
                     curr_sol.copy(neighbour_sol)
 
-                    if curr_fitness > best_fitness:
-                        best_fitness = curr_fitness
+                    if self.is_new_sol_better(curr_sol, best_sol):
                         best_sol.copy(curr_sol)
 
-                elif exp( abs(neighbour_fitness - curr_fitness) / curr_temp) > random.random():
+                elif exp( (neighbour_sol.num_of_satisfied_clauses - curr_sol.num_of_satisfied_clauses) / curr_temp) > random.random():
                     # Simulated Annealing condition. 
                     # Enables us to accept worse solution with a certain probability
-                    curr_fitness = neighbour_fitness
+                    # Never takes the new solution if new solution is invalid and old one is valid 
                     curr_sol.copy(neighbour_sol)
 
                 else:
@@ -159,7 +180,7 @@ class SimulatedAnnealing_SAT(Algorithm):
                 out_vars[index] = -index
 
         parsed_data.update({
-            "found_value": solution.sum_value,
+            "found_value": solution.sum_weight,
             "vars_output": out_vars,
             "elapsed_configs": solution_cntr
         })

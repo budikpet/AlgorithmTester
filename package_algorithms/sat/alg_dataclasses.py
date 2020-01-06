@@ -21,13 +21,25 @@ class TaskSAT:
         self.min_temp: float = context.extra_options["min_temperature"]
 
 class SolutionSA():
+    """
+    Arguments:
+        solution (np.ndarray): 0,1 array length of number of variables. Settings of all variables.
+        invalid_literals_per_var (np.ndarray): Int array length of number of variables. i'th position has a number which means in how many clauses is the i'th variable false with current settings.
+        sum_weight (int): Sum of weights of all variables that are set to 1.
+        num_of_satisfied_clauses (int): How many whole clauses are true with current settings.
+        is_valid (bool): True if all clauses are satisfied.
+    """
 
-    def __init__(self, solution: np.ndarray, sum_value: int, is_valid: bool):
+    def __init__(self, solution: np.ndarray, sum_weight: int):
         self.solution: np.ndarray = solution    # 01 array, length of number of variables
-        self.sum_value: int = sum_value
-        self.is_valid: bool = is_valid
+        self.invalid_literals_per_var: np.ndarray = np.zeros(self.solution.shape, dtype=int)
+        self.sum_weight: int = sum_weight
+        self.num_of_satisfied_clauses = 0
+        self.is_valid: bool = False
 
     def copy(self, other):
         np.copyto(self.solution, other.solution)
-        self.sum_value = other.sum_value
+        np.copyto(self.invalid_literals_per_var, other.invalid_literals_per_var)
+        self.sum_weight = other.sum_weight
+        self.num_of_satisfied_clauses = other.num_of_satisfied_clauses
         self.is_valid = other.is_valid

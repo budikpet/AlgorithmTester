@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import flexmock
 from package_algorithms.sat.sa_sat import SimulatedAnnealing_SAT
-from package_algorithms.sat.alg_dataclasses import TaskSAT
+from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
 from tests.test_algorithms.fixtures import base_context
 
 @pytest.fixture
@@ -11,7 +11,7 @@ def base_task():
         num_of_vars = 4,
         num_of_clauses = 6,
         algorithm = "SA_SAT",
-        clauses = np.array([[1, 0, -3, 4], [-1, 2, -3, 0], [0, 0, 3, 4], [1, 2, -3, -4], [0, 0, -2, 3], [0, 0, -3, -4]], dtype=int),
+        clauses = np.array([[1, 0, -3, 4], [-1, 2, -3, 0], [0, 0, 3, 4], [1, 2, -3, -4], [0, -2, 3, 0], [0, 0, -3, -4]], dtype=int),
         weights = np.array([2, 4, 1, 6], dtype=int),
         all_weights_sum = 13,
 
@@ -25,15 +25,50 @@ def base_task():
 
 def test_is_solution_valid(base_context, base_task):
     alg = SimulatedAnnealing_SAT()
+    zero_array = np.zeros(4, dtype=int)
     
-    sol1 = np.array([0, 0, 0, 1], dtype=int)
-    sol2 = np.array([1, 0, 0, 1], dtype=int)
-    sol3 = np.array([1, 1, 1, 0], dtype=int)
-    sol4 = np.array([0, 0, 1, 1], dtype=int)
+    sol1 = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
+    sol2 = SolutionSA(np.array([1, 0, 0, 1], dtype=int), 0)
+    sol3 = SolutionSA(np.array([1, 1, 1, 0], dtype=int), 0)
+    sol4 = SolutionSA(np.array([0, 0, 1, 1], dtype=int), 0)
 
-    assert alg.is_solution_valid(base_task, sol1) == True
-    assert alg.is_solution_valid(base_task, sol2) == True
-    assert alg.is_solution_valid(base_task, sol3) == True
-    assert alg.is_solution_valid(base_task, sol4) == False
+    alg.check_validity(base_task, sol1)
+    alg.check_validity(base_task, sol2)
+    alg.check_validity(base_task, sol3)
+    alg.check_validity(base_task, sol4)
+
+    assert sol1.is_valid
+    assert sol1.num_of_satisfied_clauses == base_task.num_of_clauses
+    assert (sol1.solution == np.array([0, 0, 0, 1], dtype=int)).all()
+    assert (sol1.invalid_literals_per_var == np.array([2, 2, 2, 2], dtype=int)).all()
+
+    assert sol2.is_valid
+    assert sol2.num_of_satisfied_clauses == base_task.num_of_clauses
+    assert (sol2.solution == np.array([1, 0, 0, 1], dtype=int)).all()
+    assert (sol2.invalid_literals_per_var == np.array([1, 2, 2, 2], dtype=int)).all()
+
+
+    assert sol3.is_valid
+    assert sol3.num_of_satisfied_clauses == base_task.num_of_clauses
+    assert (sol3.solution == np.array([1, 1, 1, 0], dtype=int)).all()
+    assert (sol3.invalid_literals_per_var == np.array([1, 1, 4, 2], dtype=int)).all()
+
+    assert not sol4.is_valid
+    assert sol4.num_of_satisfied_clauses < base_task.num_of_clauses
+    assert (sol4.solution == np.array([0, 0, 1, 1], dtype=int)).all()
+    assert (sol4.invalid_literals_per_var == np.array([2, 2, 4, 2], dtype=int)).all()
 
     print
+
+def test_duplicate_solution(base_task):
+    alg = SimulatedAnnealing_SAT()
+    
+    sol = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
+    alg.check_validity(base_task, sol)
+
+    duplicate = alg.duplicate_solution(sol)
+
+    assert (sol.invalid_literals_per_var == duplicate.invalid_literals_per_var).all()
+    assert sol.is_valid == duplicate.is_valid
+    assert sol.num_of_satisfied_clauses == duplicate.num_of_satisfied_clauses
+    assert sol.sum_weight == duplicate.sum_weight
