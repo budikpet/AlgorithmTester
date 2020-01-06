@@ -5,6 +5,7 @@ import random
 from math import exp
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
 from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
+import csa_sat
 
 class SimulatedAnnealing_SAT(Algorithm):
     """ 
@@ -54,34 +55,11 @@ class SimulatedAnnealing_SAT(Algorithm):
 
         return sol
 
-    def check_validity(self, task: TaskSAT, sol: SolutionSA):
-        sol.invalid_literals_per_var[:] = 0
-        sol.num_of_satisfied_clauses = 0
-        sol.is_valid = False
-
-        for clause in task.clauses:
-            is_satisfied: bool = False
-
-            for value in clause:
-                if value != 0:
-                    index = abs(value) - 1
-                    sol_value: int = sol.solution[index]
-                    if (sol_value == 0 and value < 0) or (sol_value == 1 and value > 0):
-                        # Clause satisfied
-                        is_satisfied = True
-                    else: 
-                        sol.invalid_literals_per_var[index] += 1
-            
-            if is_satisfied:
-                # Last clause was satisfied
-                sol.num_of_satisfied_clauses += 1
-        
-        sol.is_valid = task.num_of_clauses == sol.num_of_satisfied_clauses
-
     def initial_solution(self, task: TaskSAT) -> SolutionSA:
         solution: SolutionSA = SolutionSA(np.zeros(task.num_of_vars, dtype=int), 0)
 
-        self.check_validity(task, solution)
+        solution.num_of_satisfied_clauses, solution.is_valid = csa_sat.check_validity(solution.invalid_literals_per_var, 
+            task.clauses, solution.solution, task.num_of_clauses)
 
         return solution
 
@@ -97,7 +75,9 @@ class SimulatedAnnealing_SAT(Algorithm):
         else:
             neighbour.sum_weight -= curr_value
 
-        self.check_validity(task, neighbour)
+        neighbour.num_of_satisfied_clauses, neighbour.is_valid = csa_sat.check_validity(neighbour.invalid_literals_per_var, 
+            task.clauses, neighbour.solution, task.num_of_clauses)
+
 
     def is_new_sol_better(self, new_sol: SolutionSA, curr_sol: SolutionSA) -> bool:
         """
