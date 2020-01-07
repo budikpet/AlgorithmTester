@@ -102,8 +102,8 @@ class SimulatedAnnealing_SAT(Algorithm):
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 
-        np.random.seed(20191219)
-        random.seed(20191219)
+        # np.random.seed(20191219)
+        # random.seed(20191219)
 
         best_sol: SolutionSA = self.initial_solution(task)
         curr_sol: SolutionSA = self.duplicate_solution(best_sol)

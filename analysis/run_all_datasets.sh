@@ -3,8 +3,8 @@ CONC="FILES"
 
 init_temp=1000
 min_temp=0.5
-cycles=50
-cooling=0.995
+cycles=55
+cooling=0.9995
 
 # wufA
 
