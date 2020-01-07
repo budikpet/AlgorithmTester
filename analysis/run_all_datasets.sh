@@ -1,8 +1,8 @@
-ALG="SA_SAT"
+ALG="SA_SAT_V1"
 CONC="FILES"
 
-init_temp=2500
-min_temp=1
+init_temp=1000
+min_temp=0.5
 cycles=50
 cooling=0.995
 
