@@ -34,6 +34,7 @@ class TaskSAT:
         self.cycles: float = context.extra_options["cycles"]
         self.init_temp: float = context.extra_options["init_temperature"]
         self.min_temp: float = context.extra_options["min_temperature"]
+        self.max_retry_attempts: int = context.extra_options["max_retry_attempts"]
 
 class SolutionSA():
     """
