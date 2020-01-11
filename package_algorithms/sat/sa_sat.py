@@ -7,17 +7,11 @@ from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterConte
 from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA, base_columns
 import csa_sat
 
-class SimulatedAnnealing_SAT(Algorithm):
+class SimulatedAnnealing_SAT_V1(Algorithm):
     """ 
-    Version of SA algorithm that is not optimized using Cython.
+    Base version of SA algorithm for SAT problem.
     
-    Uses Simulated annealing algorithm. 
-    It's a hill climbing algorithm which can accept a worse solution with a certain probability.
-    It always accepts better solution if available.
-    This probability depends on the size of difference between solutions and current temperature.
-    The higher the temperature the more likely the algorithm is to accept a worse solution.
-    Dealing with impossible solutions:
-        This version uses a repair function to fix solutions whose weight is heigher than capacity.
+    Base working algorithm. Does not use any improving features.
     
     """
 
@@ -39,7 +33,16 @@ class SimulatedAnnealing_SAT(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def duplicate_solution(self, sol: SolutionSA):
+    def duplicate_solution(self, sol: SolutionSA) -> SolutionSA:
+        """
+        Create a deep copy of a solution.
+        
+        Arguments:
+            sol {SolutionSA} -- Solution to copy.
+        
+        Returns:
+            SolutionSA -- Deep copy.
+        """
         duplicate: SolutionSA = SolutionSA(sol.solution.copy(), sol.sum_weight)
         np.copyto(duplicate.invalid_literals_per_var, sol.invalid_literals_per_var)
         duplicate.is_valid = sol.is_valid
@@ -48,6 +51,15 @@ class SimulatedAnnealing_SAT(Algorithm):
         return sol
 
     def initial_solution(self, task: TaskSAT) -> SolutionSA:
+        """
+        Creates initial, all zeroes solution.
+        
+        Arguments:
+            task {TaskSAT} -- [description]
+        
+        Returns:
+            SolutionSA -- Initial solution.
+        """
         solution: SolutionSA = SolutionSA(np.zeros(task.num_of_vars, dtype=int), 0)
 
         solution.num_of_satisfied_clauses, solution.is_valid = csa_sat.check_validity(solution.invalid_literals_per_var, 
@@ -56,6 +68,13 @@ class SimulatedAnnealing_SAT(Algorithm):
         return solution
 
     def get_new_neighbour(self, task: TaskSAT, neighbour: SolutionSA):
+        """
+        Gets a new neighbour by flipping 1 random bit.
+        
+        Arguments:
+            task {TaskSAT} -- [description]
+            neighbour {SolutionSA} -- Currently used solution.
+        """
         index: int = random.randint(0, task.num_of_vars-1)
         curr_value: int = task.weights[index]
 
@@ -99,6 +118,12 @@ class SimulatedAnnealing_SAT(Algorithm):
         return False
 
     def get_solution(self, task: TaskSAT) -> (SolutionSA, int):
+        """
+        Compute solution.
+        
+        Returns:
+            SolutionSA -- Found solution.
+        """
         curr_temp: float = task.init_temp
         sol_cntr: int = 0
 

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import flexmock
-from package_algorithms.sat.sa_sat import SimulatedAnnealing_SAT
+from package_algorithms.sat.sa_sat import SimulatedAnnealing_SAT_V1
 from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
 from tests.test_algorithms.fixtures import base_context
 import csa_sat
@@ -29,7 +29,7 @@ def check_validity(task, sol: SolutionSA):
         task.clauses, sol.solution, task.num_of_clauses)
 
 def test_is_solution_valid(base_context, base_task):
-    alg = SimulatedAnnealing_SAT()
+    alg = SimulatedAnnealing_SAT_V1()
     zero_array = np.zeros(4, dtype=int)
     
     sol1 = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
@@ -66,7 +66,7 @@ def test_is_solution_valid(base_context, base_task):
     print
 
 def test_duplicate_solution(base_task):
-    alg = SimulatedAnnealing_SAT()
+    alg = SimulatedAnnealing_SAT_V1()
     
     sol = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
     sol.num_of_satisfied_clauses, sol.is_valid = csa_sat.check_validity(sol.invalid_literals_per_var, 
