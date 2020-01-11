@@ -66,7 +66,7 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         solution: SolutionSA = SolutionSA(np.zeros(task.num_of_vars, dtype=int), 0)
 
         solution.num_of_satisfied_clauses, solution.is_valid = csa_sat.check_validity(solution.invalid_literals_per_var, 
-            task.clauses, solution.solution, task.num_of_clauses)
+            solution.invalid_literals_per_var_helper, task.clauses, solution.solution, task.num_of_clauses)
 
         return solution
 
@@ -90,7 +90,7 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
             neighbour.sum_weight -= curr_value
 
         neighbour.num_of_satisfied_clauses, neighbour.is_valid = csa_sat.check_validity(neighbour.invalid_literals_per_var, 
-            task.clauses, neighbour.solution, task.num_of_clauses)
+            neighbour.invalid_literals_per_var_helper, task.clauses, neighbour.solution, task.num_of_clauses)
 
 
     def is_new_sol_better(self, new_sol: SolutionSA, curr_sol: SolutionSA) -> bool:

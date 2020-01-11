@@ -52,6 +52,7 @@ class SolutionSA():
     def __init__(self, solution: np.ndarray, sum_weight: int):
         self.solution: np.ndarray = solution    # 01 array, length of number of variables
         self.invalid_literals_per_var: np.ndarray = np.zeros(self.solution.shape, dtype=int)
+        self.invalid_literals_per_var_helper: np.ndarray = np.zeros(self.solution.shape, dtype=int)
         self.sum_weight: int = sum_weight
         self.num_of_satisfied_clauses = 0
         self.is_valid: bool = False

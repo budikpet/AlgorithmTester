@@ -70,5 +70,6 @@ class SimulatedAnnealing_SAT_V3(SimulatedAnnealing_SAT_V2):
             neighbour.sum_weight -= curr_value
 
         neighbour.num_of_satisfied_clauses, neighbour.is_valid = csa_sat.check_validity(neighbour.invalid_literals_per_var, 
-            task.clauses, neighbour.solution, task.num_of_clauses)
+            neighbour.invalid_literals_per_var_helper, task.clauses, neighbour.solution, task.num_of_clauses)
 
+        print
