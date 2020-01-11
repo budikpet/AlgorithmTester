@@ -85,8 +85,6 @@ class BaseRunner(Runner):
         Yields:
             Dict[str, object] -- One parsed instance from the input file.
         """
-        input_file.seek(0)
-        
         output = list()
         parsed_instance_data = parser.get_next_instance(input_file)
         
@@ -119,6 +117,7 @@ class BaseRunner(Runner):
         print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(input_file_path, "r") as input_file:
             for algorithm_name in context.algorithm_names:
+                input_file.seek(0)
                 algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
                 
                 click_options = get_click_options(context, algorithm)

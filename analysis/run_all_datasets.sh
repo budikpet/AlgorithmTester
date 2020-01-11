@@ -1,5 +1,5 @@
 ALG="SA_SAT_V1,SA_SAT_V2,SA_SAT_V3"
-CONC="BASE"
+CONC="Files"
 
 init_temp=1000
 min_temp=0.5
