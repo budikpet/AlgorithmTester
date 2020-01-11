@@ -33,7 +33,7 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def duplicate_solution(self, sol: SolutionSA) -> SolutionSA:
+    def duplicate_solution(self, sol: SolutionSA):
         """
         Create a deep copy of a solution.
         

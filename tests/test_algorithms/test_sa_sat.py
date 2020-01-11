@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 import flexmock
-from package_algorithms.sat.sa_sat import SimulatedAnnealing_SAT_V1
+from package_algorithms.sat.sa_sat_v1 import SimulatedAnnealing_SAT_V1
 from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA
 from tests.test_algorithms.fixtures import base_context
 import csa_sat
