@@ -102,6 +102,8 @@ class SimulatedAnnealing_SAT_V2(SimulatedAnnealing_SAT_V1):
         parsed_data.update({
             "found_value": solution.sum_weight,
             "vars_output": out_vars,
+            "is_valid": solution.is_valid,
+            "num_of_satisfied_clauses": solution.num_of_satisfied_clauses,
             "retry_count": retry_cnt,
             "elapsed_configs": solution_cntr
         })

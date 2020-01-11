@@ -19,7 +19,7 @@
                 // "-s", "Greedy", // "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "-s", "SA_SAT_V2",
+                "-s", "SA_SAT_V3",
                 "-r", "base",
                 "--init-temperature", "1000.0",
                 "--cooling", "0.995",
