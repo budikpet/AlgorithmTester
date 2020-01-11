@@ -24,8 +24,11 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
             required=True, doc_help="A float number from interval (0; +inf). Represents the minimum temperature of SA. The algorithm ends when this or lower temperature is achieved.")
         cycles = DynamicClickOption(name="cycles", data_type=int, short_opt="", long_opt="--cycles", 
             required=True, doc_help="An int number from interval (0; +inf). Represents the number of internal cycles of SA that are done before cooling occurs.")
-        
-        return [init_temp, cooling, min_temp, cycles]
+        max_retry_attempts = DynamicClickOption(name="max_retry_attempts", data_type=int, short_opt="", 
+            long_opt="--max-retry-attempts", required=True, 
+            doc_help="An integer from interval (0; +inf). Represents the maximum number of temperature resets.")
+
+        return [init_temp, cooling, min_temp, cycles, max_retry_attempts]
 
     def get_name(self) -> str:
         return "SA_SAT_V1"
@@ -179,6 +182,7 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         parsed_data.update({
             "found_value": solution.sum_weight,
             "vars_output": out_vars,
+            "retry_count": 1,
             "elapsed_configs": solution_cntr
         })
 

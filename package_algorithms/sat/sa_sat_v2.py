@@ -16,22 +16,8 @@ class SimulatedAnnealing_SAT_V2(SimulatedAnnealing_SAT_V1):
     
     """
 
-    def required_click_params(self) -> List[DynamicClickOption]:
-        params = super().required_click_params()
-        max_retry_attempts = DynamicClickOption(name="max_retry_attempts", data_type=int, short_opt="", 
-            long_opt="--max-retry-attempts", required=True, 
-            doc_help="An integer from interval (0; +inf). Represents the maximum number of temperature resets.")
-        
-        params.append(max_retry_attempts)
-        return params
-
     def get_name(self) -> str:
         return "SA_SAT_V2"
-
-    def get_columns(self, show_time: bool = True) -> List[str]:
-        columns: List[str] = base_columns.copy()
-        columns.insert(-2, "retry_count")
-        return columns
 
     def try_new_solution(self, task: TaskSAT, best_sol: SolutionSA, curr_sol: SolutionSA, neighbour_sol: SolutionSA, curr_temp: float):
         """
