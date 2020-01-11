@@ -16,6 +16,8 @@ base_columns: List[str] = [
     "min_temperature",
     "cooling",
     "cycles",
+    "is_valid",
+    "num_of_satisfied_clauses",
     "retry_count",
     "elapsed_configs",
     "elapsed_time"

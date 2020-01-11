@@ -19,7 +19,7 @@
                 // "-s", "Greedy", // "Brute,Greedy,BB",
                 // "--time-retries", "1000",
                 // "-e", "10",
-                "-s", "SA_SAT_V1",
+                "-s", "SA_SAT_V2",
                 "-r", "base",
                 "--init-temperature", "1000.0",
                 "--cooling", "0.995",
@@ -32,7 +32,7 @@
                 // "--relative", "0.lll",
                 "-p", "SATParser",
                 // "--create-evo-file", "True",
-                "--input-dir", "${workspaceFolder}/data/wuf-A/wuf20-88-A",
+                "--input-dir", "${workspaceFolder}/data/wuf-M/wuf20-78-M",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
