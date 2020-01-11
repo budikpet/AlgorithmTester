@@ -85,6 +85,9 @@ class BaseRunner(Runner):
         Yields:
             Dict[str, object] -- One parsed instance from the input file.
         """
+        input_file.seek(0)
+        
+        output = list()
         parsed_instance_data = parser.get_next_instance(input_file)
         
         click_options: Dict[str, object] = get_click_options(context, algorithm)
@@ -97,9 +100,11 @@ class BaseRunner(Runner):
             parsed_instance_data["algorithm"] = algorithm
             parsed_instance_data.update(context.extra_options)
 
-            yield parsed_instance_data
+            output.append(parsed_instance_data)
 
             parsed_instance_data = parser.get_next_instance(input_file)
+
+        return output
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str):
         """
