@@ -29,7 +29,7 @@ class SimulatedAnnealing_SAT_V2(SimulatedAnnealing_SAT_V1):
         return "SA_SAT_V2"
 
     def get_columns(self, show_time: bool = True) -> List[str]:
-        columns: List[str] = base_columns
+        columns: List[str] = base_columns.copy()
         columns.insert(-2, "retry_count")
         return columns
 
