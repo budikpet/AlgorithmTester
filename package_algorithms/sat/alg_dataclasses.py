@@ -39,6 +39,13 @@ class TaskSAT:
         self.min_temp: float = context.extra_options["min_temperature"]
         self.max_retry_attempts: int = context.extra_options["max_retry_attempts"]
 
+        self.evo_filepath = None
+        self.output_file_name: str = parsed_data.get("output_file_name")
+        self.sol_file_name: str = parsed_data.get("output_filename").replace(".cnf", "")
+        if context.extra_options.get("create_evo_file") is not None:
+            if context.extra_options.get("create_evo_file") == True:
+                self.evo_filepath = f'{context.output_dir}/{self.output_file_name.replace(".mwcnf", ".evo")}'
+
 class SolutionSA():
     """
     Arguments:

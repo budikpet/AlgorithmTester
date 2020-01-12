@@ -31,7 +31,7 @@
                 // "--relative-mistake", "0.5",
                 // "--relative", "0.lll",
                 "-p", "SATParser",
-                // "--create-evo-file", "True",
+                "--create-evo-file", "True",
                 "--input-dir", "${workspaceFolder}/data/wuf-M/wuf20-78-M",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],

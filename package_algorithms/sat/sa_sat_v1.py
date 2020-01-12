@@ -32,8 +32,10 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         max_retry_attempts = DynamicClickOption(name="max_retry_attempts", data_type=int, short_opt="", 
             long_opt="--max-retry-attempts", required=True, 
             doc_help="An integer from interval (0; +inf). Represents the maximum number of temperature resets.")
+        evo_file = DynamicClickOption(name="create_evo_file", data_type=bool, short_opt="", long_opt="--create-evo-file", 
+            required=False, doc_help="If true, creates a file which contains evolution of results. Stored in output dir.")
 
-        return [init_temp, cooling, min_temp, cycles, max_retry_attempts]
+        return [init_temp, cooling, min_temp, cycles, max_retry_attempts, evo_file]
 
     def get_name(self) -> str:
         return "SA_SAT_V1"
@@ -158,6 +160,39 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
             neighbour_sol.copy(neighbour_sol)
         print
 
+    def compute_solution_with_evo(self, task: TaskSAT, best_sol: SolutionSA, curr_sol: SolutionSA, neighbour_sol: SolutionSA):
+        curr_temp: float = task.init_temp
+        sol_cntr: int = 0
+
+        with open(task.evo_filepath, "w") as evo_file:
+            while curr_temp > task.min_temp:
+                for _ in range(task.cycles):
+                    sol_cntr += 1
+
+                    self.try_new_solution(task, best_sol, curr_sol, neighbour_sol, curr_temp)
+                    evo_file.write(f'{task.sol_file_name} {curr_sol.num_of_satisfied_clauses} {curr_sol.sum_weight}\n')
+
+
+                curr_temp *= task.cooling
+
+        return best_sol, sol_cntr
+
+    def compute_solution(self, task: TaskSAT, best_sol: SolutionSA, curr_sol: SolutionSA, neighbour_sol: SolutionSA):
+        curr_temp: float = task.init_temp
+        sol_cntr: int = 0
+
+        while curr_temp > task.min_temp:
+            for _ in range(task.cycles):
+                sol_cntr += 1
+
+                self.try_new_solution(task, best_sol, curr_sol, neighbour_sol, curr_temp)
+
+
+            curr_temp *= task.cooling
+
+        return best_sol, sol_cntr
+
+
     def get_solution(self, task: TaskSAT) -> (SolutionSA, int):
         """
         Compute solution.
@@ -165,8 +200,6 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         Returns:
             SolutionSA -- Found solution.
         """
-        curr_temp: float = task.init_temp
-        sol_cntr: int = 0
 
         # np.random.seed(20191219)
         # random.seed(20191219)
@@ -175,15 +208,10 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         curr_sol: SolutionSA = self.duplicate_solution(best_sol)
         neighbour_sol: SolutionSA = self.duplicate_solution(best_sol)
 
-        while curr_temp > task.min_temp:
-            for _ in range(task.cycles):
-                sol_cntr += 1
-
-                self.try_new_solution(task, best_sol, curr_sol, neighbour_sol, curr_temp)
-
-            curr_temp *= task.cooling
-
-        return best_sol, sol_cntr
+        if task.evo_filepath is not None:
+            return self.compute_solution_with_evo(task, best_sol, curr_sol, neighbour_sol)
+        else:
+            return self.compute_solution(task, best_sol, curr_sol, neighbour_sol)
  
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         task: TaskSAT = TaskSAT(context=context, parsed_data=parsed_data)
