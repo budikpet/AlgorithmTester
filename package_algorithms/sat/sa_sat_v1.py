@@ -41,23 +41,6 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
     def get_columns(self, show_time: bool = True) -> List[str]:
         return base_columns
 
-    def duplicate_solution(self, sol: SolutionSA):
-        """
-        Create a deep copy of a solution.
-        
-        Arguments:
-            sol {SolutionSA} -- Solution to copy.
-        
-        Returns:
-            SolutionSA -- Deep copy.
-        """
-        duplicate: SolutionSA = SolutionSA(sol.solution.copy(), sol.sum_weight)
-        np.copyto(duplicate.invalid_literals_per_var, sol.invalid_literals_per_var)
-        duplicate.is_valid = sol.is_valid
-        duplicate.num_of_satisfied_clauses = sol.num_of_satisfied_clauses
-
-        return sol
-
     def initial_solution(self, task: TaskSAT) -> SolutionSA:
         """
         Creates initial, all zeroes solution.
@@ -96,6 +79,8 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
 
         neighbour.num_of_satisfied_clauses, neighbour.is_valid = csa_sat.check_validity(neighbour.invalid_literals_per_var, 
             neighbour.invalid_literals_per_var_helper, task.clauses, neighbour.solution, task.num_of_clauses)
+        
+        print
 
 
     def is_new_sol_better(self, new_sol: SolutionSA, curr_sol: SolutionSA) -> bool:
@@ -112,11 +97,11 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
 
         if new_sol.is_valid and curr_sol.is_valid:
             # Both valid, compare weights
-            return new_sol.sum_weight > curr_sol.sum_weight
+            return new_sol.sum_weight >= curr_sol.sum_weight
 
-        if not new_sol.is_valid and curr_sol.is_valid:
+        if not new_sol.is_valid and not curr_sol.is_valid:
             # Both invalid, compare number of satisfied clauses
-            return new_sol.num_of_satisfied_clauses > curr_sol.num_of_satisfied_clauses
+            return new_sol.num_of_satisfied_clauses >= curr_sol.num_of_satisfied_clauses
 
         if new_sol.is_valid and not curr_sol.is_valid:
             # Only neighbour is valid -> it is better
@@ -203,8 +188,8 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         # random.seed(20191219)
 
         best_sol: SolutionSA = self.initial_solution(task)
-        curr_sol: SolutionSA = self.duplicate_solution(best_sol)
-        neighbour_sol: SolutionSA = self.duplicate_solution(best_sol)
+        curr_sol: SolutionSA = self.initial_solution(task)
+        neighbour_sol: SolutionSA = self.initial_solution(task)
 
         if task.evo_filepath is not None:
             return self.compute_solution_with_evo(task, best_sol, curr_sol, neighbour_sol)

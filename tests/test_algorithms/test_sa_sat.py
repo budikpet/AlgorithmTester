@@ -68,20 +68,6 @@ def test_is_solution_valid(base_context, base_task):
 
     print
 
-def test_duplicate_solution(base_task):
-    alg = SimulatedAnnealing_SAT_V1()
-    
-    sol = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
-    sol.num_of_satisfied_clauses, sol.is_valid = csa_sat.check_validity(sol.invalid_literals_per_var, 
-        sol.invalid_literals_per_var_helper, base_task.clauses, sol.solution, base_task.num_of_clauses)
-
-    duplicate = alg.duplicate_solution(sol)
-
-    assert (sol.invalid_literals_per_var == duplicate.invalid_literals_per_var).all()
-    assert sol.is_valid == duplicate.is_valid
-    assert sol.num_of_satisfied_clauses == duplicate.num_of_satisfied_clauses
-    assert sol.sum_weight == duplicate.sum_weight
-
 def test_is_new_sol_better(base_context, base_task):
     alg = SimulatedAnnealing_SAT_V1()
     zero_array = np.zeros(4, dtype=int)
