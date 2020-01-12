@@ -6,6 +6,11 @@ from math import exp
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, DynamicClickOption
 from package_algorithms.sat.alg_dataclasses import TaskSAT, SolutionSA, base_columns
 import csa_sat
+# TODO: Evo file
+# TODO: Otestování dat, které mám
+# TODO: Znovuvygenerování V1_Simple dat
+# TODO: Algoritmus V4 se zvyšováním počtu kroků?
+# TODO: Vypočítat i data, pro která nemám řešení? Použít odchylku vypočteného počtu splněných klauzulí od počtu všech klauzulí.
 
 class SimulatedAnnealing_SAT_V1(Algorithm):
     """ 
@@ -120,6 +125,39 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
         # Only current solution is valid -> it is better
         return False
 
+    def try_new_solution(self, task: TaskSAT, best_sol: SolutionSA, curr_sol: SolutionSA, neighbour_sol: SolutionSA, curr_temp: float):
+        """
+        Generates neighbour solution. 
+        
+        Arguments:
+            task {TaskSAT} -- [description]
+            best_sol {SolutionSA} -- Best solution ever found.
+            curr_sol {SolutionSA} -- Currently used solution.
+            neighbour_sol {SolutionSA} -- Solution used to contain newly generated neighbour solution.
+            curr_temp {float} -- Current temperature.
+        """
+        
+        # Try neighbour solution
+        self.get_new_neighbour(task, neighbour_sol)
+
+        if self.is_new_sol_better(neighbour_sol, curr_sol):
+            # Neighbour solution is better, accept it
+            curr_sol.copy(neighbour_sol)
+
+            if self.is_new_sol_better(curr_sol, best_sol):
+                best_sol.copy(curr_sol)
+
+        elif exp( (neighbour_sol.num_of_satisfied_clauses - curr_sol.num_of_satisfied_clauses) / curr_temp) > random.random():
+            # Simulated Annealing condition. 
+            # Enables us to accept worse solution with a certain probability
+            # Never takes the new solution if new solution is invalid and old one is valid 
+            curr_sol.copy(neighbour_sol)
+
+        else:
+            # Change the solution back
+            neighbour_sol.copy(neighbour_sol)
+        print
+
     def get_solution(self, task: TaskSAT) -> (SolutionSA, int):
         """
         Compute solution.
@@ -141,26 +179,7 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
             for _ in range(task.cycles):
                 sol_cntr += 1
 
-                # Try neighbour solution
-                self.get_new_neighbour(task, neighbour_sol)
-
-                if self.is_new_sol_better(neighbour_sol, curr_sol):
-                    # Neighbour solution is better, accept it
-                    curr_sol.copy(neighbour_sol)
-
-                    if self.is_new_sol_better(curr_sol, best_sol):
-                        best_sol.copy(curr_sol)
-
-                elif exp( (neighbour_sol.num_of_satisfied_clauses - curr_sol.num_of_satisfied_clauses) / curr_temp) > random.random():
-                    # Simulated Annealing condition. 
-                    # Enables us to accept worse solution with a certain probability
-                    # Never takes the new solution if new solution is invalid and old one is valid 
-                    curr_sol.copy(neighbour_sol)
-
-                else:
-                    # Change the solution back
-                    neighbour_sol.copy(neighbour_sol)
-                print
+                self.try_new_solution(task, best_sol, curr_sol, neighbour_sol, curr_temp)
 
             curr_temp *= task.cooling
 
