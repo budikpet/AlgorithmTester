@@ -132,15 +132,21 @@ class SimulatedAnnealing_SAT_V1(Algorithm):
             if self.is_new_sol_better(curr_sol, best_sol):
                 best_sol.copy(curr_sol)
 
-        elif exp( (neighbour_sol.num_of_satisfied_clauses - curr_sol.num_of_satisfied_clauses) / curr_temp) > random.random():
-            # Simulated Annealing condition. 
-            # Enables us to accept worse solution with a certain probability
-            # Never takes the new solution if new solution is invalid and old one is valid 
-            curr_sol.copy(neighbour_sol)
-
         else:
-            # Change the solution back
-            neighbour_sol.copy(neighbour_sol)
+            if neighbour_sol.is_valid and curr_sol.is_valid:
+                # Both solutions valid
+                if exp( (neighbour_sol.sum_weight - curr_sol.sum_weight) / curr_temp) > random.random():
+                    # Accept worse solution - solution with less sum_weight, because both solutions are valid
+                    curr_sol.copy(neighbour_sol)
+                else:
+                    # Change the solution back
+                    neighbour_sol.copy(curr_sol)
+            elif (not curr_sol.is_valid) and exp( (neighbour_sol.num_of_satisfied_clauses - curr_sol.num_of_satisfied_clauses) / curr_temp) > random.random():
+                # Accept worse solution - solution with less clauses, because neither solution is valid
+                curr_sol.copy(neighbour_sol)
+            else:
+                # Change the solution back
+                neighbour_sol.copy(curr_sol)
         print
 
     def compute_solution_with_evo(self, task: TaskSAT, best_sol: SolutionSA, curr_sol: SolutionSA, neighbour_sol: SolutionSA):
