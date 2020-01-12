@@ -24,9 +24,13 @@ def base_task():
 
     return base_task
 
-def check_validity(task, sol: SolutionSA):
+def set_solution_data(task, sol: SolutionSA):
     sol.num_of_satisfied_clauses, sol.is_valid = csa_sat.check_validity(sol.invalid_literals_per_var, 
         sol.invalid_literals_per_var_helper, task.clauses, sol.solution, task.num_of_clauses)
+
+    for (index, value) in enumerate(sol.solution):
+        if value == 1:
+            sol.sum_weight += task.weights[index]
 
 def test_is_solution_valid(base_context, base_task):
     alg = SimulatedAnnealing_SAT_V1()
@@ -37,10 +41,10 @@ def test_is_solution_valid(base_context, base_task):
     sol3 = SolutionSA(np.array([1, 1, 1, 0], dtype=int), 0)
     sol4 = SolutionSA(np.array([0, 0, 1, 1], dtype=int), 0)
 
-    check_validity(base_task, sol1)
-    check_validity(base_task, sol2)
-    check_validity(base_task, sol3)
-    check_validity(base_task, sol4)
+    set_solution_data(base_task, sol1)
+    set_solution_data(base_task, sol2)
+    set_solution_data(base_task, sol3)
+    set_solution_data(base_task, sol4)
 
     assert sol1.is_valid
     assert sol1.num_of_satisfied_clauses == base_task.num_of_clauses
@@ -77,3 +81,25 @@ def test_duplicate_solution(base_task):
     assert sol.is_valid == duplicate.is_valid
     assert sol.num_of_satisfied_clauses == duplicate.num_of_satisfied_clauses
     assert sol.sum_weight == duplicate.sum_weight
+
+def test_is_new_sol_better(base_context, base_task):
+    alg = SimulatedAnnealing_SAT_V1()
+    zero_array = np.zeros(4, dtype=int)
+
+    sol1 = SolutionSA(np.array([0, 0, 0, 1], dtype=int), 0)
+    sol2 = SolutionSA(np.array([1, 0, 0, 1], dtype=int), 0)
+    sol3 = SolutionSA(np.array([1, 1, 1, 0], dtype=int), 0)
+    sol4 = SolutionSA(np.array([0, 0, 1, 1], dtype=int), 0)
+
+    set_solution_data(base_task, sol1)
+    set_solution_data(base_task, sol2)
+    set_solution_data(base_task, sol3)
+    set_solution_data(base_task, sol4)
+
+    assert alg.is_new_sol_better(sol2, sol1)
+    assert alg.is_new_sol_better(sol2, sol3)
+    assert alg.is_new_sol_better(sol2, sol4)
+
+    assert not alg.is_new_sol_better(sol4, sol1)
+    assert not alg.is_new_sol_better(sol4, sol2)
+    assert not alg.is_new_sol_better(sol4, sol3)
