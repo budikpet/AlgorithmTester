@@ -32,7 +32,7 @@
                 // "--relative", "0.lll",
                 "-p", "SATParser",
                 // "--create-evo-file", "True",
-                "--input-dir", "${workspaceFolder}/data/wuf-M/wuf20-78-M",
+                "--input-dir", "${workspaceFolder}/data/wuf-M/wuf75-310-M",
                 "--output-dir", "${workspaceFolder}/analysis/tester_results/TEST"
             ],
             "module": "algorithm_tester",
