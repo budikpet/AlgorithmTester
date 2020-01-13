@@ -53,7 +53,7 @@ def create_columns_description_file(context: AlgTesterContext, algorithm: Algori
 
 class Runner(object):
 
-    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         pass
 
 class BaseRunner(Runner):
@@ -85,6 +85,7 @@ class BaseRunner(Runner):
         Yields:
             Dict[str, object] -- One parsed instance from the input file.
         """
+        output = list()
         parsed_instance_data = parser.get_next_instance(input_file)
         
         click_options: Dict[str, object] = get_click_options(context, algorithm)
@@ -97,9 +98,11 @@ class BaseRunner(Runner):
             parsed_instance_data["algorithm"] = algorithm
             parsed_instance_data.update(context.extra_options)
 
-            yield parsed_instance_data
+            output.append(parsed_instance_data)
 
             parsed_instance_data = parser.get_next_instance(input_file)
+
+        return output
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str):
         """
@@ -114,6 +117,7 @@ class BaseRunner(Runner):
         print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(input_file_path, "r") as input_file:
             for algorithm_name in context.algorithm_names:
+                input_file.seek(0)
                 algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
                 
                 click_options = get_click_options(context, algorithm)
@@ -127,7 +131,7 @@ class BaseRunner(Runner):
 
                         parser.write_result_to_file(output_file, solution)
 
-    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -136,11 +140,11 @@ class BaseRunner(Runner):
             files_dict {Dict[str, str]} -- All files with instances that are to be computed. 
             Keys were created to make it possible to process files in a sorted order.
         """
-        for index, n_key in enumerate(sorted(files_dict)):
+        for index, filename in enumerate(sorted(input_files)):
             if context.max_num is not None and index >= context.max_num:
                 break
 
-            input_file_path: str = files_dict.get(n_key)
+            input_file_path: str = f'{context.input_dir}/{filename}'
             self.run_tester_for_file(context, input_file_path)
 
 class ConcurrentFilesRunner(Runner):
@@ -150,7 +154,7 @@ class ConcurrentFilesRunner(Runner):
     """
     _base_runner: BaseRunner = BaseRunner()
 
-    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -160,11 +164,11 @@ class ConcurrentFilesRunner(Runner):
             Keys were created to make it possible to process files in a sorted order.
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            for index, n_key in enumerate(sorted(files_dict)):
+            for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
                     break
 
-                input_file_path: str = files_dict.get(n_key)
+                input_file_path: str = f'{context.input_dir}/{filename}'
                 executor.submit(self._base_runner.run_tester_for_file, context, input_file_path)
 
 class ConcurrentInstancesRunner(Runner):
@@ -198,7 +202,7 @@ class ConcurrentInstancesRunner(Runner):
                 
                 self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, executor)
 
-    def compute_results(self, context: AlgTesterContext, files_dict: Dict[str, str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -209,11 +213,11 @@ class ConcurrentInstancesRunner(Runner):
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
 
-            for index, n_key in enumerate(sorted(files_dict)):
+            for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
                     break
 
-                input_file_path: str = files_dict.get(n_key)
+                input_file_path: str = f'{context.input_dir}/{filename}'
                 self.run_tester_for_file(context, input_file_path, executor)
 
 class Runners(Enum):

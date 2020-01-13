@@ -1,25 +1,9 @@
 import pytest
 from flexmock import flexmock
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext
-from package_algorithms.sa import SimulatedAnnealing, TaskSA, SolutionSA
+from package_algorithms.knapsack.sa import SimulatedAnnealing, TaskSA, SolutionSA
 from package_parsers.knapsack_parser import KnapsackParser
-
-@pytest.fixture
-def base_context() -> flexmock:
-    dummy_context = flexmock(
-        algorithm_names = [],
-        parser_name = "DummyParser",
-        communicator_names = "DummyCommunicator",
-        concurrency_runner_name = "BASE",
-        check_time = False,
-        time_retries = 1,
-        extra_options = {},
-        input_dir = "",
-        output_dir = "",
-        batch_size = 10,
-    )
-
-    return dummy_context
+from tests.test_algorithms.fixtures import base_context
 
 def test_initial_solution(base_context):
     parser: KnapsackParser = KnapsackParser()

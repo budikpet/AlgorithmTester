@@ -30,15 +30,11 @@ def get_files_dict(path: str):
                 data[key] = [value]
     return data
 
-def get_files(path: str):
-    data = get_files_dict(path)
-    
-    result = list()
-    for (key, pair) in data.items():
-        value = FilePair(pair[0], pair[1])
-        result.append((key, value))
+def get_input_files(path: str):
+    output = list()
 
-    # result.sort() # FIXME: Breaks sort
-    result = [pair for (_, pair) in result]
+    for root, _, files in os.walk(path):
+        for file in files:
+            output.append(file)
 
-    return result
+    return output

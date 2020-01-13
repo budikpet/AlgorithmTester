@@ -1,0 +1,1 @@
+output_filename found_value vars_output num_of_vars num_of_clauses algorithm_name init_temperature min_temperature cooling cycles is_valid num_of_satisfied_clauses retry_count elapsed_configs elapsed_time
