@@ -29,7 +29,10 @@ def get_subclasses(package, parent_class: type) -> List[type]:
     return [plugin() for plugin in package.__plugins__ if predicate(plugin)]
 
 def get_plugins(key: str, parent_class: type) -> List[type]:
-    package_algorithms = __discovered_plugins[key]
+    package_algorithms = __discovered_plugins.get(key)
+
+    if package_algorithms is None:
+        return list()
 
     subclasses = get_subclasses(package_algorithms, parent_class)
     return subclasses
