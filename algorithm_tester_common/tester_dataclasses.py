@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from typing import List, Tuple, Dict, IO
 from enum import Enum
 import re
-import numpy as np
 
 class AlgTesterContext():
     """
