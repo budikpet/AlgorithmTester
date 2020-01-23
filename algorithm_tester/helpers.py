@@ -1,36 +1,26 @@
 import os
+from typing import List
 
-class FilePair:
-    def __init__(self, file1, file2):
-        if "_sol" in file1:
-            self.solutionFile, self.dataFile = file1, file2
-        else:
-            self.solutionFile, self.dataFile = file2, file1
-
-def create_path(path):
+def create_path(path: str):
+    """
+    Creates a required directory path if it does not exist.
+    
+    Arguments:
+        path {str} -- Directory path.
+    """
     if not os.path.isdir(path):
         os.makedirs(path)
 
-def get_files_dict(path: str):
-    data = dict()
+def get_input_files(path: str) -> List[str]:
+    """
+    Gets all files from the path.
     
-    # r=root, d=directories, f = files
-    for root, _, files in os.walk(path):
-        for file in files:
-            parts = file.split("_")
-            value = f'{root}/{file}'
-            key: str = parts[1]
-
-            if key.isnumeric():
-                key = int(key)
-
-            if key in data.keys():
-                data[key].append(value)
-            else:
-                data[key] = [value]
-    return data
-
-def get_input_files(path: str):
+    Arguments:
+        path {str} -- Directory to get files from.
+    
+    Returns:
+        List[str] -- List of filenames.
+    """
     output = list()
 
     for root, _, files in os.walk(path):

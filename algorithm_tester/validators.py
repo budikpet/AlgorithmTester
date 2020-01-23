@@ -5,7 +5,30 @@ from algorithm_tester_common.tester_dataclasses import DynamicClickOption
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runners, Runner
 
+"""
+Click CLI validators.
+
+Raises:
+    click.BadParameter: This error can be raised by any validator if it says the input is invalid.
+
+Returns:
+    [type] -- Validated result.
+"""
+
 def validate_concurrency_runner(self, ctx, value: str) -> str:
+    """
+    Validate concurrency runner name.
+    
+    Args:
+        ctx: Click context
+        value (str): Name of a concurrency runner.
+    
+    Raises:
+        click.BadParameter: Provided name is not a concurrency runner name.
+    
+    Returns:
+        str: Concurrency runner name.
+    """
     try:
         current_runner = [runner for runner in Runners if runner.name.casefold() == value.casefold()]
 

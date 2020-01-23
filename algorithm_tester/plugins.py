@@ -29,6 +29,15 @@ def get_subclasses(package, parent_class: type) -> List[type]:
     return [plugin() for plugin in package.__plugins__ if predicate(plugin)]
 
 def get_plugins(key: str, parent_class: type) -> List[type]:
+    """[summary]
+    
+    Arguments:
+        key {str} -- Type of plugin the plugin.
+        parent_class {type} -- Class the plugin must be subclass of.
+    
+    Returns:
+        List[type] -- List of plugin classes of the required parent class that were provided using entrypoints.
+    """
     package_algorithms = __discovered_plugins.get(key)
 
     if package_algorithms is None:

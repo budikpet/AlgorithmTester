@@ -7,6 +7,10 @@ from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorit
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runner, Runners
 
+"""
+Contains main logic of the application.
+"""
+
 def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
     """
     Get all data provided by click CLI interface. Run the whole programme.

@@ -1,5 +1,6 @@
 # other
 .DS_Store
+.tmp.sh
 #analysis/tester_results
 analysis/excel
 *.c

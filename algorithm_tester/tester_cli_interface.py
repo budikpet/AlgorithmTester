@@ -7,6 +7,10 @@ from algorithm_tester.decorators import docstring_parameters, use_dynamic_option
 from algorithm_tester.validators import validate_algorithms, validate_parser, validate_extra_options, validate_concurrency_runner
 from algorithm_tester.concurrency_runners import Runners, Runner
 
+"""
+Click CLI interface for the application.
+"""
+
 
 @click.command(name='my-cmd', context_settings=dict(
     ignore_unknown_options=True,
