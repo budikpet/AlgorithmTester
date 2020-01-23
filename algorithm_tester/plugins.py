@@ -1,7 +1,7 @@
 import pkg_resources
 import sys, inspect
 from typing import Dict, List, Set
-from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, Communicator, DynamicClickOption
 
 """
 This module should be used to automatically retrieve plugins (Algorithm, Parser and Communicators classes) from setup.py entrypoints.
@@ -54,6 +54,17 @@ class Plugins():
     def __init__(self):
         self.__algorithms: List[Algorithm] = get_plugins("algorithms", parent_class=Algorithm)
         self.__parsers: List[Parser] = get_plugins("parsers", parent_class=Parser)
+        self.__communicators: List[Communicator] = get_plugins("communicators", parent_class=Communicator)
+
+        # Internal communicators
+        self.__communicators.extend(get_plugins("communicators_internal", parent_class=Communicator))
+        
+        self.__check_internal_communicators_preconditions()
+
+    def __check_internal_communicators_preconditions(self):
+        # Check preconditions for internal communicators such as necessery config files.
+        configs = __discovered_plugins.get("configs")
+        print
 
     #################################################################################################
     #  ALGORITHMS                                                                                   #
@@ -133,5 +144,46 @@ class Plugins():
             List[str]: Get names of all available parsers.
         """
         return [parser.get_name() for parser in self.__parsers]
+
+    #################################################################################################
+    #  COMMUNICATORS                                                                                #
+    #################################################################################################
+
+    def get_communicators(self, with_names: List[str] = None) -> List[Communicator]:
+        """
+        Get instances of multiple communicators.
+        
+        Args:
+            with_names (List[str], optional): Names of required communicators. Defaults to None.
+        
+        Returns:
+            List[Communicator]: Instances of required communicators.
+        """
+        if with_names is None:
+            return self.__communicators
+        
+        # Filter communicators that match the given names
+
+        return [comm for comm in self.__communicators if comm.get_name() in with_names]
+
+    def get_communicator(self, name: str) -> Communicator:
+        """
+        Get an instance of an communicator by name.
+        
+        Args:
+            name (str): Name of the required communicator.
+        
+        Returns:
+            Communicator: Instance of the required communicator.
+        """
+        return [comm for comm in self.__communicators if comm.get_name() == name][0]
+    
+    def get_communicator_names(self) -> List[str]:
+        """
+        
+        Returns:
+            List[str]: Names of all available communicators.
+        """
+        return [comm.get_name() for comm in self.__communicators]
 
 plugins: Plugins = Plugins()

@@ -5,12 +5,12 @@ with open('README.rst') as f:
 
 setup(
     name='algorithm_tester',
-    version='0.6.2',
+    version='0.6.3.2',
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
     setup_requires=['pytest-runner'],
-    install_requires=['Click'],
+    install_requires=['Click', 'slackclient'],
     tests_require=['pytest==5.0.1', 'flexmock'],
     
     # All these 'dev' packages can then be installed by 'pip install .[dev]'
@@ -28,6 +28,9 @@ setup(
     entry_points={
         'console_scripts': [
             'run_tester = algorithm_tester:run_tester_cli_interface',
+        ],
+        'algorithm_tester.plugins': [
+            'communicators_internal = communicators_slack'
         ]
     },
     classifiers=[

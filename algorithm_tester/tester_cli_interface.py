@@ -21,7 +21,7 @@ Click CLI interface for the application.
 @click.option("--check-time", type=bool, default=False, help="Should the result also check elapsed time.")
 @click.option("--time-retries", type=int, default=1, help="How many times should we retry if elapsed time is checked.")
 @click.option("-p", "--parser", type=str, callback=validate_parser, required=True, help="Name of the parser that is used to parse input files.")
-@click.option("-c", "--communicators", type=str, required=False, help="CSV string of names of available communication interfaces.")
+@click.option("-c", "--communicators", type=str, required=False, default=",".join(plugins.get_communicator_names()), show_default=True, help="CSV string of names of available communication interfaces.")
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")
 @click.option("--input-dir", type=str, required=True, help="Path to directory with input files.")
 @click.option("--output-dir", type=str, required=True, help="Path to directory where output files are to be stored.")

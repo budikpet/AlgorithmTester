@@ -156,3 +156,13 @@ class Parser(object):
             data (Dict[str, object]): Result data from an algorithm and options that were given to the script.
         """
         pass
+
+class Communicator:
+
+    def get_name(self) -> str:
+        """
+        
+        Returns:
+            str: Name of this communicator that is used to identify it.
+        """
+        pass
