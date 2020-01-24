@@ -5,8 +5,9 @@ import multiprocessing
 import concurrent.futures
 from enum import Enum
 from typing import IO, Dict, List
-from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, Communicator
 from algorithm_tester.plugins import plugins
+from algorithm_tester.helpers import curr_time_millis
 
 """
 Contains logic of all concurrency runners. These provide logic of the application with different types of concurrency.
@@ -40,6 +41,47 @@ def get_click_options(context: AlgTesterContext, algorithm: Algorithm) -> Dict[s
     click_options["algorithm"] = algorithm
 
     return click_options
+
+def get_communicators(context: AlgTesterContext):
+    """
+    Prepares and returns a list of Communicator instances.
+    
+    Arguments:
+        context {AlgTesterContext} -- [description]
+    
+    Returns:
+        List[Communicator] -- List of Communicator instances.
+    """
+    communicators: List[Communicator] = list()
+    for communicator_name in context.communicator_names:
+        communicator: Communicator = plugins.get_communicator(communicator_name)
+        communicators.append(communicator)
+
+    return communicators
+
+def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], output_file_name: str) -> bool:
+    """
+    Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
+    
+    Arguments:
+        context {AlgTesterContext} -- Used context.
+        communicators {List[Communicator]} -- All available communicators.
+        output_file_name {str} -- Name of the output file that was created.
+
+    Returns:
+        Bool -- True if communicators were notified, False if not
+    """
+    curr_time: int = curr_time_millis()
+
+    if (curr_time - context.last_communication_time) >= context.min_time_between_communications:
+        # Notify communicators
+        context.last_communication_time = curr_time
+        for communicator in communicators:
+            communicator.notify_instance_computed(context, output_file_name)
+
+        return True
+
+    return False
 
 def create_columns_description_file(context: AlgTesterContext, algorithm: Algorithm):
     """
@@ -128,6 +170,7 @@ class BaseRunner(Runner):
             input_file_path {str} -- Path to the input file to compute results for.
         """
         parser: Parser = plugins.get_parser(context.parser_name)
+        communicators: List[Communicator] = get_communicators(context)
         
         print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(input_file_path, "r") as input_file:
@@ -145,6 +188,8 @@ class BaseRunner(Runner):
                         solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
 
                         parser.write_result_to_file(output_file, solution)
+                        context.num_of_instances_done += 1
+                        notify_communicators(context, communicators, output_file_name)
 
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
@@ -193,7 +238,7 @@ class ConcurrentInstancesRunner(Runner):
     """
     _base_runner: BaseRunner = BaseRunner()
 
-    def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, executor: concurrent.futures.ProcessPoolExecutor):
+    def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, communicators: List[Communicator], executor: concurrent.futures.ProcessPoolExecutor):
         """
         Asynchronously gets results from multiple instances and writes them into the output file using the Parser.
         
@@ -217,6 +262,8 @@ class ConcurrentInstancesRunner(Runner):
             for future in concurrent.futures.as_completed(futures):
                 solution: Dict[str, object] = future.result()
                 parser.write_result_to_file(output_file, solution)
+                context.num_of_instances_done += 1
+                notify_communicators(context, communicators, output_file_name)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
         """
@@ -229,13 +276,14 @@ class ConcurrentInstancesRunner(Runner):
         """
         
         parser: Parser = plugins.get_parser(context.parser_name)
+        communicators: List[Communicator] = get_communicators(context)
         
         print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(input_file_path, "r") as input_file:
             for algorithm_name in context.algorithm_names:
                 algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
                 
-                self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, executor)
+                self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, communicators, executor)
 
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """

@@ -6,17 +6,25 @@ from algorithm_tester.helpers import get_input_files, create_path
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runner, Runners
+from algorithm_tester.helpers import curr_time_millis
 
 """
 Contains main logic of the application.
 """
 
-def count_instances(context: AlgTesterContext, parser_name: str, input_files: List[str]):
+def count_instances(context: AlgTesterContext, input_files: List[str]):
+    """
+    Count instances of all instance files and stores the value in context.
+    
+    Arguments:
+        context {AlgTesterContext} -- Used context.
+        input_files {List[str]} -- List of all input files.
+    """
 
-    parser: Parser = plugins.get_parser(parser_name)
+    parser: Parser = plugins.get_parser(context.parser_name)
     context.num_of_instances = 0
     for input_file in input_files:
-        with open(input_file) as instance_file:
+        with open(f'{context.input_dir}/{input_file}') as instance_file:
             context.num_of_instances += parser.get_num_of_instances(context, instance_file)
             instance_file.seek(0)
 
@@ -49,11 +57,12 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
     create_path(output_dir)
 
     # Count number of instances
-    count_instances(context, parser, input_files)
+    count_instances(context, input_files)
 
-    context.start_time = time.perf_counter()
+    context.start_time = curr_time_millis()
+    start = time.perf_counter()
     runner.compute_results(context, input_files)
     finish = time.perf_counter()
-    print(f'Finished task in {round(finish - context.start_time, 2)} second(s)')
+    print(f'Finished task in {round(finish - start, 2)} second(s)')
 
     print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')

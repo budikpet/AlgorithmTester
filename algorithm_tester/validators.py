@@ -15,6 +15,31 @@ Returns:
     [type] -- Validated result.
 """
 
+def validate_communicators(self, ctx, value: str) -> List[str]:
+    """
+    Validates CSV string of communicator names.
+
+    Args:
+        ctx: Click context
+        value (str): CSV string of communicator names.
+
+    Raises:
+        click.BadParameter: Found a value that is not a communicator name.
+
+    Returns:
+        List[str]: List of names of Communicators.
+    """
+
+    try:
+        values = [c.strip() for c in value.split(",")]
+        for out_value in values:
+            if out_value not in plugins.get_communicator_names():
+                raise click.BadParameter(value)
+
+        return values
+    except:
+        raise click.BadParameter(value)
+
 def validate_concurrency_runner(self, ctx, value: str) -> str:
     """
     Validate concurrency runner name.

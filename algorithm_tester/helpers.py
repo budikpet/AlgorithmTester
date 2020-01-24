@@ -1,5 +1,6 @@
 import os
 from typing import List
+import time
 
 def create_path(path: str):
     """
@@ -28,3 +29,6 @@ def get_input_files(path: str) -> List[str]:
             output.append(file)
 
     return output
+
+def curr_time_millis():
+    return int(round(time.time() * 1000))

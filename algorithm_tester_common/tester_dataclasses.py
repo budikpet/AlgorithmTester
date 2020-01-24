@@ -19,13 +19,17 @@ class AlgTesterContext():
         self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
         self.output_dir: str = output_dir
+        self.min_time_between_communications: int = 2 * 1000
         
-        self.start_time = None
-        self.num_of_instances = None
-        self.num_of_instances_done = 0
+        self.start_time: int = None
+        self.num_of_instances: int = None
+        self.num_of_instances_done: int = 0
 
         if self.extra_options is None:
             self.extra_options = dict()
+
+        # Last time that communicators were notified
+        self.last_communication_time: int = 0
 
     def get_options(self) -> Dict[str, object]:
         options = {
@@ -180,5 +184,15 @@ class Communicator:
         
         Returns:
             str: Name of this communicator that is used to identify it.
+        """
+        pass
+        
+    def notify_instance_computed(self, context: AlgTesterContext, output_file_name: str):
+        """
+        The communicator is notified when an instance is computed.
+        
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            output_file_name {str} -- [description]
         """
         pass
