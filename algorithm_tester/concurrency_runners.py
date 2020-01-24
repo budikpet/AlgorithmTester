@@ -212,6 +212,11 @@ class BaseRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
+        # TODO: Remove
+        instances_done_counter = multiprocessing.Value('i', 0)
+        last_communication_time = multiprocessing.Value('d', 0.0)
+        init_globals(instances_done_counter, last_communication_time)
+
         for index, filename in enumerate(sorted(input_files)):
             if context.max_num is not None and index >= context.max_num:
                 break
