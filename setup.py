@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='algorithm_tester',
-    version='0.6.3.4',
+    version='0.6.3.11',
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",

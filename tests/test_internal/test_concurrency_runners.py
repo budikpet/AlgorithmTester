@@ -18,9 +18,7 @@ def base_context() -> flexmock:
         output_dir = "",
         min_time_between_communications = 10000,
         start_time = 0,
-        num_of_instances = 100,
-        num_of_instances_done = 0,
-        last_communication_time = 0
+        num_of_instances = 100
     )
 
     return dummy_context
@@ -41,21 +39,5 @@ def test_create_columns_description_file(base_context, tmpdir):
     contents = output_dir.listdir()
     assert len(contents) == 1
     assert algorithm.get_name() in contents[0].basename
-
-    print
-
-def test_notify_communicators_time(base_context):
-    dummy_communicator = flexmock(
-        notify_instance_computed=lambda context, output_file: True
-    )
-    communicators = [dummy_communicator]
-
-    last_communication_time = base_context.last_communication_time
-    assert notify_communicators(base_context, communicators, "out_file_1") == True
-    assert base_context.last_communication_time != last_communication_time
-
-    last_communication_time = base_context.last_communication_time
-    assert notify_communicators(base_context, communicators, "out_file_1") == False
-    assert base_context.last_communication_time == last_communication_time
 
     print

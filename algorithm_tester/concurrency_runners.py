@@ -13,6 +13,11 @@ from algorithm_tester.helpers import curr_time_millis
 Contains logic of all concurrency runners. These provide logic of the application with different types of concurrency.
 """
 
+def init_globals(counter, last_communication_time):
+    global _COUNTER, _LAST_COMM_TIME
+    _COUNTER = counter
+    _LAST_COMM_TIME = last_communication_time
+
 new_template = """
 def inner(_it, _timer{init}):
     {setup}
@@ -71,13 +76,20 @@ def notify_communicators(context: AlgTesterContext, communicators: List[Communic
     Returns:
         Bool -- True if communicators were notified, False if not
     """
-    curr_time: int = curr_time_millis()
+    curr_time: float = curr_time_millis()
 
-    if (curr_time - context.last_communication_time) >= context.min_time_between_communications:
+    with _COUNTER.get_lock():
+        _COUNTER.value += 1
+
+    if (curr_time - _LAST_COMM_TIME.value) >= context.min_time_between_communications:
         # Notify communicators
-        context.last_communication_time = curr_time
+        with _LAST_COMM_TIME.get_lock():
+            print(f'before: {curr_time} - {_LAST_COMM_TIME.value}')
+            _LAST_COMM_TIME.value = curr_time
+            print(f'after: {curr_time} - {_LAST_COMM_TIME.value}')
+
         for communicator in communicators:
-            communicator.notify_instance_computed(context, output_file_name)
+            communicator.notify_instance_computed(context, output_file_name, _COUNTER.value)
 
         return True
 
@@ -169,6 +181,7 @@ class BaseRunner(Runner):
             context {AlgTesterContext} -- Current application context.
             input_file_path {str} -- Path to the input file to compute results for.
         """
+        print(input_file_path)
         parser: Parser = plugins.get_parser(context.parser_name)
         communicators: List[Communicator] = get_communicators(context)
         
@@ -188,7 +201,6 @@ class BaseRunner(Runner):
                         solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
 
                         parser.write_result_to_file(output_file, solution)
-                        context.num_of_instances_done += 1
                         notify_communicators(context, communicators, output_file_name)
 
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
@@ -223,13 +235,17 @@ class ConcurrentFilesRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        instances_done_counter = multiprocessing.Value('i', 0)
+        last_communication_time = multiprocessing.Value('d', 0.0)
+        with concurrent.futures.ProcessPoolExecutor(initializer=init_globals, initargs=(instances_done_counter,last_communication_time,)) as executor:
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
                     break
 
                 input_file_path: str = f'{context.input_dir}/{filename}'
                 executor.submit(self._base_runner.run_tester_for_file, context, input_file_path)
+                
+                
 
 class ConcurrentInstancesRunner(Runner):
     """
@@ -262,7 +278,6 @@ class ConcurrentInstancesRunner(Runner):
             for future in concurrent.futures.as_completed(futures):
                 solution: Dict[str, object] = future.result()
                 parser.write_result_to_file(output_file, solution)
-                context.num_of_instances_done += 1
                 notify_communicators(context, communicators, output_file_name)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
@@ -293,7 +308,7 @@ class ConcurrentInstancesRunner(Runner):
             context {AlgTesterContext} -- Current application context.
             input_files {List[str]} -- Unsorted list of input file names.
         """
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        with concurrent.futures.ProcessPoolExecutor(initializer=init_globals, initargs=(context.num_of_instances_done,)) as executor:
 
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:

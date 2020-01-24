@@ -9,7 +9,7 @@ class SlackCommunicator(Communicator):
     def get_name(self):
         return "Slack"
 
-    def notify_instance_computed(self, context: AlgTesterContext, output_file_name: str):
+    def notify_instance_computed(self, context: AlgTesterContext, output_file_name: str, num_of_instances_done: int):
         """
         The Slack communicator is notified when an instance is computed.
         
@@ -18,4 +18,4 @@ class SlackCommunicator(Communicator):
             output_file_name {str} -- Last name of a output file that the instance belongs to.
         """
         print(f'Output file: {context.output_dir}/{output_file_name}')
-        print(f'Instances remaining: {context.num_of_instances_done}/{context.num_of_instances}')
+        print(f'Instances remaining: {num_of_instances_done}/{context.num_of_instances}')
