@@ -1,4 +1,5 @@
 from typing import List, Dict, IO
+import time
 from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, Communicator, AlgTesterContext
 
 class DummyAlgorithm(Algorithm):
@@ -10,7 +11,7 @@ class DummyAlgorithm(Algorithm):
         return ["index", "name"]
 
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-
+        time.sleep(0.5)
         parsed_data.update({
             "index": int(parsed_data["id"]),
             "name": f'Test_{parsed_data["item_count"]}'
