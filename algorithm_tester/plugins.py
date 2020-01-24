@@ -1,6 +1,7 @@
 import pkg_resources
-import sys, inspect
+import sys, inspect, os
 from typing import Dict, List, Set
+from configparser import ConfigParser
 from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, Communicator, DynamicClickOption
 
 """
@@ -57,13 +58,26 @@ class Plugins():
         self.__communicators: List[Communicator] = get_plugins("communicators", parent_class=Communicator)
 
         # Internal communicators
-        self.__communicators.extend(get_plugins("communicators_internal", parent_class=Communicator))
-        
-        self.__check_internal_communicators_preconditions()
+        self.__add_slack_communicator()
 
-    def __check_internal_communicators_preconditions(self):
-        # Check preconditions for internal communicators such as necessery config files.
-        configs = __discovered_plugins.get("configs")
+    def __add_slack_communicator(self):
+        """
+        Adds Slack communicator to other communicators if slack_config environment variable is provided.
+
+        Requires slack_config environment variable which contains a path to a valid slack configuration file.
+        """
+        if os.environ.get("slack_config") is None:
+            return
+        
+        config_parser: ConfigParser = ConfigParser()
+        with open(os.environ["slack_config"]) as config_file:
+            config_parser.read_file(config_file)
+        
+        # Add slack config data to environment vars
+        os.environ["slack_access_token"] = config_parser["auth"]["access_token"]
+        os.environ["slack_channel_id"] = config_parser["channel"]["id"]
+
+        self.__communicators.extend(get_plugins("communicators_internal", parent_class=Communicator))
         print
 
     #################################################################################################
