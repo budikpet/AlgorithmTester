@@ -5,7 +5,7 @@ with open('README.rst') as f:
 
 setup(
     name='algorithm_tester',
-    version='0.6.3.11',
+    version='0.6.3.12',
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
@@ -30,7 +30,9 @@ setup(
             'run_tester = algorithm_tester:run_tester_cli_interface',
         ],
         'algorithm_tester.plugins': [
-            'communicators_internal = communicators_slack'
+            'communicators_internal = communicators_slack',
+            'algorithms = tests.dummy_plugins',
+            'parsers = tests.dummy_plugins'
         ]
     },
     classifiers=[
