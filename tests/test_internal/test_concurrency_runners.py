@@ -14,8 +14,7 @@ def base_context() -> flexmock:
         time_retries = 1,
         extra_options = {},
         input_dir = "",
-        output_dir = "",
-        batch_size = 10,
+        output_dir = ""
     )
 
     return dummy_context

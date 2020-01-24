@@ -6,7 +6,7 @@ def test_check_internal_communicators_preconditions():
     plugins: Plugins = Plugins()
     assert len(plugins.get_communicators()) == 0
 
-    config_file_path: str = "tests/test_internal/fixtures/slack_communicator.cfg"
+    config_file_path: str = "tests/test_internal/fixtures/slack_communicator_SAMPLE.cfg"
     with open(config_file_path) as config_file:
         config_parser: ConfigParser = ConfigParser()
         config_parser.read_file(config_file)

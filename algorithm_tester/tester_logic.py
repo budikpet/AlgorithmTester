@@ -11,6 +11,15 @@ from algorithm_tester.concurrency_runners import Runner, Runners
 Contains main logic of the application.
 """
 
+def count_instances(context: AlgTesterContext, parser_name: str, input_files: List[str]):
+
+    parser: Parser = plugins.get_parser(parser_name)
+    context.num_of_instances = 0
+    for input_file in input_files:
+        with open(input_file) as instance_file:
+            context.num_of_instances += parser.get_num_of_instances(context, instance_file)
+            instance_file.seek(0)
+
 def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
     """
     Get all data provided by click CLI interface. Run the whole programme.
@@ -28,6 +37,8 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         extra_options {[type]} -- [description]
     """
 
+    runner: Runner = Runners[concurrency_runner].value
+    input_files: List[str] = get_input_files(input_dir)
     context: AlgTesterContext = AlgTesterContext(
         algorithms=algorithms, parser=parser, communicators=communicators, concurrency_runner=concurrency_runner,
         max_num=max_num, check_time=check_time, time_retries=time_retries,
@@ -35,15 +46,14 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         input_dir=input_dir, output_dir=output_dir
         )
 
-    input_files: List[str] = get_input_files(input_dir)
-
     create_path(output_dir)
 
-    runner = Runners[concurrency_runner].value
+    # Count number of instances
+    count_instances(context, parser, input_files)
 
-    start = time.perf_counter()
+    context.start_time = time.perf_counter()
     runner.compute_results(context, input_files)
     finish = time.perf_counter()
-    print(f'Finished task in {round(finish - start, 2)} second(s)')
+    print(f'Finished task in {round(finish - context.start_time, 2)} second(s)')
 
     print(f'Algorithm ended at {time.strftime("%H:%M:%S %d.%m.")}')

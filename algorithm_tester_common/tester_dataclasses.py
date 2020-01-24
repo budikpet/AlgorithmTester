@@ -19,7 +19,10 @@ class AlgTesterContext():
         self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
         self.output_dir: str = output_dir
-        self.batch_size: int = 10
+        
+        self.start_time = None
+        self.num_of_instances = None
+        self.num_of_instances_done = 0
 
         if self.extra_options is None:
             self.extra_options = dict()
@@ -138,6 +141,19 @@ class Parser(object):
         """
         pass
 
+    def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
+        """
+        Returns number of instances contained in that particular file.
+        
+        Arguments:
+            context {AlgTesterContext} -- [description]
+            input_file {IO} -- Instances file.
+        
+        Returns:
+            int -- Number of instances contained in the input file.
+        """
+        pass
+
     def get_next_instance(self, input_file: IO) -> Dict[str, object]:
         """
         Parses next instance from an input file and returns it.
@@ -147,7 +163,7 @@ class Parser(object):
         """
         pass
 
-    def write_result_to_file(self, output_file, data: Dict[str, object]):
+    def write_result_to_file(self, output_file: IO, data: Dict[str, object]):
         """
         Write result data to an output file.
         
