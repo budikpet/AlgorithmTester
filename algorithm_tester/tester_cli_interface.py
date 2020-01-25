@@ -23,11 +23,12 @@ Click CLI interface for the application.
 @click.option("-p", "--parser", type=str, callback=validate_parser, required=True, help="Name of the parser that is used to parse input files.")
 @click.option("-c", "--communicators", type=str, callback=validate_communicators, required=False, default=",".join(plugins.get_communicator_names()), show_default=True, help="CSV string of names of available communication interfaces.")
 @click.option("-n", "--max-num", type=int, required=False, help="If set then the run_tester uses only (0, max-num] of input files.")
+@click.option("-t", "--min-communicator-delay", type=float, default=5.0, help="How many seconds there at least must be between two communicator messages.")
 @click.option("--input-dir", type=str, required=True, help="Path to directory with input files.")
 @click.option("--output-dir", type=str, required=True, help="Path to directory where output files are to be stored.")
 @click.argument('extra-options', callback=validate_extra_options, nargs=-1, type=click.UNPROCESSED)
-def run_tester_cli_interface(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
-    run_tester(algorithms, concurrency_runner, check_time, time_retries, parser, communicators, max_num, input_dir, output_dir, extra_options)
+def run_tester_cli_interface(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, min_communicator_delay: float, input_dir, output_dir, extra_options):
+    run_tester(algorithms, concurrency_runner, check_time, time_retries, parser, communicators, max_num, min_communicator_delay, input_dir, output_dir, extra_options)
 
 def main(prog_name: str):
     run_tester_cli_interface(prog_name=prog_name)   # pylint: disable=no-value-for-parameter,unexpected-keyword-arg

@@ -28,7 +28,7 @@ def count_instances(context: AlgTesterContext, input_files: List[str]):
             context.num_of_instances += parser.get_num_of_instances(context, instance_file)
             instance_file.seek(0)
 
-def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, input_dir, output_dir, extra_options):
+def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, min_communicator_delay: float, input_dir, output_dir, extra_options):
     """
     Get all data provided by click CLI interface. Run the whole programme.
     
@@ -40,6 +40,7 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         parser {str} -- Name of the parser that is to be used.
         communicators {List[str]} -- [description]
         max_num {int} -- How many files should be checked at most.
+        min_communicator_delay {float} -- How many seconds between two communicator messages.
         input_dir {[type]} -- [description]
         output_dir {[type]} -- [description]
         extra_options {[type]} -- [description]
@@ -49,7 +50,7 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
     input_files: List[str] = get_input_files(input_dir)
     context: AlgTesterContext = AlgTesterContext(
         algorithms=algorithms, parser=parser, communicators=communicators, concurrency_runner=concurrency_runner,
-        max_num=max_num, check_time=check_time, time_retries=time_retries,
+        max_num=max_num, check_time=check_time, time_retries=time_retries, min_communicator_delay=min_communicator_delay,
         extra_options=extra_options,
         input_dir=input_dir, output_dir=output_dir
         )
