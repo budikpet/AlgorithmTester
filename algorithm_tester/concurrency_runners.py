@@ -13,11 +13,6 @@ from algorithm_tester.helpers import curr_time_millis
 Contains logic of all concurrency runners. These provide logic of the application with different types of concurrency.
 """
 
-def init_globals(counter, last_communication_time):
-    global _COUNTER, _LAST_COMM_TIME
-    _COUNTER = counter
-    _LAST_COMM_TIME = last_communication_time
-
 new_template = """
 def inner(_it, _timer{init}):
     {setup}
@@ -64,36 +59,33 @@ def get_communicators(context: AlgTesterContext):
 
     return communicators
 
-def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], output_file_name: str) -> bool:
-    """
-    Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
+# def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], output_file_name: str) -> bool:
+#     """
+#     Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
     
-    Arguments:
-        context {AlgTesterContext} -- Used context.
-        communicators {List[Communicator]} -- All available communicators.
-        output_file_name {str} -- Name of the output file that was created.
+#     Arguments:
+#         context {AlgTesterContext} -- Used context.
+#         communicators {List[Communicator]} -- All available communicators.
+#         output_file_name {str} -- Name of the output file that was created.
 
-    Returns:
-        Bool -- True if communicators were notified, False if not
-    """
-    curr_time: float = curr_time_millis()
+#     Returns:
+#         Bool -- True if communicators were notified, False if not
+#     """
+#     curr_time: float = curr_time_millis()
 
-    with _COUNTER.get_lock():
-        _COUNTER.value += 1
+#     if (curr_time - _LAST_COMM_TIME.value) >= context.min_time_between_communications:
+#         # Notify communicators
+#         with _LAST_COMM_TIME.get_lock():
+#             print(f'before: {curr_time} - {_LAST_COMM_TIME.value}')
+#             _LAST_COMM_TIME.value = curr_time
+#             print(f'after: {curr_time} - {_LAST_COMM_TIME.value}')
 
-    if (curr_time - _LAST_COMM_TIME.value) >= context.min_time_between_communications:
-        # Notify communicators
-        with _LAST_COMM_TIME.get_lock():
-            print(f'before: {curr_time} - {_LAST_COMM_TIME.value}')
-            _LAST_COMM_TIME.value = curr_time
-            print(f'after: {curr_time} - {_LAST_COMM_TIME.value}')
+#         for communicator in communicators:
+#             communicator.notify_instance_computed(context, output_file_name, _COUNTER.value)
 
-        for communicator in communicators:
-            communicator.notify_instance_computed(context, output_file_name, _COUNTER.value)
+#         return True
 
-        return True
-
-    return False
+#     return False
 
 def create_columns_description_file(context: AlgTesterContext, algorithm: Algorithm):
     """
@@ -212,11 +204,6 @@ class BaseRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
-        # TODO: Remove
-        instances_done_counter = multiprocessing.Value('i', 0)
-        last_communication_time = multiprocessing.Value('d', 0.0)
-        init_globals(instances_done_counter, last_communication_time)
-
         for index, filename in enumerate(sorted(input_files)):
             if context.max_num is not None and index >= context.max_num:
                 break
@@ -240,9 +227,7 @@ class ConcurrentFilesRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
-        instances_done_counter = multiprocessing.Value('i', 0)
-        last_communication_time = multiprocessing.Value('d', 0.0)
-        with concurrent.futures.ProcessPoolExecutor(initializer=init_globals, initargs=(instances_done_counter,last_communication_time,)) as executor:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
                     break
