@@ -168,7 +168,7 @@ class BaseRunner(Runner):
 
         return output
 
-    def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str):
+    def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, notification_vars: Dict[str, object]):
         """
         Compute results for the given input file.
         
@@ -191,7 +191,6 @@ class BaseRunner(Runner):
 
                 create_columns_description_file(context, algorithm)
                 with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
-                    notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
                     for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
                         solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
 
@@ -207,12 +206,13 @@ class BaseRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
+        notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
         for index, filename in enumerate(sorted(input_files)):
             if context.max_num is not None and index >= context.max_num:
                 break
 
             input_file_path: str = f'{context.input_dir}/{filename}'
-            self.run_tester_for_file(context, input_file_path)
+            self.run_tester_for_file(context, input_file_path, notification_vars)
 
 class ConcurrentFilesRunner(Runner):
     """
