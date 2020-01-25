@@ -191,12 +191,12 @@ class BaseRunner(Runner):
 
                 create_columns_description_file(context, algorithm)
                 with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
-
+                    notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
                     for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
                         solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
 
                         parser.write_result_to_file(output_file, solution)
-                        notify_communicators(context, communicators, output_file_name)
+                        notify_communicators(context, communicators, solution, notification_vars)
 
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
@@ -386,11 +386,12 @@ class ConcurrentInstancesRunner(Runner):
             it = self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm)
             futures = [executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance) for instance in it]
 
-            # Get results
+            notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
             for future in concurrent.futures.as_completed(futures):
+                # Write results and notify communicators
                 solution: Dict[str, object] = future.result()
                 parser.write_result_to_file(output_file, solution)
-                notify_communicators(context, communicators, output_file_name)
+                notify_communicators(context, communicators, solution, notification_vars)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
         """
@@ -420,7 +421,7 @@ class ConcurrentInstancesRunner(Runner):
             context {AlgTesterContext} -- Current application context.
             input_files {List[str]} -- Unsorted list of input file names.
         """
-        with concurrent.futures.ProcessPoolExecutor(initializer=init_globals, initargs=(context.num_of_instances_done,)) as executor:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
 
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
