@@ -15,6 +15,15 @@ class SlackCommunicator(Communicator):
     def get_name(self):
         return "Slack"
 
+    def _create_zip_file(self, output_dir: str) -> str:
+        zip_name: str = output_dir.split("/")[-1]
+        zip_dir_path: str = zip_dir(zip_name, output_dir)
+
+        # Move to output_dir parent
+        new_path: str = f'{os.path.dirname(output_dir)}/{zip_name}.zip'
+        os.replace(zip_dir_path, new_path)
+        return new_path
+
     def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int):
         """
         The Slack communicator is notified when an instance is computed.
@@ -29,11 +38,7 @@ class SlackCommunicator(Communicator):
         print(f'Instances remaining: {num_of_instances_done}/{context.num_of_instances}')
 
         # Create a zip file of the results directory in the same parent directory
-        archive_name: str = context.output_dir.split("/")[-1]
-        original_dir = os.getcwd()
-        os.chdir(os.path.dirname(context.output_dir))
-        zip_dir_path: str = zip_dir(archive_name, context.output_dir)
-        os.chdir(os.path.dirname(original_dir))
+        zip_dir_path: str = self._create_zip_file(context.output_dir)
 
         # Prepare messages
         main_message = {
@@ -45,7 +50,7 @@ class SlackCommunicator(Communicator):
         file_message = {
             "channels": os.environ['slack_channel_id'], 
             "file": zip_dir_path,
-            "filename": f"{archive_name}.zip",
+            "filename": zip_dir_path.split("/")[-1],
             "filetype": "zip"
         }
 

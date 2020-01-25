@@ -317,7 +317,6 @@ class ConcurrentFilesRunner(Runner):
             context {AlgTesterContext} -- Current application context.
             input_files {List[str]} -- Unsorted list of input file names.
         """
-
         input_files_dict: Dict[str, IO] = dict()
         output_files_dict: Dict[str, IO] = dict()
 
@@ -345,9 +344,12 @@ class ConcurrentFilesRunner(Runner):
                 notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
                 for future in concurrent.futures.as_completed(futures):
                     # An instance is done, write it down and notify communicators
-                    solution: Dict[str, object] = future.result()
-                    self.write_result(context, parser, output_files_dict, solution)
-                    notify_communicators(context, communicators, solution, notification_vars)
+                    try:
+                        solution: Dict[str, object] = future.result()
+                        self.write_result(context, parser, output_files_dict, solution)
+                        notify_communicators(context, communicators, solution, notification_vars)
+                    except Exception as e:
+                        print(f'Exception occured: {e}')
 
                 # Close all input files
                 self.close_all_files(input_files_dict)
