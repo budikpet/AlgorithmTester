@@ -62,11 +62,14 @@ def get_communicators(context: AlgTesterContext):
 def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], solution: Dict[str, object], notification_vars: Dict[str, object]) -> bool:
     """
     Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
+
+    Updates last_communication_time and instances_done_cnt variables.
     
     Arguments:
         context {AlgTesterContext} -- Used context.
         communicators {List[Communicator]} -- All available communicators.
         solution {Dict[str, object]} -- All solution data.
+        notification_vars {Dict[str, object]} -- Contains last_communication_time and instances_done_cnt.
 
     Returns:
         Bool -- True if communicators were notified, False if not
@@ -213,17 +216,37 @@ class BaseRunner(Runner):
 
 class ConcurrentFilesRunner(Runner):
     """
-    Processes multiple files concurrently. Instances in each file is processed sequentially.
+    Processes multiple files concurrently.
+
+    Technically reads first instances of all files and stores them for multiprocessing. 
+    Then reads second instances of all files and stores them for multiprocessing. 
+    This repeats until no new instances are left in any input file.
     
     """
     _base_runner: BaseRunner = BaseRunner()
 
     def close_all_files(self, files_dict: Dict[str, IO]):
+        """
+        Close all unclosed files.
+        
+        Arguments:
+            files_dict {Dict[str, IO]} -- Opened and closed files.
+        """
         for file in files_dict.values():
             if not file.closed:
                 file.close()
 
     def get_base_instances(self, input_files: Dict[str, IO], parser: Parser) -> (Dict[str, object], IO):
+        """
+        Reads instance data directly from all input files.
+        
+        Arguments:
+            input_files {Dict[str, IO]} -- All opened input files.
+            parser {Parser} -- Used parser.
+        
+        Yields:
+            (Dict[str, object], IO) -- Opened input file and instance data of one of its instances.
+        """
         instances_remaining: bool = True
             
         while instances_remaining:
@@ -243,17 +266,19 @@ class ConcurrentFilesRunner(Runner):
             
         print
 
-    def write_result(self, context: AlgTesterContext, parser: Parser, output_files: Dict[str, IO], data: Dict[str, object]):
-        output_filename: str = data["output_file_name"]
-
-        if output_filename not in output_files:
-            # Output file not yet opened
-            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "w")
-        
-        output_file: IO = output_files[output_filename]
-        parser.write_result_to_file(output_file, data)
-
     def get_data_for_executor(self, context: AlgTesterContext, input_files_dict: Dict[str, IO], parser: Parser, algorithms: List[Algorithm]):
+        """
+        Fully prepares instance data that is to be used for an algorithm.
+        
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            input_files_dict {Dict[str, IO]} -- All currently opened input files.
+            parser {Parser} -- Used parser.
+            algorithms {List[Algorithm]} -- List of all used algorithms.
+        
+        Yields:
+            (Algorithm, Dict[str, object]) -- Used algorithm and full instance data.
+        """
         for (instance_data, input_file) in self.get_base_instances(input_files_dict, parser):
             # Give all instances to the executor
             for alg in algorithms:
@@ -264,7 +289,25 @@ class ConcurrentFilesRunner(Runner):
                 instance_data["algorithm_name"] = alg.get_name()
                 instance_data["algorithm"] = alg
                 yield (alg, instance_data)
-                
+
+    def write_result(self, context: AlgTesterContext, parser: Parser, output_files: Dict[str, IO], data: Dict[str, object]):
+        """
+        Writes results into an appropriate output file.
+        
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            parser {Parser} -- Used parser.
+            output_files {Dict[str, IO]} -- Dictionary of all currently opened output files.
+            data {Dict[str, object]} -- Computation results of an instance.
+        """
+        output_filename: str = data["output_file_name"]
+
+        if output_filename not in output_files:
+            # Output file not yet opened
+            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "w")
+        
+        output_file: IO = output_files[output_filename]
+        parser.write_result_to_file(output_file, data)
         
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
@@ -306,9 +349,13 @@ class ConcurrentFilesRunner(Runner):
                     self.write_result(context, parser, output_files_dict, solution)
                     notify_communicators(context, communicators, solution, notification_vars)
 
+                # Close all input files
+                self.close_all_files(input_files_dict)
+
         except Exception as e:
             print(f"Error occured: {e}")        
         finally:
+            # Make sure all input and output files are closed.
             self.close_all_files(input_files_dict)
             self.close_all_files(output_files_dict)
 
