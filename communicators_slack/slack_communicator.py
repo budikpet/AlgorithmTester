@@ -1,6 +1,7 @@
 import os
 from slack import WebClient
 from typing import Dict
+from datetime import datetime
 from algorithm_tester_common.tester_dataclasses import Communicator
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext
 from algorithm_tester.helpers import zip_dir
@@ -41,10 +42,12 @@ class SlackCommunicator(Communicator):
         zip_dir_path: str = self._create_zip_file(context.output_dir)
 
         # Prepare messages
+        start_time = datetime.fromtimestamp(context.start_time)
+        timestr: str = f'Computation started: {start_time.strftime("%d.%m.%Y %H:%M:%S")}'
         main_message = {
             "username": "AlgorithmTester_Bot",
             "channel": os.environ['slack_channel_id'],
-            "text": f"Test message. Progress: {num_of_instances_done}/{context.num_of_instances} instances done."
+            "text": f'{timestr}\nProgress: {num_of_instances_done}/{context.num_of_instances} instances done.'
         }
 
         file_message = {
