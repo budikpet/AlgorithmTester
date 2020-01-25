@@ -30,5 +30,5 @@ def get_input_files(path: str) -> List[str]:
 
     return output
 
-def curr_time_millis():
+def curr_time_millis() -> float:
     return round(time.time(), 3)

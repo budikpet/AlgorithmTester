@@ -1,5 +1,6 @@
-from slack import WebClient
 import os
+from slack import WebClient
+from typing import Dict
 from algorithm_tester_common.tester_dataclasses import Communicator
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext
 
@@ -12,15 +13,17 @@ class SlackCommunicator(Communicator):
     def get_name(self):
         return "Slack"
 
-    def notify_instance_computed(self, context: AlgTesterContext, output_file_name: str, num_of_instances_done: int):
+    def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int):
         """
         The Slack communicator is notified when an instance is computed.
         
         Arguments:
-            context {AlgTesterContext} -- Used context.
-            output_file_name {str} -- Last name of a output file that the instance belongs to.
+            context {AlgTesterContext} -- [description]
+            last_solution {Dict[str, object]} -- [description]
+            num_of_instances_done {int} -- [description]
         """
-        print(f'Output file: {context.output_dir}/{output_file_name}')
+        output_filename: str = last_solution.get("output_file_name")
+        print(f'Output file: {context.output_dir}/{output_filename}')
         print(f'Instances remaining: {num_of_instances_done}/{context.num_of_instances}')
 
         message = {

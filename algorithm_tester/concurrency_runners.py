@@ -59,33 +59,33 @@ def get_communicators(context: AlgTesterContext):
 
     return communicators
 
-# def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], output_file_name: str) -> bool:
-#     """
-#     Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
+def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], solution: Dict[str, object], notification_vars: Dict[str, object]) -> bool:
+    """
+    Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
     
-#     Arguments:
-#         context {AlgTesterContext} -- Used context.
-#         communicators {List[Communicator]} -- All available communicators.
-#         output_file_name {str} -- Name of the output file that was created.
+    Arguments:
+        context {AlgTesterContext} -- Used context.
+        communicators {List[Communicator]} -- All available communicators.
+        solution {Dict[str, object]} -- All solution data.
 
-#     Returns:
-#         Bool -- True if communicators were notified, False if not
-#     """
-#     curr_time: float = curr_time_millis()
+    Returns:
+        Bool -- True if communicators were notified, False if not
+    """
+    curr_time: float = curr_time_millis()
 
-#     if (curr_time - _LAST_COMM_TIME.value) >= context.min_time_between_communications:
-#         # Notify communicators
-#         with _LAST_COMM_TIME.get_lock():
-#             print(f'before: {curr_time} - {_LAST_COMM_TIME.value}')
-#             _LAST_COMM_TIME.value = curr_time
-#             print(f'after: {curr_time} - {_LAST_COMM_TIME.value}')
+    last_communication_time = notification_vars["last_comm_time"]
+    notification_vars["instances_done_cnt"] += 1
 
-#         for communicator in communicators:
-#             communicator.notify_instance_computed(context, output_file_name, _COUNTER.value)
+    if (curr_time - last_communication_time) >= context.min_time_between_communications:
+        # Notify communicators
+        notification_vars["last_comm_time"] = curr_time
 
-#         return True
+        for communicator in communicators:
+            communicator.notify_instance_computed(context, solution, notification_vars["instances_done_cnt"])
 
-#     return False
+        return True
+
+    return False
 
 def create_columns_description_file(context: AlgTesterContext, algorithm: Algorithm):
     """
@@ -299,12 +299,13 @@ class ConcurrentFilesRunner(Runner):
                     # Give all instances to the executor
                     futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
 
+                notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
                 for future in concurrent.futures.as_completed(futures):
                     # An instance is done, write it down and notify communicators
                     solution: Dict[str, object] = future.result()
                     self.write_result(context, parser, output_files_dict, solution)
-                    # notify_communicators(context, communicators, output_file_name)
-                    
+                    notify_communicators(context, communicators, solution, notification_vars)
+
         except Exception as e:
             print(f"Error occured: {e}")        
         finally:
