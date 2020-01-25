@@ -218,6 +218,54 @@ class ConcurrentFilesRunner(Runner):
     """
     _base_runner: BaseRunner = BaseRunner()
 
+    def close_all_files(self, files_dict: Dict[str, IO]):
+        for file in files_dict.values():
+            if not file.closed:
+                file.close()
+
+    def get_base_instances(self, input_files: Dict[str, IO], parser: Parser) -> (Dict[str, object], IO):
+        instances_remaining: bool = True
+            
+        while instances_remaining:
+            instances_remaining = False
+            
+            for (filename, file) in input_files.items():
+                # Get instances from accross all input files
+
+                if file.closed:
+                    continue
+
+                instance = parser.get_next_instance(file)
+
+                if instance is not None:
+                    instances_remaining = True
+                    yield (instance, file)
+            
+        print
+
+    def write_result(self, context: AlgTesterContext, parser: Parser, output_files: Dict[str, IO], data: Dict[str, object]):
+        output_filename: str = data["output_file_name"]
+
+        if output_filename not in output_files:
+            # Output file not yet opened
+            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "w")
+        
+        output_file: IO = output_files[output_filename]
+        parser.write_result_to_file(output_file, data)
+
+    def get_data_for_executor(self, context: AlgTesterContext, input_files_dict: Dict[str, IO], parser: Parser, algorithms: List[Algorithm]):
+        for (instance_data, input_file) in self.get_base_instances(input_files_dict, parser):
+            # Give all instances to the executor
+            for alg in algorithms:
+                click_options: Dict[str, object] = get_click_options(context, alg)
+                output_filename: str = parser.get_output_file_name(context, input_file, click_options)
+
+                instance_data["output_file_name"] = output_filename
+                instance_data["algorithm_name"] = alg.get_name()
+                instance_data["algorithm"] = alg
+                yield (alg, instance_data)
+                
+        
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
@@ -227,15 +275,41 @@ class ConcurrentFilesRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        input_files_dict: Dict[str, IO] = dict()
+        output_files_dict: Dict[str, IO] = dict()
+
+        parser: Parser = plugins.get_parser(context.parser_name)
+        communicators: List[Communicator] = get_communicators(context)
+        algorithms: List[Algorithm] = [plugins.get_algorithm(alg_name) for alg_name in context.algorithm_names]
+
+        for alg in algorithms:
+            create_columns_description_file(context, alg)
+
+        try:
+            # Open all input files
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
                     break
+                
+                input_files_dict[filename] = open(f'{context.input_dir}/{filename}', "r")
 
-                input_file_path: str = f'{context.input_dir}/{filename}'
-                executor.submit(self._base_runner.run_tester_for_file, context, input_file_path)
-                
-                
+            with concurrent.futures.ProcessPoolExecutor() as executor:
+                futures = list()
+                for data in self.get_data_for_executor(context, input_files_dict, parser, algorithms):
+                    # Give all instances to the executor
+                    futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
+
+                for future in concurrent.futures.as_completed(futures):
+                    # An instance is done, write it down and notify communicators
+                    solution: Dict[str, object] = future.result()
+                    self.write_result(context, parser, output_files_dict, solution)
+                    # notify_communicators(context, communicators, output_file_name)
+                    
+        except Exception as e:
+            print(f"Error occured: {e}")        
+        finally:
+            self.close_all_files(input_files_dict)
+            self.close_all_files(output_files_dict)
 
 class ConcurrentInstancesRunner(Runner):
     """

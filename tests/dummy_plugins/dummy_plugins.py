@@ -68,3 +68,4 @@ class DummyParser(Parser):
         
         output: str = f'{" ".join(map(str, output_data))}'
         output_file.write(f'{output}\n')
+        output_file.flush()

@@ -18,7 +18,7 @@
             "args": [
                 // "-s", "Greedy", // "Brute,Greedy,BB",
                 "-s", "DummyAlgorithm",
-                "-r", "base",
+                "-r", "files",
                 "--check-time","True",
                 // "-n", "1",
                 "-p", "DummyParser",
