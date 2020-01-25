@@ -1,4 +1,5 @@
 import os
+import shutil
 from typing import List
 import time
 
@@ -32,3 +33,6 @@ def get_input_files(path: str) -> List[str]:
 
 def curr_time_millis() -> float:
     return round(time.time(), 3)
+
+def zip_dir(output_filename: str, dir_name: str, archive_root_dir: str = None) -> str:
+    return shutil.make_archive(output_filename, 'zip', dir_name, base_dir=archive_root_dir)
