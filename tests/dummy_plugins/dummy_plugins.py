@@ -12,7 +12,7 @@ class DummyAlgorithm(Algorithm):
         return ["index", "name"]
 
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        # time.sleep(round(random.random(), 3))
+        time.sleep(round(random.random(), 3))
         parsed_data.update({
             "index": int(parsed_data["id"]),
             "name": f'Test_{parsed_data["item_count"]}'

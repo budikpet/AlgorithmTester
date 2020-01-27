@@ -310,6 +310,40 @@ class ConcurrentFilesRunner(Runner):
         
         output_file: IO = output_files[output_filename]
         parser.write_result_to_file(output_file, data)
+
+    def run_tester_for_data(self, context: AlgTesterContext, algorithms: List[Algorithm], parser: Parser, communicators: List[Communicator], input_files_dict: Dict[str, IO], output_files_dict: Dict[str, IO]):
+        """
+        Parses instances from given input files, solve them using required algorithms and write results to the output file.
+        
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            algorithms {List[Algorithm]} -- Used algorithms.
+            parser {Parser} -- Used parser.
+            communicators {List[Communicator]} -- Used communicators.
+            input_files_dict {Dict[str, IO]} -- Opened input files.
+            output_files_dict {Dict[str, IO]} -- A dictionary for all output files to be opened.
+        """
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = list()
+            for data in self.get_data_for_executor(context, input_files_dict, parser, algorithms):
+                # Give all instances to the executor
+                futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
+
+            notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
+            for future in concurrent.futures.as_completed(futures):
+                # An instance is done, write it down and notify communicators
+                try:
+                    solution: Dict[str, object] = future.result()
+                    self.write_result(context, parser, output_files_dict, solution)
+                    notification_vars["instances_done_cnt"] += 1
+                    self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
+                except Exception as e:
+                    print(f'Exception occured: {e}')
+
+            self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
+
+            # Close all input files
+            self.close_all_files(input_files_dict)
         
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
@@ -337,27 +371,7 @@ class ConcurrentFilesRunner(Runner):
                 
                 input_files_dict[filename] = open(f'{context.input_dir}/{filename}', "r")
 
-            with concurrent.futures.ProcessPoolExecutor() as executor:
-                futures = list()
-                for data in self.get_data_for_executor(context, input_files_dict, parser, algorithms):
-                    # Give all instances to the executor
-                    futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
-
-                notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
-                for future in concurrent.futures.as_completed(futures):
-                    # An instance is done, write it down and notify communicators
-                    try:
-                        solution: Dict[str, object] = future.result()
-                        self.write_result(context, parser, output_files_dict, solution)
-                        notification_vars["instances_done_cnt"] += 1
-                        _base_runner.notify_communicators(context, communicators, solution, notification_vars)
-                    except Exception as e:
-                        print(f'Exception occured: {e}')
-
-                _base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
-
-                # Close all input files
-                self.close_all_files(input_files_dict)
+            self.run_tester_for_data(context, algorithms, parser, communicators, input_files_dict, output_files_dict)
 
         except Exception as e:
             print(f"Error occured: {e}")        
@@ -399,9 +413,9 @@ class ConcurrentInstancesRunner(Runner):
                 solution: Dict[str, object] = future.result()
                 parser.write_result_to_file(output_file, solution)
                 notification_vars["instances_done_cnt"] += 1
-                _base_runner.notify_communicators(context, communicators, solution, notification_vars)
+                self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
         
-        _base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
+        self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
         """
