@@ -59,36 +59,6 @@ def get_communicators(context: AlgTesterContext):
 
     return communicators
 
-def notify_communicators(context: AlgTesterContext, communicators: List[Communicator], solution: Dict[str, object], notification_vars: Dict[str, object], forced: bool = False) -> bool:
-    """
-    Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
-
-    Updates last_communication_time and instances_done_cnt variables.
-    
-    Arguments:
-        context {AlgTesterContext} -- Used context.
-        communicators {List[Communicator]} -- All available communicators.
-        solution {Dict[str, object]} -- All solution data.
-        notification_vars {Dict[str, object]} -- Contains last_communication_time and instances_done_cnt.
-
-    Returns:
-        Bool -- True if communicators were notified, False if not
-    """
-    curr_time: float = curr_time_millis()
-
-    last_communication_time = notification_vars["last_comm_time"]
-
-    if ((curr_time - last_communication_time) >= context.min_time_between_communications) or forced:
-        # Notify communicators
-        notification_vars["last_comm_time"] = curr_time
-
-        for communicator in communicators:
-            communicator.notify_instance_computed(context, solution, notification_vars["instances_done_cnt"])
-
-        return True
-
-    return False
-
 def create_columns_description_file(context: AlgTesterContext, algorithm: Algorithm):
     """
     Create an output file with names of columns for a specific algorithm.
@@ -111,6 +81,36 @@ class BaseRunner(Runner):
     """
     Processes files and their instances sequentially. No concurrency is used.
     """
+
+    def notify_communicators(self, context: AlgTesterContext, communicators: List[Communicator], solution: Dict[str, object], notification_vars: Dict[str, object], forced: bool = False) -> bool:
+        """
+        Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
+
+        Updates last_communication_time and instances_done_cnt variables.
+        
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            communicators {List[Communicator]} -- All available communicators.
+            solution {Dict[str, object]} -- All solution data.
+            notification_vars {Dict[str, object]} -- Contains last_communication_time and instances_done_cnt.
+
+        Returns:
+            Bool -- True if communicators were notified, False if not
+        """
+        curr_time: float = curr_time_millis()
+
+        last_communication_time = notification_vars["last_comm_time"]
+
+        if ((curr_time - last_communication_time) >= context.min_time_between_communications) or forced:
+            # Notify communicators
+            notification_vars["last_comm_time"] = curr_time
+
+            for communicator in communicators:
+                communicator.notify_instance_computed(context, solution, notification_vars["instances_done_cnt"])
+
+            return True
+
+        return False
 
     def get_solution_for_instance(self, context: AlgTesterContext, algorithm: Algorithm, parsed_instance_data: Dict[str, object]) -> Dict[str, object]:
         """
@@ -195,9 +195,9 @@ class BaseRunner(Runner):
 
                         parser.write_result_to_file(output_file, solution)
                         notification_vars["instances_done_cnt"] += 1
-                        notify_communicators(context, communicators, solution, notification_vars)
+                        self.notify_communicators(context, communicators, solution, notification_vars)
         
-        notify_communicators(context, communicators, solution, notification_vars, forced=True)
+        self.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
@@ -350,11 +350,11 @@ class ConcurrentFilesRunner(Runner):
                         solution: Dict[str, object] = future.result()
                         self.write_result(context, parser, output_files_dict, solution)
                         notification_vars["instances_done_cnt"] += 1
-                        notify_communicators(context, communicators, solution, notification_vars)
+                        _base_runner.notify_communicators(context, communicators, solution, notification_vars)
                     except Exception as e:
                         print(f'Exception occured: {e}')
 
-                notify_communicators(context, communicators, solution, notification_vars, forced=True)
+                _base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
                 # Close all input files
                 self.close_all_files(input_files_dict)
@@ -399,9 +399,9 @@ class ConcurrentInstancesRunner(Runner):
                 solution: Dict[str, object] = future.result()
                 parser.write_result_to_file(output_file, solution)
                 notification_vars["instances_done_cnt"] += 1
-                notify_communicators(context, communicators, solution, notification_vars)
+                _base_runner.notify_communicators(context, communicators, solution, notification_vars)
         
-        notify_communicators(context, communicators, solution, notification_vars, forced=True)
+        _base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
         """

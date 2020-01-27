@@ -1,6 +1,6 @@
 import pytest
 from flexmock import flexmock
-from algorithm_tester.concurrency_runners import Runner, Runners, BaseRunner, ConcurrentFilesRunner, ConcurrentInstancesRunner
+from algorithm_tester.concurrency_runners import Runner, Runners
 import algorithm_tester.concurrency_runners as concurrency_runners
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext
 from algorithm_tester.helpers import curr_time_millis
@@ -24,29 +24,5 @@ def test_create_columns_description_file(tmpdir):
 
     assert line is not None
     assert ' '.join(algorithm.get_columns()) == line
-
-    print
-
-def test_notify_communicators_timing():
-    base_context = create_dummy_context()
-    notification_vars = {
-        "last_comm_time": 0,
-        "instances_done_cnt": 0
-    }
-
-    res = concurrency_runners.notify_communicators(base_context, [], {}, notification_vars)
-    new_last_comm_time = notification_vars["last_comm_time"]
-    assert notification_vars["last_comm_time"] != 0
-    assert res == True
-
-    res = concurrency_runners.notify_communicators(base_context, [], {}, notification_vars)
-    assert res == False
-    assert notification_vars["last_comm_time"] == new_last_comm_time
-
-    notification_vars["last_comm_time"] -= base_context.min_time_between_communications + 1
-    new_last_comm_time = notification_vars["last_comm_time"]
-    res = concurrency_runners.notify_communicators(base_context, [], {}, notification_vars)
-    assert res == True
-    assert notification_vars["last_comm_time"] != new_last_comm_time
 
     print
