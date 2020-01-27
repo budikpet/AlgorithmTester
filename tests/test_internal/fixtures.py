@@ -1,26 +1,27 @@
 import pytest
 from flexmock import flexmock
-from typing import List, Dict
-from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm
+from typing import List, Dict, IO
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 
-@pytest.fixture
-def base_context() -> flexmock:
-    dummy_context = flexmock(
-        algorithm_names = [],
-        parser_name = "DummyParser",
-        communicator_names = "",
-        concurrency_runner_name = "BASE",
-        check_time = False,
-        time_retries = 1,
-        extra_options = {},
-        input_dir = "",
-        output_dir = "",
-        min_time_between_communications = 10.0,
-        start_time = 0,
-        num_of_instances = 100
-    )
+def create_dummy_context(algorithms: List[str] = list(), parser: Parser = "DummyParser", communicators: List[str] = list()) -> AlgTesterContext:
+    context: AlgTesterContext = AlgTesterContext(
+        algorithms=algorithms, 
+        parser=parser, 
+        communicators=communicators, 
+        concurrency_runner="Base",
+        max_num=None, 
+        check_time=False, 
+        time_retries=1, 
+        min_communicator_delay=10.0,
+        extra_options=dict(),
+        input_dir="tests/test_internal/fixtures/data", 
+        output_dir="tests/test_internal/fixtures/tester_results"
+        )
 
-    return dummy_context
+    context.start_time = 0
+    context.num_of_instances = 100
+
+    return context
 
 def get_base_parsed_data(base_context: AlgTesterContext, algorithm: Algorithm) -> Dict[str, object]:
     dummy_data = dict()
@@ -30,10 +31,10 @@ def get_base_parsed_data(base_context: AlgTesterContext, algorithm: Algorithm) -
 
     return dummy_data
 
-def _base_perform(context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+def _dummy_perform_algorithm(context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
     return parsed_data
 
-def create_dummy_algorithm(columns: List[str] = ["A", "B", "C"], name: str = "DummyAlgorithm", perform_func = _base_perform):
+def create_dummy_algorithm(columns: List[str] = ["A", "B", "C"], name: str = "DummyAlgorithm", perform_func = _dummy_perform_algorithm):
     class DummyAlgorithm(Algorithm):
 
         def get_name(self) -> str:
@@ -46,3 +47,48 @@ def create_dummy_algorithm(columns: List[str] = ["A", "B", "C"], name: str = "Du
             return perform_func(context, parsed_data)
 
     return DummyAlgorithm()
+
+def _dummy_get_next_instance(input_file: IO) -> Dict[str, object]:
+    instance: str = input_file.readline()
+
+    if instance is None or instance == "":
+        return None
+
+    values: List[str] = instance.split(" ")
+    id, count, capacity = int(values.pop(0)), int(values.pop(0)), int(values.pop(0))
+    it = iter(values)
+    things = [(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
+
+    parsed_data = {
+        "id": id,
+        "item_count": count,
+        "capacity": capacity,
+        "things": things
+    }
+
+    return parsed_data
+
+def create_dummy_parser(name: str = "DummyParser", get_next_instance_func = _dummy_get_next_instance):
+    class DummyParser(Parser):
+
+        def get_name(self) -> str:
+            return name
+
+        def get_output_file_name(self, context: AlgTesterContext, input_file: IO, click_args: Dict[str, object]) -> str:
+            input_file_name: str = input_file.name.split("/")[-1]
+
+            return input_file_name.replace(".dat", f'_{click_args["algorithm_name"]}_sol.dat')
+
+        def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
+            for index, _ in enumerate(input_file):
+                pass
+
+            return index + 1
+
+        def get_next_instance(self, input_file: IO) -> Dict[str, object]:
+            return get_next_instance_func(input_file)
+
+        def write_result_to_file(self, output_file: IO, data: Dict[str, object]):
+            pass
+
+    return DummyParser()

@@ -4,9 +4,10 @@ from algorithm_tester.concurrency_runners import Runner, Runners, BaseRunner, Co
 import algorithm_tester.concurrency_runners as concurrency_runners
 from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext
 from algorithm_tester.helpers import curr_time_millis
-from tests.test_internal.fixtures import base_context, create_dummy_algorithm
+from tests.test_internal.fixtures import create_dummy_context, create_dummy_algorithm
 
-def test_create_columns_description_file(base_context, tmpdir):
+def test_create_columns_description_file(tmpdir):
+    base_context = create_dummy_context()
     output_dir = tmpdir
     base_context.output_dir = output_dir.strpath
 
@@ -26,7 +27,8 @@ def test_create_columns_description_file(base_context, tmpdir):
 
     print
 
-def test_notify_communicators_timing(base_context):
+def test_notify_communicators_timing():
+    base_context = create_dummy_context()
     notification_vars = {
         "last_comm_time": 0,
         "instances_done_cnt": 0
@@ -41,7 +43,7 @@ def test_notify_communicators_timing(base_context):
     assert res == False
     assert notification_vars["last_comm_time"] == new_last_comm_time
 
-    notification_vars["last_comm_time"] -= 100.0
+    notification_vars["last_comm_time"] -= base_context.min_time_between_communications + 1
     new_last_comm_time = notification_vars["last_comm_time"]
     res = concurrency_runners.notify_communicators(base_context, [], {}, notification_vars)
     assert res == True
