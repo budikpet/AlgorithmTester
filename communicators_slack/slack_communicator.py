@@ -45,7 +45,7 @@ class SlackCommunicator(Communicator):
         start_time = datetime.fromtimestamp(context.start_time)
         timestr: str = f'Computation started: {start_time.strftime("%d.%m.%Y %H:%M:%S")}'
         main_message = {
-            "username": "AlgorithmTester_Bot",
+            "username": os.environ['slack_bot_username'],
             "channel": os.environ['slack_channel_id'],
             "text": f'{timestr}\nProgress: [{num_of_instances_done}/{num_of_instances_failed}]/{context.num_of_instances} instances [done/failed].'
         }
@@ -70,7 +70,7 @@ class SlackCommunicator(Communicator):
             response = self.slack_web_client.files_delete(file=self.file_id)
             
             main_message.update({
-                "as_user": "AlgorithmTester_Bot",
+                "as_user": os.environ['slack_bot_username'],
                 "ts": self.main_msg_ts,
             })
             response = self.slack_web_client.chat_update(**main_message)

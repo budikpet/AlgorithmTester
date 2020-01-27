@@ -76,6 +76,7 @@ class Plugins():
         # Add slack config data to environment vars
         os.environ["slack_access_token"] = config_parser["auth"]["access_token"]
         os.environ["slack_channel_id"] = config_parser["channel"]["id"]
+        os.environ["slack_bot_username"] = config_parser["channel"]["bot_username"]
 
         self.__communicators.extend(get_plugins("communicators_internal", parent_class=Communicator))
         print
