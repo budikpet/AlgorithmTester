@@ -8,7 +8,7 @@ def create_dummy_context(algorithms: List[str] = list(), parser: Parser = "Dummy
         algorithms=algorithms, 
         parser=parser, 
         communicators=communicators, 
-        concurrency_runner="Base",
+        concurrency_runner="BASE",
         max_num=None, 
         check_time=False, 
         time_retries=1, 

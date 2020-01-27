@@ -2,11 +2,10 @@ import os
 import timeit
 import time
 from typing import Dict, List, IO
-from algorithm_tester.helpers import get_input_files, create_path
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runner, Runners
-from algorithm_tester.helpers import curr_time_millis
+import algorithm_tester.helpers as helpers
 
 """
 Contains main logic of the application.
@@ -38,16 +37,16 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         check_time {bool} -- True if we want to check actual time of the execution.
         time_retries {int} -- If check_time is True, then this number indicates how many times should the computation be repeated to get more accurate results.
         parser {str} -- Name of the parser that is to be used.
-        communicators {List[str]} -- [description]
+        communicators {List[str]} -- List of all used communicators.
         max_num {int} -- How many files should be checked at most.
         min_communicator_delay {float} -- How many seconds between two communicator messages.
-        input_dir {[type]} -- [description]
-        output_dir {[type]} -- [description]
-        extra_options {[type]} -- [description]
+        input_dir {[type]} -- Directory of all files with instances.
+        output_dir {[type]} -- Directory where the programme will store output files.
+        extra_options {[type]} -- Other options that algorithms need.
     """
 
     runner: Runner = Runners[concurrency_runner].value
-    input_files: List[str] = get_input_files(input_dir)
+    input_files: List[str] = helpers.get_input_files(input_dir)
     context: AlgTesterContext = AlgTesterContext(
         algorithms=algorithms, parser=parser, communicators=communicators, concurrency_runner=concurrency_runner,
         max_num=max_num, check_time=check_time, time_retries=time_retries, min_communicator_delay=min_communicator_delay,
@@ -55,12 +54,12 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         input_dir=input_dir, output_dir=output_dir
         )
 
-    create_path(output_dir)
+    helpers.create_path(output_dir)
 
     # Count number of instances
     count_instances(context, input_files)
 
-    context.start_time = curr_time_millis()
+    context.start_time = helpers.curr_time_millis()
     start = time.perf_counter()
     runner.compute_results(context, input_files)
     finish = time.perf_counter()
