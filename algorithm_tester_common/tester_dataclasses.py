@@ -16,6 +16,7 @@ class AlgTesterContext():
         self.concurrency_runner_name: str = concurrency_runner
         self.check_time: bool = check_time
         self.time_retries: int = time_retries
+        # TODO: Rename to max_files_to_check
         self.max_num: int = max_num
         self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
