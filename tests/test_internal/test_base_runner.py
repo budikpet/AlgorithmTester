@@ -1,3 +1,5 @@
+import os
+import re
 import pytest
 from flexmock import flexmock
 from typing import Dict, List, IO
@@ -100,4 +102,23 @@ def test_run_tester_for_file(algorithm: Algorithm, tmpdir):
     _runner.run_tester_for_file(base_context, f'{base_context.input_dir}/4_inst.dat', notification_vars)
 
     assert notification_vars["instances_done_cnt"] == base_context.num_of_instances
+    print
+
+def test_compute_results():
+    base_context: AlgTesterContext = create_dummy_context()
+    base_context.max_num = None
+
+    input_files = list()
+    for root, _, files in os.walk(base_context.input_dir):
+        for filename in files:
+            input_files.append(f'{root}/{filename}')
+
+    flexmock(BaseRunner)
+    (BaseRunner.should_receive("run_tester_for_file")
+        .with_args(base_context, re.compile(f'{base_context.input_dir}/.*'), object)
+        .and_return(None)
+        .times(len(input_files)))
+
+    _runner.compute_results(base_context, input_files)
+
     print
