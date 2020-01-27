@@ -1,4 +1,4 @@
-ALG="DummyAlgorithm"
+ALG="DummyAlgorithm,DummyFailingAlgorithm"
 CONC="files"
 fixtures="tests/dummy_plugins/fixtures"
 

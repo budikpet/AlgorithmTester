@@ -16,7 +16,7 @@ def test_notify_communicators_timing():
     base_context = create_dummy_context()
     notification_vars = {
         "last_comm_time": 0,
-        "instances_done_cnt": 0
+        "instances_done": 0
     }
 
     res = _runner.notify_communicators(base_context, [], {}, notification_vars)
@@ -74,25 +74,29 @@ def test_get_parsed_instances_data(algorithm: Algorithm):
 
     print
 
-@pytest.mark.parametrize('algorithm', 
-    (create_dummy_algorithm(),
-    create_dummy_algorithm(name="DummyRemovingAlgorithm", perform_func=_removing_perform))
+@pytest.mark.parametrize('algorithms', 
+    ([create_dummy_algorithm(), create_dummy_algorithm("Alg2")],
+    [create_dummy_algorithm(name="DummyRemovingAlgorithm", perform_func=_removing_perform), create_dummy_algorithm("Alg2")])
 )
-def test_run_tester_for_file(algorithm: Algorithm, tmpdir):
+def test_run_tester_for_file(algorithms: Algorithm, tmpdir):
     output_dir = tmpdir
     parser = create_dummy_parser()
-    base_context: AlgTesterContext = create_dummy_context(algorithms=[algorithm.get_name()], parser=parser.get_name())
-    base_context.num_of_instances = 500
+    base_context: AlgTesterContext = create_dummy_context(algorithms=[alg.get_name() for alg in algorithms], parser=parser.get_name())
+    base_context.num_of_instances = 500*len(algorithms)
     base_context.output_dir = output_dir.strpath
 
     notification_vars = {
         "last_comm_time": 0,
-        "instances_done_cnt": 0
+        "instances_done": 0
     }
     
     flexmock(Plugins)
     Plugins.should_receive("get_parser").and_return(parser)
-    Plugins.should_receive("get_algorithm").and_return(algorithm)
+    
+    for algorithm in algorithms:
+        (Plugins.should_receive("get_algorithm")
+            .with_args(algorithm.get_name())
+            .and_return(algorithm))
 
     flexmock(BaseRunner)
     BaseRunner.should_receive("notify_communicators").times(base_context.num_of_instances + 1)
@@ -101,7 +105,43 @@ def test_run_tester_for_file(algorithm: Algorithm, tmpdir):
 
     _runner.run_tester_for_file(base_context, f'{base_context.input_dir}/4_inst.dat', notification_vars)
 
-    assert notification_vars["instances_done_cnt"] == base_context.num_of_instances
+    assert notification_vars["instances_done"] == base_context.num_of_instances
+    print
+
+def _dummy_failing_func(context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+    raise Exception("Dummy exception")
+
+def test_run_tester_for_file_exceptions(tmpdir):
+    output_dir = tmpdir
+    parser = create_dummy_parser()
+    algorithms = [create_dummy_algorithm(), create_dummy_algorithm(name="AlgFailure", perform_func=_dummy_failing_func)]
+    base_context: AlgTesterContext = create_dummy_context(parser=parser.get_name(), algorithms=[alg.get_name() for alg in algorithms])
+    base_context.num_of_instances = 500
+    base_context.output_dir = output_dir.strpath
+
+    notification_vars = {
+        "last_comm_time": 0,
+        "instances_done": 0,
+        "instances_failed": 0
+    }
+    
+    flexmock(Plugins)
+    Plugins.should_receive("get_parser").and_return(parser)
+    
+    for algorithm in algorithms:
+        (Plugins.should_receive("get_algorithm")
+            .with_args(algorithm.get_name())
+            .and_return(algorithm))
+
+    flexmock(BaseRunner)
+    BaseRunner.should_receive("notify_communicators").times(base_context.num_of_instances + 1)
+
+    flexmock(parser).should_receive("write_result_to_file").times(base_context.num_of_instances)
+
+    _runner.run_tester_for_file(base_context, f'{base_context.input_dir}/4_inst.dat', notification_vars)
+
+    assert notification_vars["instances_done"] == base_context.num_of_instances
+    assert notification_vars["instances_failed"] == base_context.num_of_instances
     print
 
 def test_compute_results():

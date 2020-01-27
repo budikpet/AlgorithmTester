@@ -25,7 +25,7 @@ class SlackCommunicator(Communicator):
         os.replace(zip_dir_path, new_path)
         return new_path
 
-    def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int):
+    def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int, num_of_instances_failed: int):
         """
         The Slack communicator is notified when an instance is computed.
         
@@ -36,7 +36,7 @@ class SlackCommunicator(Communicator):
         """
         output_filename: str = last_solution.get("output_filename")
         print(f'Output file: {context.output_dir}/{output_filename}')
-        print(f'Instances remaining: {num_of_instances_done}/{context.num_of_instances}')
+        print(f'Instances [done/failed]: [{num_of_instances_done}/{num_of_instances_failed}]/{context.num_of_instances}')
 
         # Create a zip file of the results directory in the same parent directory
         zip_dir_path: str = self._create_zip_file(context.output_dir)
@@ -47,7 +47,7 @@ class SlackCommunicator(Communicator):
         main_message = {
             "username": "AlgorithmTester_Bot",
             "channel": os.environ['slack_channel_id'],
-            "text": f'{timestr}\nProgress: {num_of_instances_done}/{context.num_of_instances} instances done.'
+            "text": f'{timestr}\nProgress: [{num_of_instances_done}/{num_of_instances_failed}]/{context.num_of_instances} instances [done/failed].'
         }
 
         file_message = {

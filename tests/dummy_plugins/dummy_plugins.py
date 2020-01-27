@@ -12,13 +12,24 @@ class DummyAlgorithm(Algorithm):
         return ["index", "name"]
 
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        time.sleep(round(random.random(), 3))
+        # time.sleep(round(random.random(), 3))
         parsed_data.update({
             "index": int(parsed_data["id"]),
             "name": f'Test_{parsed_data["item_count"]}'
         })
 
         return parsed_data
+
+class DummyFailingAlgorithm(Algorithm):
+
+    def get_name(self) -> str:
+        return "DummyFailingAlgorithm" 
+
+    def get_columns(self, show_time: bool = True) -> List[str]:
+        return ["index", "name"]
+
+    def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        raise Exception("Dummy failure.")
 
 class DummyParser(Parser):
     """

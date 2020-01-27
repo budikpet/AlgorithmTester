@@ -86,13 +86,13 @@ class BaseRunner(Runner):
         """
         Notifies all Communicators that a instance was computed if enough time has passed since the last notification.
 
-        Updates last_communication_time and instances_done_cnt variables.
+        Updates last_communication_time and instances_done variables.
         
         Arguments:
             context {AlgTesterContext} -- Used context.
             communicators {List[Communicator]} -- All available communicators.
             solution {Dict[str, object]} -- All solution data.
-            notification_vars {Dict[str, object]} -- Contains last_communication_time and instances_done_cnt.
+            notification_vars {Dict[str, object]} -- Contains last_communication_time and instances_done.
 
         Returns:
             Bool -- True if communicators were notified, False if not
@@ -106,7 +106,7 @@ class BaseRunner(Runner):
             notification_vars["last_comm_time"] = curr_time
 
             for communicator in communicators:
-                communicator.notify_instance_computed(context, solution, notification_vars["instances_done_cnt"])
+                communicator.notify_instance_computed(context, solution, notification_vars["instances_done"], notification_vars["instances_failed"])
 
             return True
 
@@ -167,6 +167,34 @@ class BaseRunner(Runner):
 
         return output
 
+    def run_tester_for_file_algorithm(self, context: AlgTesterContext, parser: Parser, algorithm: Algorithm, communicators: Communicator, input_file: IO, notification_vars: Dict[str, object]):
+        """
+        Opens an output file and writes solutions into it using the specified algorithm.
+        
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            parser {Parser} -- Used parser.
+            algorithm {Algorithm} -- Used algorithm.
+            communicators {Communicator} -- Used communicators.
+            input_file {IO} -- Opened input file.
+            notification_vars {Dict[str, object]} -- Used notification variables.
+        """
+        click_options = get_click_options(context, algorithm)
+        output_filename: str = parser.get_output_file_name(context, input_file, click_options)
+
+        with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
+            for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
+                # Use solution only if no exception was raised
+                try:
+                    solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
+                except Exception as e:
+                    print(f'Algorithm {algorithm.get_name()}. Exception occured: {e}')
+                    notification_vars["instances_failed"] += 1
+                else:
+                    parser.write_result_to_file(output_file, solution)
+                    notification_vars["instances_done"] += 1
+                    self.notify_communicators(context, communicators, solution, notification_vars)
+
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, notification_vars: Dict[str, object]):
         """
         Compute results for the given input file.
@@ -178,24 +206,16 @@ class BaseRunner(Runner):
         print(input_file_path)
         parser: Parser = plugins.get_parser(context.parser_name)
         communicators: List[Communicator] = get_communicators(context)
+        solution = dict()
         
         print(f'Currently testing file \'{input_file_path.split("/")[-1]}\'. Started {time.strftime("%H:%M:%S %d.%m.")}')
         with open(input_file_path, "r") as input_file:
             for algorithm_name in context.algorithm_names:
                 input_file.seek(0)
                 algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
-                
-                click_options = get_click_options(context, algorithm)
-                output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
                 create_columns_description_file(context, algorithm)
-                with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
-                    for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
-                        solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
-
-                        parser.write_result_to_file(output_file, solution)
-                        notification_vars["instances_done_cnt"] += 1
-                        self.notify_communicators(context, communicators, solution, notification_vars)
+                self.run_tester_for_file_algorithm(context, parser, algorithm, communicators, input_file, notification_vars)
         
         self.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
@@ -208,7 +228,7 @@ class BaseRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
-        notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
+        notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
         for index, filename in enumerate(sorted(input_files)):
             if context.max_num is not None and index >= context.max_num:
                 break
@@ -329,16 +349,18 @@ class ConcurrentFilesRunner(Runner):
                 # Give all instances to the executor
                 futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
 
-            notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
+            notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
             for future in concurrent.futures.as_completed(futures):
                 # An instance is done, write it down and notify communicators
                 try:
                     solution: Dict[str, object] = future.result()
-                    self.write_result(context, parser, output_files_dict, solution)
-                    notification_vars["instances_done_cnt"] += 1
-                    self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
                 except Exception as e:
                     print(f'Exception occured: {e}')
+                    notification_vars["instances_failed"] += 1
+                else:
+                    self.write_result(context, parser, output_files_dict, solution)
+                    notification_vars["instances_done"] += 1
+                    self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
 
             self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
@@ -387,7 +409,7 @@ class ConcurrentInstancesRunner(Runner):
     """
     _base_runner: BaseRunner = BaseRunner()
 
-    def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, communicators: List[Communicator], executor: concurrent.futures.ProcessPoolExecutor):
+    def compute_solution_for_file_and_algorithm(self, context: AlgTesterContext, input_file: IO, parser: Parser, algorithm: Algorithm, communicators: List[Communicator], notification_vars: Dict[str, object], executor: concurrent.futures.ProcessPoolExecutor):
         """
         Asynchronously gets results from multiple instances and writes them into the output file using the Parser.
         
@@ -396,34 +418,41 @@ class ConcurrentInstancesRunner(Runner):
             input_file {IO} -- Opened input file with instances.
             parser {Parser} -- Currently used instances parser.
             algorithm {Algorithm} -- Currently tested algorithm.
+            notification_vars {Dict[str, object]} -- Notification variables
             executor {concurrent.futures.ProcessPoolExecutor} -- [description]
         """
         
         click_options = get_click_options(context, algorithm)
         output_filename: str = parser.get_output_file_name(context, input_file, click_options)
+        solution: Dict[str, object] = dict()
 
         create_columns_description_file(context, algorithm)
         with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
             it = self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm)
             futures = [executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance) for instance in it]
 
-            notification_vars: Dict[str, object] = {"instances_done_cnt": 0, "last_comm_time": 0.0}
             for future in concurrent.futures.as_completed(futures):
-                # Write results and notify communicators
-                solution: Dict[str, object] = future.result()
-                parser.write_result_to_file(output_file, solution)
-                notification_vars["instances_done_cnt"] += 1
-                self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
+                # Write results and notify communicators                
+                try:
+                    solution: Dict[str, object] = future.result()
+                except Exception as e:
+                    print(f'Exception occured: {e}')
+                    notification_vars["instances_failed"] += 1
+                else:
+                    parser.write_result_to_file(output_file, solution)
+                    notification_vars["instances_done"] += 1
+                    self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
         
         self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
-    def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, executor: concurrent.futures.ProcessPoolExecutor):
+    def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, notification_vars: Dict[str, object], executor: concurrent.futures.ProcessPoolExecutor):
         """
         Run all algorithms for the selected file.
         
         Arguments:
             context {AlgTesterContext} -- Current application context.
             input_file_path {str} -- String path to the input file
+            notification_vars {Dict[str, object]} -- Notification variables
             executor {concurrent.futures.ProcessPoolExecutor} -- [description]
         """
         
@@ -435,7 +464,7 @@ class ConcurrentInstancesRunner(Runner):
             for algorithm_name in context.algorithm_names:
                 algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
                 
-                self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, communicators, executor)
+                self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, communicators, notification_vars, executor)
 
     def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
@@ -447,12 +476,13 @@ class ConcurrentInstancesRunner(Runner):
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
 
+            notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_num is not None and index >= context.max_num:
                     break
 
                 input_file_path: str = f'{context.input_dir}/{filename}'
-                self.run_tester_for_file(context, input_file_path, executor)
+                self.run_tester_for_file(context, input_file_path, notification_vars, executor)
 
 class Runners(Enum):
     """

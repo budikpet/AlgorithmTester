@@ -26,6 +26,8 @@ def count_instances(context: AlgTesterContext, input_files: List[str]):
         with open(f'{context.input_dir}/{input_file}') as instance_file:
             context.num_of_instances += parser.get_num_of_instances(context, instance_file)
             instance_file.seek(0)
+    
+    context.num_of_instances *= len(context.algorithm_names)
 
 def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, min_communicator_delay: float, input_dir, output_dir, extra_options):
     """

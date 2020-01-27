@@ -9,7 +9,7 @@ from tests.test_internal.fixtures import create_dummy_context, create_dummy_algo
 
 def test_count_instances():
     parser: Parser = create_dummy_parser()
-    ctx: AlgTesterContext = create_dummy_context(parser=parser)
+    ctx: AlgTesterContext = create_dummy_context(parser=parser, algorithms=["Alg1", "Alg2"])
 
     input_files = list()
     for _, _, files in os.walk(ctx.input_dir):
@@ -21,7 +21,7 @@ def test_count_instances():
 
     tester_logic.count_instances(ctx, input_files)
 
-    assert ctx.num_of_instances == 500*2
+    assert ctx.num_of_instances == 500*2*len(ctx.algorithm_names)
     print
 
 def test_run_tester(tmpdir):

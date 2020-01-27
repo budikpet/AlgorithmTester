@@ -214,7 +214,7 @@ class Communicator:
         """
         pass
         
-    def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int):
+    def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int, num_of_instances_failed: int):
         """
         The communicator is notified when an instance is computed.
         
