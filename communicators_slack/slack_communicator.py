@@ -34,7 +34,7 @@ class SlackCommunicator(Communicator):
             last_solution {Dict[str, object]} -- Last computed instance data.
             num_of_instances_done {int} -- Number of instances that were computed to this time.
         """
-        output_filename: str = last_solution.get("output_file_name")
+        output_filename: str = last_solution.get("output_filename")
         print(f'Output file: {context.output_dir}/{output_filename}')
         print(f'Instances remaining: {num_of_instances_done}/{context.num_of_instances}')
 

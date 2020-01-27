@@ -113,13 +113,42 @@ class Algorithm(object):
         """
         Main method of the class. Receives instance data from a parser and creates results.
         
-        Args:
-            parsed_data (Dict[str, object]): Instance data from a parser.
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            parsed_data {Dict[str, object]} -- Input instance data
         
         Returns:
-            Dict[str, object]: Instance result data. Which values should be part of the output file is determined by the output of get_columns method.
+            Dict[str, object] -- Instance result data. Which values should be part of the output file is determined by the output of get_columns method.
         """
+        
         pass
+
+   
+    def _run_perform_algorithm_func(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+        """
+        Run the perform_algorithm method. 
+        Makes sure that important input data is still present in the output. This data is used further in the programme.
+        
+        Arguments:
+            context {AlgTesterContext} -- Used context.
+            parsed_data {Dict[str, object]} -- Input instance data
+        
+        Returns:
+            Dict[str, object] -- Instance result data. Which values should be part of the output file is determined by the output of get_columns method.
+        """
+        important_data = dict()
+        important_keys: List[str] = ["output_filename", "algorithm_name", "algorithm"]
+        for key in important_keys:
+            important_data[key] = parsed_data.get(key)
+
+        output_data = self.perform_algorithm(context, parsed_data)
+
+        # Put data back if it doesn't exist in the output
+        for key in important_keys:
+            if key not in output_data:
+                output_data[key] = important_data[key]
+
+        return output_data
 
 class Parser(object):
 
@@ -191,6 +220,6 @@ class Communicator:
         
         Arguments:
             context {AlgTesterContext} -- [description]
-            output_file_name {str} -- [description]
+            output_filename {str} -- [description]
         """
         pass

@@ -127,11 +127,11 @@ class BaseRunner(Runner):
         
         if context.check_time:
             # Use timeit to get time
-            t = timeit.Timer(lambda: algorithm.perform_algorithm(context, parsed_instance_data))
+            t = timeit.Timer(lambda: algorithm._run_perform_algorithm_func(context, parsed_instance_data))
             elapsed_time, solution = t.timeit(number=context.time_retries)
             solution["elapsed_time"] = round((elapsed_time*1000)/context.time_retries, 10)   # Store in millis
         else:
-            solution = algorithm.perform_algorithm(context, parsed_instance_data)
+            solution = algorithm._run_perform_algorithm_func(context, parsed_instance_data)
 
         return solution
 
@@ -153,10 +153,10 @@ class BaseRunner(Runner):
         
         click_options: Dict[str, object] = get_click_options(context, algorithm)
         
-        output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
+        output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
         while parsed_instance_data is not None:
-            parsed_instance_data["output_file_name"] = output_file_name
+            parsed_instance_data["output_filename"] = output_filename
             parsed_instance_data["algorithm_name"] = algorithm.get_name()
             parsed_instance_data["algorithm"] = algorithm
             parsed_instance_data.update(context.extra_options)
@@ -186,10 +186,10 @@ class BaseRunner(Runner):
                 algorithm: Algorithm = plugins.get_algorithm(algorithm_name)
                 
                 click_options = get_click_options(context, algorithm)
-                output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
+                output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
                 create_columns_description_file(context, algorithm)
-                with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
+                with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
                     for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
                         solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
 
@@ -287,7 +287,7 @@ class ConcurrentFilesRunner(Runner):
                 click_options: Dict[str, object] = get_click_options(context, alg)
                 output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
-                instance_data["output_file_name"] = output_filename
+                instance_data["output_filename"] = output_filename
                 instance_data["algorithm_name"] = alg.get_name()
                 instance_data["algorithm"] = alg
                 yield (alg, instance_data)
@@ -302,7 +302,7 @@ class ConcurrentFilesRunner(Runner):
             output_files {Dict[str, IO]} -- Dictionary of all currently opened output files.
             data {Dict[str, object]} -- Computation results of an instance.
         """
-        output_filename: str = data["output_file_name"]
+        output_filename: str = data["output_filename"]
 
         if output_filename not in output_files:
             # Output file not yet opened
@@ -386,10 +386,10 @@ class ConcurrentInstancesRunner(Runner):
         """
         
         click_options = get_click_options(context, algorithm)
-        output_file_name: str = parser.get_output_file_name(context, input_file, click_options)
+        output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
         create_columns_description_file(context, algorithm)
-        with open(f'{context.output_dir}/{output_file_name}', "w") as output_file:
+        with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
             it = self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm)
             futures = [executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance) for instance in it]
 
