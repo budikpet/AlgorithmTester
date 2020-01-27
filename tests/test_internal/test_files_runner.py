@@ -64,7 +64,7 @@ def test_get_data_for_executor():
     parser = create_dummy_parser()
     algorithms = [create_dummy_algorithm(name="DummyAlg1"), create_dummy_algorithm(name="DummyAlg2")]
     base_context: AlgTesterContext = create_dummy_context(parser=parser)
-    base_context.num_of_instances = 500*2
+    base_context.num_of_instances = 500*2*len(algorithms)
     input_files = _get_input_files(base_context.input_dir)
 
     instance_cnt = 0
@@ -72,15 +72,16 @@ def test_get_data_for_executor():
         assert algorithm in algorithms
         instance_cnt += 1
 
-    assert instance_cnt == base_context.num_of_instances*len(algorithms)
+    assert instance_cnt == base_context.num_of_instances
     
     _runner.close_all_files(input_files)
 
 def test_write_result(tmpdir):
     parser = create_dummy_parser()
     base_context: AlgTesterContext = create_dummy_context(parser=parser)
+    base_context.output_dir = tmpdir.strpath
     output_files = {
-        'output_1.dat': open(f'{tmpdir.strpath}/output_1.dat', "w")
+        'output_1.dat': open(f'{base_context.output_dir}/output_1.dat', "w")
     }
 
     flexmock(parser).should_receive("write_result_to_file").times(3)
@@ -96,3 +97,24 @@ def test_write_result(tmpdir):
 
     _runner.close_all_files(output_files)
     print
+
+# def tests_run_tester_for_data(tmpdir):
+#     parser = create_dummy_parser()
+#     algorithms = [create_dummy_algorithm(name="DummyAlg1"), create_dummy_algorithm(name="DummyAlg2")]
+#     base_context: AlgTesterContext = create_dummy_context(parser=parser)
+#     base_context.num_of_instances = 500*2*len(algorithms)
+#     base_context.output_dir = tmpdir.strpath
+#     input_files_dict = _get_input_files(base_context.input_dir)
+#     output_files_dict = dict()
+
+#     (flexmock(_runner._base_runner).should_receive("notify_communicators")
+#         .and_return(None)
+#         .times(base_context.num_of_instances + 1))
+
+#     (flexmock(_runner).should_receive("write_result")
+#         .and_return(None)
+#         .times(base_context.num_of_instances)
+#         )
+
+#     _runner.run_tester_for_data(base_context, algorithms, parser, list(), input_files_dict, output_files_dict)
+#     print
