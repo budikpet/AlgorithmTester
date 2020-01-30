@@ -196,11 +196,14 @@ class BaseRunner(Runner):
             for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
                 # Use solution only if no exception was raised
                 try:
-                    instance_identifier: str = parser._get_complete_instance_identifier(algorithm, parsed_instance_data)
-                    if not context.is_forced and self.instances_logger.is_instance_already_done(instance_identifier):
-                        continue
+                    if not context.is_forced:
+                        # Check if instance is already solved
+                        instance_identifier: str = parser._get_complete_instance_identifier(algorithm, parsed_instance_data)
+                        if self.instances_logger.is_instance_already_done(instance_identifier):
+                            continue
 
                     solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
+                    instance_identifier: str = parser._get_complete_instance_identifier(algorithm, solution)
                 except Exception as e:
                     print(f'Algorithm {algorithm.get_name()}. Exception occured: {e}')
                     notification_vars["instances_failed"] += 1
@@ -360,8 +363,15 @@ class ConcurrentFilesRunner(Runner):
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = list()
+            solution = dict()
             for data in self.get_data_for_executor(context, input_files_dict, parser, algorithms):
                 # Give all instances to the executor
+                if not context.is_forced:
+                    # Check if instance is already solved
+                    instance_identifier: str = parser._get_complete_instance_identifier(data[0], data[1])
+                    if self.instances_logger.is_instance_already_done(instance_identifier):
+                        continue
+
                 futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
 
             notification_vars: Dict[str, object] = init_notification_vars(context.is_forced, self.instances_logger.get_num_of_done_instances())
@@ -370,12 +380,14 @@ class ConcurrentFilesRunner(Runner):
                 # An instance is done, write it down and notify communicators
                 try:
                     solution: Dict[str, object] = future.result()
+                    instance_identifier: str = parser._get_complete_instance_identifier(solution["algorithm"], solution)
                 except Exception as e:
                     print(f'Exception occured: {e}')
                     notification_vars["instances_failed"] += 1
                 else:
                     self.write_result(context, parser, output_files_dict, solution)
                     notification_vars["instances_done"] += 1
+                    self.instances_logger.write_instance_to_log(instance_identifier)
                     self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
 
             self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
@@ -444,19 +456,28 @@ class ConcurrentInstancesRunner(Runner):
 
         create_columns_description_file(context, algorithm)
         with open(f'{context.output_dir}/{output_filename}', "a") as output_file:
-            it = self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm)
-            futures = [executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance) for instance in it]
+            futures = list()
+            for instance_data in self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm):
+                if not context.is_forced:
+                    # Check if instance is already solved
+                    instance_identifier: str = parser._get_complete_instance_identifier(algorithm, instance_data)
+                    if self.instances_logger.is_instance_already_done(instance_identifier):
+                        continue
+                futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance_data))
 
+            print(f'There are {len(futures)} futures being done.')
             for future in concurrent.futures.as_completed(futures):
                 # Write results and notify communicators                
                 try:
                     solution: Dict[str, object] = future.result()
+                    instance_identifier: str = parser._get_complete_instance_identifier(solution["algorithm"], solution)
                 except Exception as e:
                     print(f'Exception occured: {e}')
                     notification_vars["instances_failed"] += 1
                 else:
                     parser.write_result_to_file(output_file, solution)
                     notification_vars["instances_done"] += 1
+                    self.instances_logger.write_instance_to_log(instance_identifier)
                     self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
         
         self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
