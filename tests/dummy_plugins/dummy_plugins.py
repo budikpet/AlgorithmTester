@@ -1,9 +1,12 @@
 import time
 import random
 from typing import List, Dict, IO
-from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, Communicator, AlgTesterContext
+from algorithm_tester_common.tester_dataclasses import Algorithm, Parser, Communicator, AlgTesterContext, DynamicClickOption
 
 class DummyAlgorithm(Algorithm):
+    """
+    The most basic algorithm which modifies the input data and sends it back.
+    """
 
     def get_name(self) -> str:
         return "DummyAlgorithm" 
@@ -12,7 +15,7 @@ class DummyAlgorithm(Algorithm):
         return ["index", "name"]
 
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        time.sleep(round(random.uniform(0, 0.1), 3))
+        # time.sleep(round(random.uniform(0, 0.1), 3))
         parsed_data.update({
             "index": int(parsed_data["id"]),
             "name": f'Test_{parsed_data["item_count"]}'
@@ -21,12 +24,26 @@ class DummyAlgorithm(Algorithm):
         return parsed_data
 
 class DummyFailingAlgorithm(Algorithm):
+    """
+    A test algorithm that always raises an exception.
+    
+    Raises:
+        Exception: An exception that is always raised.
+    """
 
     def get_name(self) -> str:
         return "DummyFailingAlgorithm" 
 
     def get_columns(self, show_time: bool = True) -> List[str]:
         return ["index", "name"]
+
+    def required_click_params(self) -> List[DynamicClickOption]:
+        extra_option1 = DynamicClickOption(name="extra_option1", data_type=float, short_opt="-e1", long_opt="--extra-option1", 
+            required=True, doc_help="This is the first extra option.")
+        extra_option2 = DynamicClickOption(name="extra_option2", data_type=float, short_opt="-e2", long_opt="--extra-option2", 
+            required=True, doc_help="This is the second extra option.")
+
+        return [extra_option1, extra_option2]
 
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
         raise Exception("Dummy failure.")

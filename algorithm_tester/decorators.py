@@ -1,10 +1,17 @@
 import click
 from typing import Dict, List
-from algorithm_tester_common.tester_dataclasses import DynamicClickOption
+from algorithm_tester_common.tester_dataclasses import DynamicClickOption, Algorithm, Parser, Communicator
+from algorithm_tester.concurrency_runners import Runner
 
 """
 Contains all helper decorators.
 """
+
+def dynamic_help(algorithms: List[Algorithm], parsers: List[Parser], communicators: List[Communicator], runners: List[Runner]):
+    def dec(obj):
+        obj.__doc__ = "Help me"
+        return obj
+    return dec
 
 def docstring_parameters(*args, **kwargs):
     """ A decorator that enables parameterized docstring. """

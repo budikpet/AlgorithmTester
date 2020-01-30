@@ -160,6 +160,23 @@ class Plugins():
         """
         return [parser.get_name() for parser in self.__parsers]
 
+    def get_parsers(self, with_names: List[str] = None) -> List[Parser]:
+        """
+        Get instances of multiple parsers.
+        
+        Args:
+            with_names (List[str], optional): Names of required parsers. Defaults to None.
+        
+        Returns:
+            List[Parser]: Instances of required algorithms.
+        """
+        if with_names is None:
+            return self.__parsers
+        
+        # Filter algorithms that match the given names
+
+        return [parser for parser in self.__parsers if parser.get_name() in with_names]
+
     #################################################################################################
     #  COMMUNICATORS                                                                                #
     #################################################################################################

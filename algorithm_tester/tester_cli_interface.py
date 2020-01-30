@@ -3,7 +3,7 @@ import time
 from typing import List
 from algorithm_tester.plugins import plugins
 from algorithm_tester.tester_logic import run_tester
-from algorithm_tester.decorators import docstring_parameters, use_dynamic_options
+from algorithm_tester.decorators import docstring_parameters, use_dynamic_options, dynamic_help
 from algorithm_tester.validators import validate_algorithms, validate_parser, validate_extra_options, validate_concurrency_runner, validate_communicators
 from algorithm_tester.concurrency_runners import Runners, Runner
 
@@ -28,6 +28,7 @@ Click CLI interface for the application.
 @click.option("--input-dir", type=str, required=True, help="Path to directory with input files.")
 @click.option("--output-dir", type=str, required=True, help="Path to directory where output files are to be stored.")
 @click.argument('extra-options', callback=validate_extra_options, nargs=-1, type=click.UNPROCESSED)
+@dynamic_help(plugins.get_algorithms(), plugins.get_parsers(), plugins.get_communicators(), [r.value for r in Runners])
 def run_tester_cli_interface(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, is_forced: bool, min_communicator_delay: float, input_dir, output_dir, extra_options):
     run_tester(algorithms, concurrency_runner, check_time, time_retries, parser, communicators, max_num, is_forced, min_communicator_delay, input_dir, output_dir, extra_options)
 

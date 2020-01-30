@@ -7,6 +7,10 @@ from algorithm_tester_common.tester_dataclasses import AlgTesterContext
 from algorithm_tester.helpers import zip_dir
 
 class SlackCommunicator(Communicator):
+    """
+    A communicator that enables communication using Slack channel.
+    
+    """
     
     def __init__(self):
         self.slack_web_client = WebClient(token=os.environ['slack_access_token'])
@@ -17,6 +21,15 @@ class SlackCommunicator(Communicator):
         return "Slack"
 
     def _create_zip_file(self, output_dir: str) -> str:
+        """
+        Creates a ZIP file of the output directory.
+        
+        Arguments:
+            output_dir {str} -- Directory to create ZIP file of.
+        
+        Returns:
+            str -- Path to the created ZIP file.
+        """
         zip_name: str = output_dir.split("/")[-1]
         zip_dir_path: str = zip_dir(zip_name, output_dir)
 

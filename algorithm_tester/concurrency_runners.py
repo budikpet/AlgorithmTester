@@ -363,7 +363,7 @@ class ConcurrentFilesRunner(Runner):
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = list()
-            solution = dict()
+            # solution = dict()
             for data in self.get_data_for_executor(context, input_files_dict, parser, algorithms):
                 # Give all instances to the executor
                 if not context.is_forced:
@@ -381,14 +381,16 @@ class ConcurrentFilesRunner(Runner):
                 try:
                     solution: Dict[str, object] = future.result()
                     instance_identifier: str = parser._get_complete_instance_identifier(solution["algorithm"], solution)
-                except Exception as e:
-                    print(f'Exception occured: {e}')
-                    notification_vars["instances_failed"] += 1
-                else:
+
+                    print(f"Curr alg: {solution['algorithm_name']} = {solution}")
                     self.write_result(context, parser, output_files_dict, solution)
                     notification_vars["instances_done"] += 1
                     self.instances_logger.write_instance_to_log(instance_identifier)
                     self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
+                except Exception as e:
+                    print(f'Sol: {solution["algorithm_name"]}')
+                    print(f'Exception occured: {e}')
+                    notification_vars["instances_failed"] += 1                    
 
             self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
