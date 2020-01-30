@@ -26,10 +26,11 @@ Contents of AlgorithmTester's documentation:
 ----------------------------------------------
 
 .. toctree::
-	:maxdepth: 2
-
-	getting_started
-	plugins
+    :maxdepth: 2
+    
+    getting_started
+    plugins
+    slack
 
 .. toctree::
 	:maxdepth: 1

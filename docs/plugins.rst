@@ -49,7 +49,7 @@ but it's possible to add it like this quite easily.
 
 .. _algorithmsLabel:
 
-Algorithms
+Add Algorithms
 ----------------
 New algorithms need to conform 
 :class:`algorithm_tester_common.tester_dataclasses.Algorithm` class.
@@ -77,6 +77,76 @@ An example of how to add a new algorithm:
 
 These are neccessary methods for the new algorithm to work properly.
 
-The :meth:`algorithm_tester_common.tester_dataclasses.Algorithm.get_name` function
+The :meth:`algorithm_tester_common.tester_dataclasses.Algorithm.get_name` method
 is the identification of the algorithm. More information about using 
 these identifiers in :ref:`howToUse` section.
+
+The :meth:`algorithm_tester_common.tester_dataclasses.Algorithm.perform_algorithm` method
+runs the actual algorithm using the provided instance data that is received
+from a :class:`algorithm_tester_common.tester_dataclasses.Parser` plugin in a form of a python dictionary.
+The method also returns results in a form of a python dictionary.
+
+The :meth:`algorithm_tester_common.tester_dataclasses.Algorithm.get_columns` method
+is used to select keys from the results of the algorithm. Data under these keys
+will be added to the output file.
+
+Add Parsers
+-------------
+New parsers need to conform 
+:class:`algorithm_tester_common.tester_dataclasses.Parser` class.
+
+An example of how to add a new parser:
+
+.. code-block:: python
+
+    from algorithm_tester_common.tester_dataclasses import Parser
+
+    class NewParser(Parser):
+        """
+        DocString used in help.
+        
+        """
+
+        def get_name(self) -> str:
+            ...
+
+        def get_output_file_name(self, context: AlgTesterContext, input_file: IO, click_args: Dict[str, object]) -> str:
+            ...
+
+        def get_instance_identifier(self, instance_data: Dict[str, object]) -> str:
+            ...
+
+        def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
+            ...
+
+        def get_next_instance(self, input_file: IO) -> Dict[str, object]:
+            ...
+
+        def write_result_to_file(self, output_file: IO, data: Dict[str, object]):
+            ...
+
+Parser plugins make it possible to use any format of input and output files.
+It's responsible for parsing instance data from input files and writing results into output files.
+
+Add Communicators
+--------------------
+New communicators need to conform 
+:class:`algorithm_tester_common.tester_dataclasses.Communicators` class.
+
+An example of how to add a new communicator:
+
+.. code-block:: python
+
+    from algorithm_tester_common.tester_dataclasses import Communicator
+
+    class NewComm(Communicator):
+        def get_name(self) -> str:
+            ...
+            
+        def notify_instance_computed(self, context: AlgTesterContext, last_solution: Dict[str, object], num_of_instances_done: int, num_of_instances_failed: int):
+            ...
+
+They make it possible to remotely monitor progress of computation. 
+Communicators are notified in desired intervals.
+
+AlgorithmTester has a built-in Slack communicator. More about it in :ref:`slack` section.
