@@ -17,16 +17,19 @@ It receives input files with instances, hands them to provided algorithms and st
 AlgorithmTester uses plugin architecture to make it possible to add any algorithm for any type of problem and use any
 format of input and output files.
 
+AlgorithmTester provides other useful features such as asynchronous computation or 
+ability to monitor a state of computation using communicators.
+
 .. _Click: https://click.palletsprojects.com/en/7.x/
 
 Contents of AlgorithmTester's documentation:
 ----------------------------------------------
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+	:maxdepth: 2
 
-
+	getting_started
+    plugins
 
 Indices and tables
 ==================
