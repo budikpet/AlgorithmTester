@@ -5,7 +5,7 @@ from flexmock import flexmock
 from typing import Dict, List, IO
 from algorithm_tester.concurrency_runners import Runner, Runners, BaseRunner
 import algorithm_tester.concurrency_runners as concurrency_runners
-from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, Parser
+from algorithm_tester_common.tester_dataclasses import Algorithm, AlgTesterContext, Parser, InstancesLogger
 from algorithm_tester.helpers import curr_time_millis
 from tests.test_internal.fixtures import create_dummy_context, create_dummy_algorithm, get_base_parsed_data, create_dummy_parser
 from algorithm_tester.plugins import Plugins
@@ -144,9 +144,12 @@ def test_run_tester_for_file_exceptions(tmpdir):
     assert notification_vars["instances_failed"] == base_context.num_of_instances
     print
 
-def test_compute_results():
+@pytest.mark.parametrize('is_change_forced', (True, False))
+def test_compute_results(is_change_forced: bool):
     base_context: AlgTesterContext = create_dummy_context()
     base_context.max_files_to_check = None
+    base_context.is_forced = is_change_forced
+    instances_logger: InstancesLogger = InstancesLogger(base_context.output_dir, base_context.is_forced)
 
     input_files = list()
     for root, _, files in os.walk(base_context.input_dir):
@@ -159,6 +162,6 @@ def test_compute_results():
         .and_return(None)
         .times(len(input_files)))
 
-    _runner.compute_results(base_context, input_files)
+    _runner.compute_results(base_context, input_files, instances_logger)
 
     print

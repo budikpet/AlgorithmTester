@@ -5,7 +5,7 @@ import multiprocessing
 import concurrent.futures
 from enum import Enum
 from typing import IO, Dict, List
-from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, Communicator
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, Communicator, InstancesLogger
 from algorithm_tester.plugins import plugins
 from algorithm_tester.helpers import curr_time_millis
 
@@ -74,7 +74,7 @@ def create_columns_description_file(context: AlgTesterContext, algorithm: Algori
 
 class Runner(object):
 
-    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
         pass
 
 class BaseRunner(Runner):
@@ -218,7 +218,7 @@ class BaseRunner(Runner):
         
         self.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
-    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -366,7 +366,7 @@ class ConcurrentFilesRunner(Runner):
             # Close all input files
             self.close_all_files(input_files_dict)
         
-    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -465,7 +465,7 @@ class ConcurrentInstancesRunner(Runner):
                 
                 self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, communicators, notification_vars, executor)
 
-    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         

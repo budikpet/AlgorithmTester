@@ -1,7 +1,9 @@
 import os
+import shutil
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, IO
 from enum import Enum
+import algorithm_tester.helpers as helpers
 
 class AlgTesterContext():
     """
@@ -27,12 +29,6 @@ class AlgTesterContext():
 
         if self.extra_options is None:
             self.extra_options = dict()
-
-        self.instances_logger = None
-    
-    def open_instances_logger(self):
-        if self.instances_logger is None:
-            self.instances_logger = InstancesLogger(context.output_dir)
 
     def get_options(self) -> Dict[str, object]:
         options = {
@@ -88,20 +84,25 @@ class InstancesLogger():
     Class that persists created instances in a log that can be later used to resume computation without deleting old results.
     """
 
-    def __init__(self, output_dir: str):
+    def __init__(self, output_dir: str, is_forced: bool):
         self._output_dir: str = output_dir
         self._loaded_instances: Dict[str, List[str]] = list()
-        self._instance_log: IO
+        self._instance_log: IO = None
         self._instances_log_filename: str = ".instances_log.dat"
 
-    def load_instances(self, output_dir: str):
+        if is_forced:
+            # Remove instance files if forced = True
+            shutil.rmtree(output_dir)
+            helpers.create_path(output_dir)
+        else:
+            # Read already created instances from log
+            self.load_instances()
+
+    def load_instances(self):
         """
         Loads identifiers of all done instances.
-        
-        Args:
-            output_dir (str): Path to the output directory where the log file is located.
         """
-        filepath: str = f'{self._output_dir}/{self.instances_log_filename}'
+        filepath: str = f'{self._output_dir}/{self._instances_log_filename}'
         if not os.path.isfile(filepath):
             return
         
@@ -116,7 +117,19 @@ class InstancesLogger():
                     self._loaded_instances[algorithm_name] = list()
                 
                 self._loaded_instances[algorithm_name].append(instance_data)
+    
+    def get_num_of_instances(self) -> int:
+        return len(self._loaded_instances)
 
+    def write_instance_to_log(self, instance_identifier: str):
+        if self._instance_log is None:
+            self._instance_log = open(f'{self._output_dir}/{self._instances_log_filename}', 'w+')
+        
+        self._instance_log.write(f'{instance_identifier}\n')
+    
+    def close_log(self):
+        if self._instance_log is not None and not self._instance_log.closed():
+            self._instance_log.close()
 
 class Algorithm(object):
     """

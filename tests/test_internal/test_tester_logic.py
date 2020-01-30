@@ -4,7 +4,7 @@ import flexmock
 import algorithm_tester.tester_logic as tester_logic
 from algorithm_tester.concurrency_runners import Runner, BaseRunner, ConcurrentFilesRunner, ConcurrentInstancesRunner
 from algorithm_tester.plugins import Plugins
-from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, Communicator
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, Communicator, InstancesLogger
 from tests.test_internal.fixtures import create_dummy_context, create_dummy_algorithm, get_base_parsed_data, create_dummy_parser 
 
 def test_count_instances():
@@ -41,7 +41,7 @@ def test_run_tester(tmpdir):
 
     flexmock(BaseRunner)
     (BaseRunner.should_receive("compute_results")
-        .with_args(object, input_files)
+        .with_args(object, input_files, InstancesLogger)
         .and_return(None)
         .once())
 

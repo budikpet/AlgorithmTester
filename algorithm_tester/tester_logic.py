@@ -3,7 +3,7 @@ import timeit
 import time
 import shutil
 from typing import Dict, List, IO
-from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser
+from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, InstancesLogger
 from algorithm_tester.plugins import plugins
 from algorithm_tester.concurrency_runners import Runner, Runners
 import algorithm_tester.helpers as helpers
@@ -62,15 +62,19 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
     # Count number of instances
     count_instances(context, input_files)
 
-    # Remove instance files if forced = True
-    if context.is_forced:
-        shutil.rmtree(context.output_dir)
-        helpers.create_path(output_dir)
-
-
+    # Prepare instances logger
+    instances_logger = InstancesLogger(context.output_dir, context.is_forced)
+        
     context.start_time = helpers.curr_time_millis()
     start = time.perf_counter()
-    runner.compute_results(context, input_files)
+
+    try:
+        runner.compute_results(context, input_files, instances_logger)
+    except Exception as e:
+        print(f'Exception occured in tester_logic: {e}')
+    finally:
+        instances_logger.close_log()
+
     finish = time.perf_counter()
     print(f'Finished task in {round(finish - start, 2)} second(s)')
 
