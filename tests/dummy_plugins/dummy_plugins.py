@@ -12,7 +12,7 @@ class DummyAlgorithm(Algorithm):
         return ["index", "name"]
 
     def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
-        # time.sleep(round(random.random(), 3))
+        time.sleep(round(random.random(), 3))
         parsed_data.update({
             "index": int(parsed_data["id"]),
             "name": f'Test_{parsed_data["item_count"]}'
@@ -45,7 +45,7 @@ class DummyParser(Parser):
         return input_file_name.replace(".dat", f'_{click_args["algorithm_name"]}_sol.dat')
 
     def get_instance_identifier(self, instance_data: Dict[str, object]) -> str:
-        return ",".join([instance_data["id"], instance_data["item_count"]])
+        return "{},{}".format(instance_data["id"], instance_data["item_count"])
 
     def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
         for index, _ in enumerate(input_file):

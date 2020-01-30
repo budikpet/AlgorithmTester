@@ -74,7 +74,10 @@ def create_columns_description_file(context: AlgTesterContext, algorithm: Algori
 
 class Runner(object):
 
-    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
+    def init(self, instances_logger: InstancesLogger):
+        self.instances_logger: InstancesLogger = instances_logger
+
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         pass
 
 class BaseRunner(Runner):
@@ -182,10 +185,14 @@ class BaseRunner(Runner):
         click_options = get_click_options(context, algorithm)
         output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
-        with open(f'{context.output_dir}/{output_filename}', "w+") as output_file:
+        with open(f'{context.output_dir}/{output_filename}', "a") as output_file:
             for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
                 # Use solution only if no exception was raised
                 try:
+                    instance_identifier: str = parser._get_complete_instance_identifier(algorithm, parsed_instance_data)
+                    if not context.is_forced and self.instances_logger.is_instance_already_done(instance_identifier):
+                        continue
+
                     solution = self.get_solution_for_instance(context, algorithm, parsed_instance_data)
                 except Exception as e:
                     print(f'Algorithm {algorithm.get_name()}. Exception occured: {e}')
@@ -193,6 +200,7 @@ class BaseRunner(Runner):
                 else:
                     parser.write_result_to_file(output_file, solution)
                     notification_vars["instances_done"] += 1
+                    self.instances_logger.write_instance_to_log(instance_identifier)
                     self.notify_communicators(context, communicators, solution, notification_vars)
 
     def run_tester_for_file(self, context: AlgTesterContext, input_file_path: str, notification_vars: Dict[str, object]):
@@ -218,7 +226,7 @@ class BaseRunner(Runner):
         
         self.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
-    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -228,6 +236,10 @@ class BaseRunner(Runner):
         """
 
         notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
+        
+        if not context.is_forced:
+            notification_vars["instances_done"] = self.instances_logger.get_num_of_done_instances()
+        
         for index, filename in enumerate(sorted(input_files)):
             if context.max_files_to_check is not None and index >= context.max_files_to_check:
                 break
@@ -325,7 +337,7 @@ class ConcurrentFilesRunner(Runner):
 
         if output_filename not in output_files:
             # Output file not yet opened
-            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "w+")
+            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "a")
         
         output_file: IO = output_files[output_filename]
         parser.write_result_to_file(output_file, data)
@@ -366,7 +378,7 @@ class ConcurrentFilesRunner(Runner):
             # Close all input files
             self.close_all_files(input_files_dict)
         
-    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         
@@ -426,7 +438,7 @@ class ConcurrentInstancesRunner(Runner):
         solution: Dict[str, object] = dict()
 
         create_columns_description_file(context, algorithm)
-        with open(f'{context.output_dir}/{output_filename}', "w+") as output_file:
+        with open(f'{context.output_dir}/{output_filename}', "a") as output_file:
             it = self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm)
             futures = [executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance) for instance in it]
 
@@ -465,7 +477,7 @@ class ConcurrentInstancesRunner(Runner):
                 
                 self.compute_solution_for_file_and_algorithm(context, input_file, parser, algorithm, communicators, notification_vars, executor)
 
-    def compute_results(self, context: AlgTesterContext, input_files: List[str], instances_logger: InstancesLogger):
+    def compute_results(self, context: AlgTesterContext, input_files: List[str]):
         """
         Parses instances from given input files, solve them using required algorithms and write results to the output file.
         

@@ -41,7 +41,7 @@ def test_run_tester(tmpdir):
 
     flexmock(BaseRunner)
     (BaseRunner.should_receive("compute_results")
-        .with_args(object, input_files, InstancesLogger)
+        .with_args(object, input_files)
         .and_return(None)
         .once())
 

@@ -69,7 +69,8 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
     start = time.perf_counter()
 
     try:
-        runner.compute_results(context, input_files, instances_logger)
+        runner.init(instances_logger)
+        runner.compute_results(context, input_files)
     except Exception as e:
         print(f'Exception occured in tester_logic: {e}')
     finally:

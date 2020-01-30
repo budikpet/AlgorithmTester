@@ -20,9 +20,10 @@
                 "-s", "DummyAlgorithm",
                 "-r", "base",
                 "--check-time","True",
-                "-f",
+                // "-f",
                 // "-n", "1",
                 "-p", "DummyParser",
+                "-c", "Slack",
                 "--input-dir", "${workspaceFolder}/tests/dummy_plugins/fixtures/data",
                 "--output-dir", "${workspaceFolder}/tests/dummy_plugins/fixtures/tester_results"
             ],

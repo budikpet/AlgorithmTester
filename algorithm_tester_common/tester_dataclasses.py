@@ -115,12 +115,16 @@ class InstancesLogger():
                 if algorithm_name not in self._loaded_instances:
                     self._loaded_instances[algorithm_name] = list()
                 
-                self._loaded_instances[algorithm_name].append(instance_identifier)
+                self._loaded_instances[algorithm_name].append(instance_identifier.strip())
 
                 instance_identifier: str = instances_log.readline()
     
-    def get_num_of_instances(self) -> int:
-        return len(self._loaded_instances)
+    def get_num_of_done_instances(self) -> int:
+        cnt: int = 0
+        for _, instances in self._loaded_instances.items():
+            cnt += len(instances)
+        
+        return cnt
     
     def is_instance_already_done(self, instance_identifier: str) -> bool:
         algorithm_name: str = instance_identifier.split(" ")[0]
@@ -132,12 +136,13 @@ class InstancesLogger():
 
     def write_instance_to_log(self, instance_identifier: str):
         if self._instance_log is None:
-            self._instance_log = open(f'{self._output_dir}/{self._instances_log_filename}', 'w+')
+            self._instance_log = open(f'{self._output_dir}/{self._instances_log_filename}', 'a')
         
         self._instance_log.write(f'{instance_identifier}\n')
+        self._instance_log.flush()
     
     def close_log(self):
-        if self._instance_log is not None and not self._instance_log.closed():
+        if self._instance_log is not None and not self._instance_log.closed:
             self._instance_log.close()
 
 class Algorithm(object):

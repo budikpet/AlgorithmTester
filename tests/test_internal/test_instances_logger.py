@@ -70,6 +70,20 @@ def test_create_dummy_results(tmpdir, max_instances_done_per_file: int):
     if max_instances_done_per_file is not None:
         assert num_of_logs == num_of_input_files * max_instances_done_per_file
 
+def prepare_objects(output_dir, is_change_forced: bool, max_instances_done_per_file: int):
+    parser: Parser = create_dummy_parser(write_result=True)
+    algorithm: Algorithm = create_dummy_algorithm()
+    base_context: AlgTesterContext = create_dummy_context(parser=parser.get_name(), algorithms=[algorithm.get_name()])
+    base_context.max_files_to_check = None
+    base_context.is_forced = is_change_forced
+    base_context.output_dir = output_dir
+
+    create_dummy_results(base_context, algorithm, parser, log_filename, max_instances_done_per_file)
+
+    instances_logger = InstancesLogger(base_context.output_dir, base_context.is_forced)
+
+    return base_context, algorithm, parser, instances_logger
+
 
 @pytest.mark.parametrize(['is_change_forced', 'max_instances_done_per_file'], 
     [
@@ -80,17 +94,9 @@ def test_create_dummy_results(tmpdir, max_instances_done_per_file: int):
     ]
 )
 def test_init(tmpdir, is_change_forced: bool, max_instances_done_per_file: int):
-    parser: Parser = create_dummy_parser(write_result=True)
-    algorithm: Algorithm = create_dummy_algorithm()
-    base_context: AlgTesterContext = create_dummy_context(parser=parser.get_name(), algorithms=[algorithm.get_name()])
-    base_context.max_files_to_check = None
-    base_context.is_forced = is_change_forced
-    base_context.output_dir = tmpdir.strpath
+    base_context, algorithm, parser, instances_logger = prepare_objects(tmpdir.strpath, is_change_forced, max_instances_done_per_file)
+
     num_of_input_files = len(os.listdir(base_context.input_dir))
-
-    create_dummy_results(base_context, algorithm, parser, log_filename, max_instances_done_per_file)
-
-    instances_logger = InstancesLogger(base_context.output_dir, base_context.is_forced)
     
     if not is_change_forced:
         assert algorithm.get_name() in instances_logger._loaded_instances
@@ -104,21 +110,36 @@ def test_init(tmpdir, is_change_forced: bool, max_instances_done_per_file: int):
     print
 
 def test_init_no_log(tmpdir):
-    parser: Parser = create_dummy_parser(write_result=True)
-    algorithm: Algorithm = create_dummy_algorithm()
-    base_context: AlgTesterContext = create_dummy_context(parser=parser.get_name(), algorithms=[algorithm.get_name()])
-    base_context.max_files_to_check = None
-    base_context.is_forced = False
-    base_context.output_dir = tmpdir.strpath
-    num_of_input_files = len(os.listdir(base_context.input_dir))
-
-    create_dummy_results(base_context, algorithm, parser, log_filename)
+    base_context, algorithm, parser, _ = prepare_objects(tmpdir.strpath, False, None)
     os.remove(f'{base_context.output_dir}/{log_filename}')
 
-    instances_logger = InstancesLogger(base_context.output_dir, base_context.is_forced)
+    instances_logger: InstancesLogger = InstancesLogger(base_context.output_dir, base_context.is_forced)
+
+    num_of_input_files = len(os.listdir(base_context.input_dir))
     
     assert algorithm.get_name() not in instances_logger._loaded_instances
     assert os.path.isdir(base_context.output_dir)
     assert len(os.listdir(base_context.output_dir) ) == num_of_input_files
 
     print
+
+@pytest.mark.parametrize(['is_change_forced', 'max_instances_done_per_file'], 
+    [
+        (True, None),
+        (True, 10),
+        (False, None),
+        (False, 10)
+    ]
+)
+def test_get_num_of_done_instances(tmpdir, is_change_forced: bool, max_instances_done_per_file: int):
+    base_context, algorithm, parser, instances_logger = prepare_objects(tmpdir.strpath, is_change_forced, max_instances_done_per_file)
+   
+    num_of_input_files = len(os.listdir(base_context.input_dir))
+
+    if is_change_forced:
+        assert instances_logger.get_num_of_done_instances() == 0
+    else:
+        if max_instances_done_per_file is None:
+            assert instances_logger.get_num_of_done_instances() != 0
+        else:
+            assert instances_logger.get_num_of_done_instances() == num_of_input_files*max_instances_done_per_file
