@@ -57,10 +57,12 @@ class SlackCommunicator(Communicator):
         # Prepare messages
         start_time = datetime.fromtimestamp(context.start_time)
         timestr: str = f'Computation started: {start_time.strftime("%d.%m.%Y %H:%M:%S")}'
+        progress_str: str = f'Progress: [{num_of_instances_done}/{num_of_instances_failed}]/{context.num_of_instances} instances [done/failed].'
+        percent_str: str = f'{(num_of_instances_done + num_of_instances_failed)*100 // context.num_of_instances}% of work done.'
         main_message = {
             "username": os.environ['slack_bot_username'],
             "channel": os.environ['slack_channel_id'],
-            "text": f'{timestr}\nProgress: [{num_of_instances_done}/{num_of_instances_failed}]/{context.num_of_instances} instances [done/failed].'
+            "text": f'{timestr}\n{progress_str}\n{percent_str}'
         }
 
         file_message = {

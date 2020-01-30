@@ -32,3 +32,4 @@ Check how to use the AlgorithmTester using:
 That shows standard Click CLI help and also documentation of all 
 available Algorithms, Parsers, Communicators and ConcurrencyRunners.
 
+See :ref:`usingPlugins` to learn how to add new plugins.

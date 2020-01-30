@@ -29,7 +29,12 @@ Contents of AlgorithmTester's documentation:
 	:maxdepth: 2
 
 	getting_started
-    plugins
+	plugins
+
+.. toctree::
+	:maxdepth: 1
+
+	modules/modules
 
 Indices and tables
 ==================
