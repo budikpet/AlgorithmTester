@@ -24,6 +24,13 @@ def inner(_it, _timer{init}):
 """
 timeit.template = new_template
 
+def init_notification_vars(is_forced: bool, num_of_done_instances: int):
+    notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
+    if not is_forced:
+        notification_vars["instances_done"] = num_of_done_instances
+
+    return notification_vars
+
 def get_click_options(context: AlgTesterContext, algorithm: Algorithm) -> Dict[str, object]:
     """
     Create a dictionary of options and arguments given to the Click CLI. 
@@ -235,10 +242,7 @@ class BaseRunner(Runner):
             input_files {List[str]} -- Unsorted list of input file names.
         """
 
-        notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
-        
-        if not context.is_forced:
-            notification_vars["instances_done"] = self.instances_logger.get_num_of_done_instances()
+        notification_vars: Dict[str, object] = init_notification_vars(context.is_forced, self.instances_logger.get_num_of_done_instances())
         
         for index, filename in enumerate(sorted(input_files)):
             if context.max_files_to_check is not None and index >= context.max_files_to_check:
@@ -360,7 +364,8 @@ class ConcurrentFilesRunner(Runner):
                 # Give all instances to the executor
                 futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
 
-            notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
+            notification_vars: Dict[str, object] = init_notification_vars(context.is_forced, self.instances_logger.get_num_of_done_instances())
+            
             for future in concurrent.futures.as_completed(futures):
                 # An instance is done, write it down and notify communicators
                 try:
@@ -487,7 +492,7 @@ class ConcurrentInstancesRunner(Runner):
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
 
-            notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
+            notification_vars: Dict[str, object] = init_notification_vars(context.is_forced, self.instances_logger.get_num_of_done_instances())
             for index, filename in enumerate(sorted(input_files)):
                 if context.max_files_to_check is not None and index >= context.max_files_to_check:
                     break
