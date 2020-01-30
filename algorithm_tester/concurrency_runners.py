@@ -3,6 +3,7 @@ import timeit
 import time
 import multiprocessing
 import concurrent.futures
+import copy
 from enum import Enum
 from typing import IO, Dict, List
 from algorithm_tester_common.tester_dataclasses import AlgTesterContext, Algorithm, Parser, Communicator, InstancesLogger
@@ -325,10 +326,11 @@ class ConcurrentFilesRunner(Runner):
                 click_options: Dict[str, object] = get_click_options(context, alg)
                 output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
-                instance_data["output_filename"] = output_filename
-                instance_data["algorithm_name"] = alg.get_name()
-                instance_data["algorithm"] = alg
-                yield (alg, instance_data)
+                full_instance_data = copy.deepcopy(instance_data)
+                full_instance_data["output_filename"] = output_filename
+                full_instance_data["algorithm_name"] = alg.get_name()
+                full_instance_data["algorithm"] = alg
+                yield (alg, full_instance_data)
 
     def write_result(self, context: AlgTesterContext, parser: Parser, output_files: Dict[str, IO], data: Dict[str, object]):
         """
@@ -363,7 +365,7 @@ class ConcurrentFilesRunner(Runner):
         """
         with concurrent.futures.ProcessPoolExecutor() as executor:
             futures = list()
-            # solution = dict()
+            solution = dict()
             for data in self.get_data_for_executor(context, input_files_dict, parser, algorithms):
                 # Give all instances to the executor
                 if not context.is_forced:
@@ -371,7 +373,6 @@ class ConcurrentFilesRunner(Runner):
                     instance_identifier: str = parser._get_complete_instance_identifier(data[0], data[1])
                     if self.instances_logger.is_instance_already_done(instance_identifier):
                         continue
-
                 futures.append(executor.submit(self._base_runner.get_solution_for_instance, context, *data))
 
             notification_vars: Dict[str, object] = init_notification_vars(context.is_forced, self.instances_logger.get_num_of_done_instances())
@@ -380,17 +381,16 @@ class ConcurrentFilesRunner(Runner):
                 # An instance is done, write it down and notify communicators
                 try:
                     solution: Dict[str, object] = future.result()
+                except Exception as e:
+                    print(f'Exception occured: {e}')
+                    notification_vars["instances_failed"] += 1      
+                else:
                     instance_identifier: str = parser._get_complete_instance_identifier(solution["algorithm"], solution)
 
-                    print(f"Curr alg: {solution['algorithm_name']} = {solution}")
                     self.write_result(context, parser, output_files_dict, solution)
                     notification_vars["instances_done"] += 1
                     self.instances_logger.write_instance_to_log(instance_identifier)
-                    self._base_runner.notify_communicators(context, communicators, solution, notification_vars)
-                except Exception as e:
-                    print(f'Sol: {solution["algorithm_name"]}')
-                    print(f'Exception occured: {e}')
-                    notification_vars["instances_failed"] += 1                    
+                    self._base_runner.notify_communicators(context, communicators, solution, notification_vars)              
 
             self._base_runner.notify_communicators(context, communicators, solution, notification_vars, forced=True)
 
