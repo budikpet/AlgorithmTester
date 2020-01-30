@@ -3,7 +3,6 @@ import shutil
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, IO
 from enum import Enum
-import algorithm_tester.helpers as helpers
 
 class AlgTesterContext():
     """
@@ -92,8 +91,8 @@ class InstancesLogger():
 
         if is_forced:
             # Remove instance files if forced = True
-            shutil.rmtree(output_dir)
-            helpers.create_path(output_dir)
+            if os.path.isdir(output_dir):
+                shutil.rmtree(output_dir)
         else:
             # Read already created instances from log
             self.load_instances()
@@ -107,16 +106,18 @@ class InstancesLogger():
             return
         
         with open(filepath, "r") as instances_log:
-            instance_identifier: str = input_file.readline()
+            instance_identifier: str = instances_log.readline()
 
-            while instance_identifier is not None or instance_identifier != "":
+            while instance_identifier is not None and instance_identifier != "":
                 split = instance_identifier.split(" ")
                 algorithm_name: str = split[0]
                 
                 if algorithm_name not in self._loaded_instances:
                     self._loaded_instances[algorithm_name] = list()
                 
-                self._loaded_instances[algorithm_name].append(v)
+                self._loaded_instances[algorithm_name].append(instance_identifier)
+
+                instance_identifier: str = instances_log.readline()
     
     def get_num_of_instances(self) -> int:
         return len(self._loaded_instances)
@@ -245,7 +246,7 @@ class Parser(object):
         """
         pass
 
-    def __get_full_instance_identifier(self, algorithm: Algorithm, instance_data: Dict[str, object]) -> str:
+    def _get_complete_instance_identifier(self, algorithm: Algorithm, instance_data: Dict[str, object]) -> str:
         """
         Gets a complete identifier of an instance.
         

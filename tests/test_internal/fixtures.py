@@ -61,7 +61,7 @@ def create_dummy_parser(name: str = "DummyParser", write_result: bool = False):
             return input_file_name.replace(".dat", f'_{click_args["algorithm_name"]}_sol.dat')
 
         def get_instance_identifier(self, instance_data: Dict[str, object]) -> str:
-            return ",".join([instance_data["id"], instance_data["item_count"]])
+            return "{},{}".format(instance_data["id"], instance_data["item_count"])
 
         def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
             for index, _ in enumerate(input_file):

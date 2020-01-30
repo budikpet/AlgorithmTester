@@ -57,13 +57,13 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
         input_dir=input_dir, output_dir=output_dir
         )
 
-    helpers.create_path(output_dir)
-
     # Count number of instances
     count_instances(context, input_files)
 
     # Prepare instances logger
     instances_logger = InstancesLogger(context.output_dir, context.is_forced)
+
+    helpers.create_path(output_dir)
         
     context.start_time = helpers.curr_time_millis()
     start = time.perf_counter()
