@@ -19,6 +19,15 @@ def __get_full_info_strings(title: str, objects_list: List[object]):
     return full_infos
 
 def dynamic_help(algorithms: List[Algorithm], parsers: List[Parser], communicators: List[Communicator]):
+    """
+    A decorator for Click interface. Creates more detailed help string.
+    
+    Arguments:
+        algorithms {List[Algorithm]} -- All available algorithms.
+        parsers {List[Parser]} -- All available parsers.
+        communicators {List[Communicator]} -- All available communicators.
+    
+    """
     def dec(obj):
         runners = [(r.name, r.value) for r in Runners]
         runners_full_infos: List[str] = ["RUNNERS:"]
