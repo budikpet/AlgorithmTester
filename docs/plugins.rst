@@ -51,4 +51,32 @@ but it's possible to add it like this quite easily.
 
 Algorithms
 ----------------
-New algorithms need to conform
+New algorithms need to conform 
+:class:`algorithm_tester_common.tester_dataclasses.Algorithm` class.
+
+An example of how to add a new algorithm:
+
+.. code-block:: python
+
+    from algorithm_tester_common.tester_dataclasses import Algorithm
+
+    class NewAlg(Algorithm):
+        """
+        DocString used in help.
+        
+        """
+
+        def get_columns(self) -> List[str]:
+            ...
+
+        def get_name(self) -> str:
+            return "AlgName"
+        
+        def perform_algorithm(self, context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
+            ...
+
+These are neccessary methods for the new algorithm to work properly.
+
+The :meth:`algorithm_tester_common.tester_dataclasses.Algorithm.get_name` function
+is the identification of the algorithm. More information about using 
+these identifiers in :ref:`howToUse` section.
