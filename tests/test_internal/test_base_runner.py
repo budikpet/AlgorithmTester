@@ -37,7 +37,17 @@ def test_notify_communicators_timing():
     print
 
 def _removing_perform(context: AlgTesterContext, parsed_data: Dict[str, object]):
-    return dict()
+    """
+    A function that does not return input data that is further needed in the algorithm.
+    
+    Arguments:
+        context {AlgTesterContext} -- Used context.
+        parsed_data {Dict[str, object]} -- Input data.
+    
+    Returns:
+        Dict[str, object] -- Modified input data.
+    """
+    return {"id": parsed_data["id"], "item_count": parsed_data["item_count"]}
 
 @pytest.mark.parametrize('algorithm', 
     (create_dummy_algorithm(),
@@ -46,6 +56,7 @@ def _removing_perform(context: AlgTesterContext, parsed_data: Dict[str, object])
 def test_get_solution_for_instance(algorithm: Algorithm):
     base_context = create_dummy_context(algorithms=[algorithm.get_name()])
     base_data = get_base_parsed_data(base_context, algorithm)
+    base_data.update({"id": 0, "item_count": 0})
 
     res: Dict[str, object] = _runner.get_solution_for_instance(base_context, algorithm, base_data)
 
