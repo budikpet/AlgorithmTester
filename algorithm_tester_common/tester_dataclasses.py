@@ -86,7 +86,7 @@ class InstancesLogger():
 
     def __init__(self, output_dir: str, is_forced: bool):
         self._output_dir: str = output_dir
-        self._loaded_instances: Dict[str, List[str]] = list()
+        self._loaded_instances: Dict[str, List[str]] = dict()
         self._instance_log: IO = None
         self._instances_log_filename: str = ".instances_log.dat"
 
@@ -107,19 +107,27 @@ class InstancesLogger():
             return
         
         with open(filepath, "r") as instances_log:
-            instance_data: str = input_file.readline()
+            instance_identifier: str = input_file.readline()
 
-            while instance_data is not None or instance_data != "":
-                split = instance_data.split(" ")
+            while instance_identifier is not None or instance_identifier != "":
+                split = instance_identifier.split(" ")
                 algorithm_name: str = split[0]
                 
                 if algorithm_name not in self._loaded_instances:
                     self._loaded_instances[algorithm_name] = list()
                 
-                self._loaded_instances[algorithm_name].append(instance_data)
+                self._loaded_instances[algorithm_name].append(v)
     
     def get_num_of_instances(self) -> int:
         return len(self._loaded_instances)
+    
+    def is_instance_already_done(self, instance_identifier: str) -> bool:
+        algorithm_name: str = instance_identifier.split(" ")[0]
+
+        if algorithm_name in self._loaded_instances:
+            return instance_identifier in self._loaded_instances[algorithm_name]
+
+        return False
 
     def write_instance_to_log(self, instance_identifier: str):
         if self._instance_log is None:
@@ -224,6 +232,31 @@ class Parser(object):
             str: Name of the output file.
         """
         pass
+
+    def get_instance_identifier(self, instance_data: Dict[str, object]) -> str:
+        """
+        Returns a string that is used to identify an instance. Used for logging instances.
+        
+        Arguments:
+            instance_data {Dict[str, object]} -- Data of the used instance.
+        
+        Returns:
+            str -- String which identifies an instance
+        """
+        pass
+
+    def __get_full_instance_identifier(self, algorithm: Algorithm, instance_data: Dict[str, object]) -> str:
+        """
+        Gets a complete identifier of an instance.
+        
+        Arguments:
+            algorithm {Algorithm} -- Algorithm used to compute results of this instance.
+            instance_data {Dict[str, object]} -- Data of the used instance.
+        
+        Returns:
+            str -- Complete identifier string.
+        """
+        return f'{algorithm.get_name()} {self.get_instance_identifier(instance_data)}'
 
     def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
         """

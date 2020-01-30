@@ -35,7 +35,7 @@ def get_base_parsed_data(base_context: AlgTesterContext, algorithm: Algorithm) -
 def _dummy_perform_algorithm(context: AlgTesterContext, parsed_data: Dict[str, object]) -> Dict[str, object]:
     return parsed_data
 
-def create_dummy_algorithm(columns: List[str] = ["A", "B", "C"], name: str = "DummyAlgorithm", perform_func = _dummy_perform_algorithm):
+def create_dummy_algorithm(columns: List[str] = ["id", "algorithm_name"], name: str = "DummyAlgorithm", perform_func = _dummy_perform_algorithm):
     class DummyAlgorithm(Algorithm):
 
         def get_name(self) -> str:
@@ -49,27 +49,7 @@ def create_dummy_algorithm(columns: List[str] = ["A", "B", "C"], name: str = "Du
 
     return DummyAlgorithm()
 
-def _dummy_get_next_instance(input_file: IO) -> Dict[str, object]:
-    instance: str = input_file.readline()
-
-    if instance is None or instance == "":
-        return None
-
-    values: List[str] = instance.split(" ")
-    id, count, capacity = int(values.pop(0)), int(values.pop(0)), int(values.pop(0))
-    it = iter(values)
-    things = [(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
-
-    parsed_data = {
-        "id": id,
-        "item_count": count,
-        "capacity": capacity,
-        "things": things
-    }
-
-    return parsed_data
-
-def create_dummy_parser(name: str = "DummyParser", get_next_instance_func = _dummy_get_next_instance):
+def create_dummy_parser(name: str = "DummyParser", write_result: bool = False):
     class DummyParser(Parser):
 
         def get_name(self) -> str:
@@ -80,6 +60,9 @@ def create_dummy_parser(name: str = "DummyParser", get_next_instance_func = _dum
 
             return input_file_name.replace(".dat", f'_{click_args["algorithm_name"]}_sol.dat')
 
+        def get_instance_identifier(self, instance_data: Dict[str, object]) -> str:
+            return ",".join([instance_data["id"], instance_data["item_count"]])
+
         def get_num_of_instances(self, context: AlgTesterContext, input_file: IO) -> int:
             for index, _ in enumerate(input_file):
                 pass
@@ -87,9 +70,36 @@ def create_dummy_parser(name: str = "DummyParser", get_next_instance_func = _dum
             return index + 1
 
         def get_next_instance(self, input_file: IO) -> Dict[str, object]:
-            return get_next_instance_func(input_file)
+            instance: str = input_file.readline()
+
+            if instance is None or instance == "":
+                return None
+
+            values: List[str] = instance.split(" ")
+            id, count, capacity = int(values.pop(0)), int(values.pop(0)), int(values.pop(0))
+            it = iter(values)
+            things = [(pos, int(weight), int(cost)) for pos, (weight, cost) in enumerate(list(zip(it, it)))]
+
+            parsed_data = {
+                "id": id,
+                "item_count": count,
+                "capacity": capacity,
+                "things": things
+            }
+
+            return parsed_data
 
         def write_result_to_file(self, output_file: IO, data: Dict[str, object]):
-            pass
+            if write_result:
+                columns: List[str] = data["algorithm"].get_columns()
+
+                if data.get("things") is not None:
+                    data["things"] = "".join(map(str, data["things"]))
+                
+                output_data = [data.get(column) for column in columns]
+                
+                output: str = f'{" ".join(map(str, output_data))}'
+                output_file.write(f'{output}\n')
+                output_file.flush()
 
     return DummyParser()
