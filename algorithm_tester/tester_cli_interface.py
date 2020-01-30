@@ -28,7 +28,7 @@ Click CLI interface for the application.
 @click.option("--input-dir", type=str, required=True, help="Path to directory with input files.")
 @click.option("--output-dir", type=str, required=True, help="Path to directory where output files are to be stored.")
 @click.argument('extra-options', callback=validate_extra_options, nargs=-1, type=click.UNPROCESSED)
-@dynamic_help(plugins.get_algorithms(), plugins.get_parsers(), plugins.get_communicators(), [r.value for r in Runners])
+@dynamic_help(plugins.get_algorithms(), plugins.get_parsers(), plugins.get_communicators())
 def run_tester_cli_interface(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, is_forced: bool, min_communicator_delay: float, input_dir, output_dir, extra_options):
     run_tester(algorithms, concurrency_runner, check_time, time_retries, parser, communicators, max_num, is_forced, min_communicator_delay, input_dir, output_dir, extra_options)
 
