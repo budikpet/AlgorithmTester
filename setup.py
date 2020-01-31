@@ -1,11 +1,29 @@
 from setuptools import setup, find_packages
+import os
+from typing import List
+
+def get_plugins() -> List[str]:
+    """
+    Uses dummy plugins only if we are testing the framework.
+    
+    Returns:
+        List[str] -- Plugins entrypoints.
+    """
+    res: List[str] = ['communicators_internal = communicators_slack']
+    if os.path.isfile("./tests/dummy_plugins/fixtures/slack_communicator.cfg"):
+        res.extend([
+            'algorithms = tests.dummy_plugins',
+            'parsers = tests.dummy_plugins'
+        ])
+    
+    return res
 
 with open('README.rst') as f:
     long_description = ''.join(f.readlines())
 
 setup(
     name='algorithm_tester',
-    version='0.7.0',
+    version='0.7.2',
     description='Algorithms tester for MI-PAA.',
     long_description=long_description,
     keywords="algorithms,tester,budikpet, cli",
@@ -29,11 +47,7 @@ setup(
         'console_scripts': [
             'run_tester = algorithm_tester:run_tester_cli_interface',
         ],
-        'algorithm_tester.plugins': [
-            'communicators_internal = communicators_slack',
-            'algorithms = tests.dummy_plugins',
-            'parsers = tests.dummy_plugins'
-        ]
+        'algorithm_tester.plugins': get_plugins()
     },
     classifiers=[
         'Intended Audience :: Developers',
