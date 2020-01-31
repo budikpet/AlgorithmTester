@@ -11,7 +11,7 @@ Welcome to AlgorithmTester's documentation!
 Introduction
 -------------
 AlgorithmTester is a framework which is used to test performance and behaviour of provided algorithms. 
-The framework itself is a Click_ CLI application. 
+The framework itself is a `Click CLI`_ application. 
 It receives input files with instances, hands them to provided algorithms and stores results in output files.
 
 AlgorithmTester uses plugin architecture to make it possible to add any algorithm for any type of problem and use any
@@ -20,14 +20,14 @@ format of input and output files.
 AlgorithmTester provides other useful features such as asynchronous computation or 
 ability to monitor a state of computation using communicators.
 
-.. _Click: https://click.palletsprojects.com/en/7.x/
+.. _`Click CLI`: https://click.palletsprojects.com/en/7.x/
 
 Contents of AlgorithmTester's documentation:
 ----------------------------------------------
 
 .. toctree::
     :maxdepth: 2
-    
+
     getting_started
     plugins
     slack
