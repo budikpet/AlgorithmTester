@@ -8,7 +8,7 @@ Contains all helper decorators.
 """
 
 __help_full_info: str = "\b\n{name}:\n    {doc}"
-__help_short_info: str = "\b\nAvailable {title}:    {names}"
+__help_short_info: str = "\b\nAvailable {title}:    [{names}]"
 
 def __get_full_info_strings(title: str, objects_list: List[object]):
     full_infos: List[str] = [f'{title.upper()}:']
