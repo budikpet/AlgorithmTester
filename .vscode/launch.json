@@ -20,6 +20,7 @@
                 "-s", "DummyAlgorithm",
                 "-r", "base",
                 "--check-time","True",
+                "-f",
                 // "-n", "1",
                 "-p", "DummyParser",
                 "--input-dir", "${workspaceFolder}/tests/dummy_plugins/fixtures/data",

@@ -29,7 +29,7 @@ def count_instances(context: AlgTesterContext, input_files: List[str]):
     
     context.num_of_instances *= len(context.algorithm_names)
 
-def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, min_communicator_delay: float, input_dir, output_dir, extra_options):
+def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool, time_retries: int, parser: str, communicators: List[str], max_num: int, is_forced: True, min_communicator_delay: float, input_dir, output_dir, extra_options):
     """
     Get all data provided by click CLI interface. Run the whole programme.
     
@@ -52,7 +52,7 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
     context: AlgTesterContext = AlgTesterContext(
         algorithms=algorithms, parser=parser, communicators=communicators, concurrency_runner=concurrency_runner,
         max_num=max_num, check_time=check_time, time_retries=time_retries, min_communicator_delay=min_communicator_delay,
-        extra_options=extra_options,
+        extra_options=extra_options, is_forced = is_forced,
         input_dir=input_dir, output_dir=output_dir
         )
 
@@ -60,6 +60,8 @@ def run_tester(algorithms: List[str], concurrency_runner: str, check_time: bool,
 
     # Count number of instances
     count_instances(context, input_files)
+
+    # Remove instance files if forced = True
 
     context.start_time = helpers.curr_time_millis()
     start = time.perf_counter()

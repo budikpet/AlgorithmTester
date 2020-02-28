@@ -47,7 +47,7 @@ def test_run_tester(tmpdir):
 
     assert not os.path.isdir(ctx.output_dir)
     
-    tester_logic.run_tester(ctx.algorithm_names, ctx.concurrency_runner_name, ctx.check_time, ctx.time_retries, ctx.parser_name, ctx.communicator_names, ctx.max_num, ctx.min_time_between_communications, ctx.input_dir, ctx.output_dir, ctx.extra_options)
+    tester_logic.run_tester(ctx.algorithm_names, ctx.concurrency_runner_name, ctx.check_time, ctx.time_retries, ctx.parser_name, ctx.communicator_names, ctx.max_num, ctx.is_forced, ctx.min_time_between_communications, ctx.input_dir, ctx.output_dir, ctx.extra_options)
 
     assert os.path.isdir(ctx.output_dir)
 

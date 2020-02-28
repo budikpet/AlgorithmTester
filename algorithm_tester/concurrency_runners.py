@@ -182,7 +182,7 @@ class BaseRunner(Runner):
         click_options = get_click_options(context, algorithm)
         output_filename: str = parser.get_output_file_name(context, input_file, click_options)
 
-        with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
+        with open(f'{context.output_dir}/{output_filename}', "w+") as output_file:
             for parsed_instance_data in self.get_parsed_instances_data(context, input_file, parser, algorithm):
                 # Use solution only if no exception was raised
                 try:
@@ -326,7 +326,7 @@ class ConcurrentFilesRunner(Runner):
 
         if output_filename not in output_files:
             # Output file not yet opened
-            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "w")
+            output_files[output_filename] = open(f'{context.output_dir}/{output_filename}', "w+")
         
         output_file: IO = output_files[output_filename]
         parser.write_result_to_file(output_file, data)
@@ -427,7 +427,7 @@ class ConcurrentInstancesRunner(Runner):
         solution: Dict[str, object] = dict()
 
         create_columns_description_file(context, algorithm)
-        with open(f'{context.output_dir}/{output_filename}', "w") as output_file:
+        with open(f'{context.output_dir}/{output_filename}', "w+") as output_file:
             it = self._base_runner.get_parsed_instances_data(context, input_file, parser, algorithm)
             futures = [executor.submit(self._base_runner.get_solution_for_instance, context, algorithm, instance) for instance in it]
 

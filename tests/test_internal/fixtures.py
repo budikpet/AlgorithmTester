@@ -10,6 +10,7 @@ def create_dummy_context(algorithms: List[str] = list(), parser: Parser = "Dummy
         communicators=communicators, 
         concurrency_runner="BASE",
         max_num=None, 
+        is_forced=True,
         check_time=False, 
         time_retries=1, 
         min_communicator_delay=10.0,

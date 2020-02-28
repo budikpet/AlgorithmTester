@@ -9,7 +9,7 @@ class AlgTesterContext():
     Contains all options and arguments given to the application.
     """
 
-    def __init__(self, algorithms: List[str], parser: str, concurrency_runner: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, extra_options: Dict[str, object], min_communicator_delay: float, input_dir, output_dir):
+    def __init__(self, algorithms: List[str], parser: str, concurrency_runner: str, communicators: List[str], check_time: bool, time_retries: int, max_num: int, is_forced: bool, extra_options: Dict[str, object], min_communicator_delay: float, input_dir, output_dir):
         self.algorithm_names: List[str] = algorithms
         self.parser_name: str = parser
         self.communicator_names: List[str] = communicators
@@ -18,6 +18,7 @@ class AlgTesterContext():
         self.time_retries: int = time_retries
         # TODO: Rename to max_files_to_check
         self.max_num: int = max_num
+        self.is_forced: bool = is_forced
         self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
         self.output_dir: str = output_dir
