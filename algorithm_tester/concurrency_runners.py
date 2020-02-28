@@ -230,7 +230,7 @@ class BaseRunner(Runner):
 
         notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
         for index, filename in enumerate(sorted(input_files)):
-            if context.max_num is not None and index >= context.max_num:
+            if context.max_files_to_check is not None and index >= context.max_files_to_check:
                 break
 
             input_file_path: str = f'{context.input_dir}/{filename}'
@@ -388,7 +388,7 @@ class ConcurrentFilesRunner(Runner):
         try:
             # Open all input files
             for index, filename in enumerate(sorted(input_files)):
-                if context.max_num is not None and index >= context.max_num:
+                if context.max_files_to_check is not None and index >= context.max_files_to_check:
                     break
                 
                 input_files_dict[filename] = open(f'{context.input_dir}/{filename}', "r")
@@ -478,7 +478,7 @@ class ConcurrentInstancesRunner(Runner):
 
             notification_vars: Dict[str, object] = {"instances_done": 0, "last_comm_time": 0.0, "instances_failed": 0}
             for index, filename in enumerate(sorted(input_files)):
-                if context.max_num is not None and index >= context.max_num:
+                if context.max_files_to_check is not None and index >= context.max_files_to_check:
                     break
 
                 input_file_path: str = f'{context.input_dir}/{filename}'

@@ -146,7 +146,7 @@ def test_run_tester_for_file_exceptions(tmpdir):
 
 def test_compute_results():
     base_context: AlgTesterContext = create_dummy_context()
-    base_context.max_num = None
+    base_context.max_files_to_check = None
 
     input_files = list()
     for root, _, files in os.walk(base_context.input_dir):

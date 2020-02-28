@@ -17,7 +17,7 @@ class AlgTesterContext():
         self.check_time: bool = check_time
         self.time_retries: int = time_retries
         # TODO: Rename to max_files_to_check
-        self.max_num: int = max_num
+        self.max_files_to_check: int = max_num
         self.is_forced: bool = is_forced
         self.extra_options: Dict[str, object] = extra_options
         self.input_dir: str = input_dir
@@ -37,7 +37,7 @@ class AlgTesterContext():
             "communicator_names": self.communicator_names,
             "check_time": self.check_time,
             "time_retries": self.time_retries,
-            "max_num": self.max_num,
+            "max_files_to_check": self.max_files_to_check,
             "input_dir": self.input_dir,
             "output_dir": self.output_dir
         }
