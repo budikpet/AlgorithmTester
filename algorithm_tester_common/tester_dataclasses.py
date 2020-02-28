@@ -1,8 +1,7 @@
-from dataclasses import dataclass, field
+import os
+from dataclasses import dataclass
 from typing import List, Tuple, Dict, IO
 from enum import Enum
-import re
-import multiprocessing
 
 class AlgTesterContext():
     """
@@ -16,7 +15,6 @@ class AlgTesterContext():
         self.concurrency_runner_name: str = concurrency_runner
         self.check_time: bool = check_time
         self.time_retries: int = time_retries
-        # TODO: Rename to max_files_to_check
         self.max_files_to_check: int = max_num
         self.is_forced: bool = is_forced
         self.extra_options: Dict[str, object] = extra_options
@@ -29,6 +27,12 @@ class AlgTesterContext():
 
         if self.extra_options is None:
             self.extra_options = dict()
+
+        self.instances_logger = None
+    
+    def open_instances_logger(self):
+        if self.instances_logger is None:
+            self.instances_logger = InstancesLogger(context.output_dir)
 
     def get_options(self) -> Dict[str, object]:
         options = {
@@ -78,6 +82,41 @@ class DynamicClickOption():
         if isinstance(other, DynamicClickOption):
             return self.__key() == other.__key()
         return NotImplemented
+
+class InstancesLogger():
+    """
+    Class that persists created instances in a log that can be later used to resume computation without deleting old results.
+    """
+
+    def __init__(self, output_dir: str):
+        self._output_dir: str = output_dir
+        self._loaded_instances: Dict[str, List[str]] = list()
+        self._instance_log: IO
+        self._instances_log_filename: str = ".instances_log.dat"
+
+    def load_instances(self, output_dir: str):
+        """
+        Loads identifiers of all done instances.
+        
+        Args:
+            output_dir (str): Path to the output directory where the log file is located.
+        """
+        filepath: str = f'{self._output_dir}/{self.instances_log_filename}'
+        if not os.path.isfile(filepath):
+            return
+        
+        with open(filepath, "r") as instances_log:
+            instance_data: str = input_file.readline()
+
+            while instance_data is not None or instance_data != "":
+                split = instance_data.split(" ")
+                algorithm_name: str = split[0]
+                
+                if algorithm_name not in self._loaded_instances:
+                    self._loaded_instances[algorithm_name] = list()
+                
+                self._loaded_instances[algorithm_name].append(instance_data)
+
 
 class Algorithm(object):
     """

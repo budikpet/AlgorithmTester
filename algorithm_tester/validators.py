@@ -31,6 +31,9 @@ def validate_communicators(self, ctx, value: str) -> List[str]:
     """
 
     try:
+        if value is None:
+            return []
+        
         values = [c.strip() for c in value.split(",")]
         for out_value in values:
             if out_value not in plugins.get_communicator_names():

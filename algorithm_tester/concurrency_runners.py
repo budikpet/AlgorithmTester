@@ -203,7 +203,6 @@ class BaseRunner(Runner):
             context {AlgTesterContext} -- Current application context.
             input_file_path {str} -- Path to the input file to compute results for.
         """
-        print(input_file_path)
         parser: Parser = plugins.get_parser(context.parser_name)
         communicators: List[Communicator] = get_communicators(context)
         solution = dict()
